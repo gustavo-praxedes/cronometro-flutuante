@@ -2,6 +2,7 @@
 // app/build.gradle.kts  —  MÓDULO DO APP
 // ============================================================
 
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
