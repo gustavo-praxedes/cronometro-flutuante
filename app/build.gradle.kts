@@ -84,6 +84,15 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
+    applicationVariants.all {
+        val variant = this
+        variant.outputs.map { it as com.android.build.gradle.internal.api.ApkVariantOutputImpl }
+            .forEach { output ->
+                val name = "cronometro-flutuante-v${variant.versionName}.apk"
+                output.outputFileName = name
+            }
+    }
 }
 
 // ── Substitui kotlinOptions { jvmTarget } deprecado ──────────
