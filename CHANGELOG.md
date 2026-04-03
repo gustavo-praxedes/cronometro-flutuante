@@ -2,6 +2,13 @@
 
 Histórico de mudanças do Cronômetro Flutuante.
 
+## [1.0.5](https://github.com/Gustavo-Praxedes/cronometro-flutuante/compare/v1.0.4...v1.0.5) (2026-04-03)
+
+
+### 📝 Documentação
+
+* Ajuste do README. ([3960aea](https://github.com/Gustavo-Praxedes/cronometro-flutuante/commit/3960aeac61c404b07cdf1318ce1978d878f58698))
+
 ## [1.0.4](https://github.com/Gustavo-Praxedes/cronometro-flutuante/compare/v1.0.3...v1.0.4) (2026-04-03)
 
 
