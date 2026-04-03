@@ -2,6 +2,29 @@
 
 Histórico de mudanças do Cronômetro Flutuante.
 
+## [1.1.0](https://github.com/gustavo-praxedes/cronometro-flutuante/compare/v1.0.5...v1.1.0) (2026-04-03)
+
+
+### ✨ Novidades
+
+* Janela de doação e gatilhos de tempo adicionados. ([dbf6ffb](https://github.com/gustavo-praxedes/cronometro-flutuante/commit/dbf6ffb5d784442ae78b979bb405e954fda201d8))
+
+
+### 🐛 Correções
+
+* app\build.gradle.kts atualizado. ([eac1783](https://github.com/gustavo-praxedes/cronometro-flutuante/commit/eac1783cba486a4d336c1ba9b3d7452830a46be4))
+* Função não usara remnovida do TimeUtils.kts e o import no TimeViewModel.kt. ([934ccb1](https://github.com/gustavo-praxedes/cronometro-flutuante/commit/934ccb19872a0ea11ecd3a07a3c29ef892136091))
+* Limpeza de código no FloatingTimeUi.kt. Imports não usados removidos. ([0fd00c5](https://github.com/gustavo-praxedes/cronometro-flutuante/commit/0fd00c5441387b75a6a1e439310993bfa2891444))
+* Limpeza de código no TimerViewModel.kt. Variáveis não usadas foram removidas. ([f842628](https://github.com/gustavo-praxedes/cronometro-flutuante/commit/f8426280f42e8db3546290296371fa052f64bb3b))
+* Limpeza no código do OverlayDataStore.kt para remover verificação float desnecessária. ([d922c09](https://github.com/gustavo-praxedes/cronometro-flutuante/commit/d922c098db1bdd0a40b3594bf9c5fcbf690ac265))
+* NotificationActionReceiver.kt ajustado. startForegroundService() para todas as ações. ([c0c8182](https://github.com/gustavo-praxedes/cronometro-flutuante/commit/c0c818207dcefb3033edc89e029f84053cb07c32))
+* OverlayDataStore.kt ajustado para salvar a posição no updateConfig. ([2fd06bc](https://github.com/gustavo-praxedes/cronometro-flutuante/commit/2fd06bc60651e1433f892a3be03751abe267f082))
+
+
+### 📝 Documentação
+
+* Atualiza instruções de instalação no README. ([9c47df6](https://github.com/gustavo-praxedes/cronometro-flutuante/commit/9c47df62e2472f95808f98269436694d3eb74e0b))
+
 ## [1.0.5](https://github.com/Gustavo-Praxedes/cronometro-flutuante/compare/v1.0.4...v1.0.5) (2026-04-03)
 
 
