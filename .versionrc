@@ -1,0 +1,31 @@
+{
+  "types": [
+    { "type": "feat",     "section": "✨ Novidades" },
+    { "type": "fix",      "section": "🐛 Correções" },
+    { "type": "perf",     "section": "⚡ Performance" },
+    { "type": "refactor", "section": "♻️ Refatorações" },
+    { "type": "docs",     "section": "📝 Documentação" },
+    { "type": "chore",    "section": "🔧 Manutenção" },
+    { "type": "test",     "section": "✅ Testes" },
+    { "type": "style",    "section": "💄 Estilo" }
+  ],
+  "bumpFiles": [
+    {
+      "filename": "package.json",
+      "type": "json"
+    },
+    {
+      "filename": "app/build.gradle.kts",
+      "updater": "scripts/update-version.js"
+    }
+  ],
+  "packageFiles": [
+    {
+      "filename": "package.json",
+      "type": "json"
+    }
+  ],
+  "commitAll": true,
+  "infile": "CHANGELOG.md",
+  "header": "# Changelog\n\nHistórico de mudanças do Cronômetro Flutuante.\n"
+}

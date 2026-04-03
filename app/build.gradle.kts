@@ -1,3 +1,7 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+
 // ============================================================
 // app/build.gradle.kts  —  MÓDULO DO APP
 // ============================================================
@@ -8,6 +12,22 @@ plugins {
     alias(libs.plugins.kotlin.compose)
 }
 
+// ── versionCode dinâmico ─────────────────────────────────────
+// Formato: yyMMddHHmm
+// Exemplo: 25 04 03 14 30 → 2504031430
+// Sempre cresce com o tempo — nunca precisa ser incrementado manualmente.
+// Cabe dentro do limite de Int da Play Store (máx: 2.100.000.000).
+// O maior valor possível em 2099 seria: 9912312359 → excede Int!
+// Por isso usamos apenas ano com 2 dígitos (yy), garantindo
+// que o valor máximo seja 9912312359... mas espera:
+// 99_12_31_23_59 = 9912312359 > 2.147.483.647 (Int.MAX_VALUE)
+// Solução: removemos os minutos e usamos yyMMddHH (8 dígitos)
+// Exemplo: 25 04 03 14 → 25040314 — sempre dentro do limite.
+fun generateVersionCode(): Int {
+    val formatter = DateTimeFormatter.ofPattern("yyMMddHH")
+    return LocalDateTime.now().format(formatter).toInt()
+}
+
 android {
     namespace  = "com.gustavo.cronometro"
     compileSdk = 35
@@ -16,8 +36,15 @@ android {
         applicationId = "com.gustavo.cronometro"
         minSdk        = 26
         targetSdk     = 35
-        versionCode   = 1
-        versionName   = "1.0.0"
+
+        // ── versionCode: gerado automaticamente ──────────────
+        // Não edite manualmente — cresce a cada build.
+        versionCode = generateVersionCode()
+
+        // ── versionName: gerenciado pelo commit-and-tag-version
+        // Para atualizar, use: npm run release
+        // O script scripts/update-version.js substitui este valor.
+        versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -47,10 +74,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-        jvmTarget = "17"
-    }
-
     buildFeatures {
         compose     = true
         buildConfig = true
@@ -63,26 +86,27 @@ android {
     }
 }
 
+// ── Substitui kotlinOptions { jvmTarget } deprecado ──────────
+// kotlinOptions foi deprecado no Kotlin 2.0.
+// A forma correta agora é kotlin { compilerOptions { } }.
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_17)
+    }
+}
+
 dependencies {
 
-    // ── AndroidX Core ────────────────────────────────────────
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)
-
-    // ── Material Components ───────────────────────────────────
-    // Necessário para Theme.Material3.DayNight.NoActionBar
-    // declarado no themes.xml como tema base da Activity.
     implementation(libs.material)
 
-    // ── Lifecycle ────────────────────────────────────────────
     implementation(libs.androidx.lifecycle.runtime)
     implementation(libs.androidx.lifecycle.viewmodel)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 
-    // ── SavedState ───────────────────────────────────────────
     implementation(libs.androidx.savedstate)
 
-    // ── Jetpack Compose BOM ──────────────────────────────────
     val composeBom = platform(libs.androidx.compose.bom)
     implementation(composeBom)
     androidTestImplementation(composeBom)
@@ -94,20 +118,13 @@ dependencies {
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.compose.runtime)
 
-    // ── DataStore ────────────────────────────────────────────
     implementation(libs.androidx.datastore.preferences)
-
-    // ── Coroutines ───────────────────────────────────────────
     implementation(libs.kotlinx.coroutines.android)
-
-    // ── Color Picker ─────────────────────────────────────────
     implementation(libs.skydoves.colorpicker.compose)
 
-    // ── Debug ────────────────────────────────────────────────
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
-    // ── Testes ───────────────────────────────────────────────
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso)
