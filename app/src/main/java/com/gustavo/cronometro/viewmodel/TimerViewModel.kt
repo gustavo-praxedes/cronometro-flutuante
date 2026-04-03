@@ -7,22 +7,10 @@ import com.gustavo.cronometro.data.TimerPreferences
 import com.gustavo.cronometro.data.TimerState
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-
-// ============================================================
-// TimerViewModel.kt
-// Gerencia a lógica do cronômetro com persistência resiliente.
-//
-// Correção principal: elapsedMs agora é um campo real no
-// TimerState. O StateFlow detecta mudanças a cada tick porque
-// o valor de elapsedMs muda, forçando recomposição da UI.
-// ============================================================
 
 class TimerViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -31,7 +19,7 @@ class TimerViewModel(application: Application) : AndroidViewModel(application) {
     private val _timerState = MutableStateFlow(loadInitialState())
 
 
-// Controle para testes em tempos longos.
+// CONTROLE PARA TESTES DE TEMPOS LONGOS.
 /*    private val _timerState = MutableStateFlow(
         TimerState(
             startTime   = System.currentTimeMillis(),
@@ -42,10 +30,6 @@ class TimerViewModel(application: Application) : AndroidViewModel(application) {
     )*/
 
     val timerState: StateFlow<TimerState> = _timerState.asStateFlow()
-
-    // Emite a cada segundo completo — para beep e vibração
-    private val _tickFlow = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
-    val tickFlow: SharedFlow<Unit> = _tickFlow.asSharedFlow()
 
     private var timerJob: Job? = null
     private var timeLimitSeconds: Long = 0L
@@ -117,17 +101,12 @@ class TimerViewModel(application: Application) : AndroidViewModel(application) {
         timerPrefs.clearState()
     }
 
-    fun togglePlayPause() {
-        if (_timerState.value.isRunning) pause() else start()
-    }
-
     // ── Loop de Atualização ──────────────────────────────────
     // Roda a cada 10ms. Atualiza elapsedMs no TimerState,
     // o que faz o StateFlow emitir novo valor e a UI recompor.
     private fun startUpdateLoop() {
         timerJob?.cancel()
         timerJob = viewModelScope.launch {
-            var lastSecond = _timerState.value.elapsedMs / 1000L
 
             while (true) {
                 delay(10L)
@@ -153,13 +132,6 @@ class TimerViewModel(application: Application) : AndroidViewModel(application) {
                     _timerState.value = limitState
                     timerPrefs.saveStateSync(limitState)
                     break
-                }
-
-                // ── Tick de 1 segundo ────────────────────────
-                val currentSecond = elapsed / 1000L
-                if (currentSecond > lastSecond) {
-                    lastSecond = currentSecond
-                    _tickFlow.tryEmit(Unit)
                 }
 
                 // ── Atualiza elapsedMs — força recomposição ──
