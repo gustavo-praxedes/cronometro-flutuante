@@ -25,6 +25,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.krono.app.BuildConfig
 import com.krono.app.ui.theme.KronoTokens
+import com.krono.app.ui.theme.adaptiveDialogWidth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -82,7 +83,7 @@ fun BugReportDialog(onDismiss: () -> Unit) {
     ) {
         Surface(
             modifier       = Modifier
-                .fillMaxWidth(KronoTokens.Spacing.dialogWidthFrac)
+                .adaptiveDialogWidth()
                 .wrapContentHeight(),
             shape          = KronoTokens.Shape.dialog,
             color          = MaterialTheme.colorScheme.surface,
