@@ -28,6 +28,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.krono.app.BuildConfig
 import com.krono.app.ui.theme.KronoTokens
+import com.krono.app.ui.theme.adaptiveDialogWidth
 import com.krono.app.util.UpdateInfo
 import com.krono.app.util.UpdateResult
 import com.krono.app.util.checkForUpdate
@@ -122,7 +123,7 @@ fun ChangelogDialog(
     ) {
         Surface(
             modifier       = Modifier
-                .fillMaxWidth(KronoTokens.Spacing.dialogWidthFrac)
+                .adaptiveDialogWidth()
                 .wrapContentHeight(),
             shape          = KronoTokens.Shape.dialog,
             color          = MaterialTheme.colorScheme.surface,
