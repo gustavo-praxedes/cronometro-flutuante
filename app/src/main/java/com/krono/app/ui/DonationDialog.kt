@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Coffee
@@ -23,6 +25,7 @@ import androidx.compose.ui.window.DialogProperties
 import com.krono.app.data.OverlayDataStore
 import com.krono.app.data.formatLifetimeDetailed
 import com.krono.app.ui.theme.KronoTokens
+import com.krono.app.ui.theme.adaptiveDialogWidth
 
 private const val KOFI_URL = "https://ko-fi.com/gustavopraxedes"
 
@@ -45,14 +48,16 @@ fun DonationDialog(
     ) {
         Surface(
             modifier       = Modifier
-                .fillMaxWidth(KronoTokens.Spacing.dialogWidthFrac)
+                .adaptiveDialogWidth()
                 .wrapContentHeight(),
             shape          = KronoTokens.Shape.dialog,
             color          = MaterialTheme.colorScheme.surface,
             tonalElevation = KronoTokens.Elevation.dialog
         ) {
             Column(
-                modifier            = Modifier.padding(KronoTokens.Spacing.dialogPadding),
+                modifier            = Modifier
+                    .padding(KronoTokens.Spacing.dialogPadding)
+                    .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 // ── Cabeçalho ────────────────────────────────

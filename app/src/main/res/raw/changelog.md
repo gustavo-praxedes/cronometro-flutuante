@@ -1,4 +1,5 @@
 # 🔧 Manutenção
+- refactor(ui): aplicar largura adaptativa e rolagem no UpdateDialog
 - refactor(ui): aplicar largura adaptativa e rolagem no PermissionsDialog
 - refactor(ui): aplicar largura adaptativa no BugReportDialog
 - refactor(ui): tornar AboutDialog adaptativo e com rolagem
