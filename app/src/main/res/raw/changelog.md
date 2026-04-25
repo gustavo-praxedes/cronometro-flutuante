@@ -1,3 +1,3 @@
 # 🔧 Manutenção
-- chore: 3.2.2
-- chore: Adicionado o google firebase
+- chore: 3.2.3
+- Correção do workflow no github

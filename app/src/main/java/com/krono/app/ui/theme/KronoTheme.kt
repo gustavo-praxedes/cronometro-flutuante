@@ -13,6 +13,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.Modifier
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.widthIn
 
 // ============================================================
 // KronoTheme.kt — GIT 7
@@ -80,6 +83,7 @@ object KronoTokens {
 
         val dialogPadding   = 20.dp
         val dialogWidthFrac = 0.92f
+        val maxDialogWidth  = 440.dp
         val listItemGap     = 10.dp
         val listIconGap     = 12.dp
         val sectionGap      = 20.dp
@@ -276,3 +280,11 @@ fun overlayColorsForTheme(option: KronoThemeOption, systemIsDark: Boolean): Pair
     }
 }
 
+/**
+ * Modificador para tornar o diálogo adaptativo: usa uma fração da tela,
+ * mas limita a uma largura máxima em telas grandes (tablets/foldables).
+ */
+@Composable
+fun Modifier.adaptiveDialogWidth(): Modifier = this
+    .fillMaxWidth(KronoTokens.Spacing.dialogWidthFrac)
+    .widthIn(max = KronoTokens.Spacing.maxDialogWidth)
