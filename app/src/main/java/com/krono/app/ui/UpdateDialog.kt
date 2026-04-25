@@ -4,6 +4,8 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -22,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.krono.app.ui.theme.KronoTokens
+import com.krono.app.ui.theme.adaptiveDialogWidth
 import com.krono.app.util.ApkInstaller
 import com.krono.app.util.DownloadStatus
 import com.krono.app.util.UpdateInfo
@@ -87,14 +90,16 @@ fun UpdateDialog(
     ) {
         Surface(
             modifier       = Modifier
-                .fillMaxWidth(KronoTokens.Spacing.dialogWidthFrac)
+                .adaptiveDialogWidth()
                 .wrapContentHeight(),
             shape          = KronoTokens.Shape.dialog,
             color          = MaterialTheme.colorScheme.surface,
             tonalElevation = KronoTokens.Elevation.dialog
         ) {
             Column(
-                modifier            = Modifier.padding(KronoTokens.Spacing.dialogPadding),
+                modifier            = Modifier
+                    .padding(KronoTokens.Spacing.dialogPadding)
+                    .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 // ── Cabeçalho ────────────────────────────────
