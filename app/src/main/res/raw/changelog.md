@@ -1,3 +1,2 @@
 # 🔧 Manutenção
-- chore: 3.2.3
-- Correção do workflow no github
+- refactor(ui): adicionar largura adaptativa para dialogos no tema

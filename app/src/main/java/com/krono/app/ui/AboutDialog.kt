@@ -4,6 +4,8 @@ import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.BugReport
@@ -23,6 +25,7 @@ import androidx.compose.ui.window.DialogProperties
 import com.krono.app.BuildConfig
 import com.krono.app.R
 import com.krono.app.ui.theme.KronoTokens
+import com.krono.app.ui.theme.adaptiveDialogWidth
 import com.krono.app.util.UpdateInfo
 
 private const val GITHUB_URL = "https://github.com/gustavo-praxedes/krono"
@@ -57,14 +60,16 @@ fun AboutDialog(
     ) {
         Surface(
             modifier       = Modifier
-                .fillMaxWidth(KronoTokens.Spacing.dialogWidthFrac)
+                .adaptiveDialogWidth()
                 .wrapContentHeight(),
             shape          = KronoTokens.Shape.dialog,
             color          = MaterialTheme.colorScheme.surface,
             tonalElevation = KronoTokens.Elevation.dialog
         ) {
             Column(
-                modifier            = Modifier.padding(KronoTokens.Spacing.dialogPadding),
+                modifier            = Modifier
+                    .padding(KronoTokens.Spacing.dialogPadding)
+                    .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 // ── Cabeçalho ────────────────────────────────
