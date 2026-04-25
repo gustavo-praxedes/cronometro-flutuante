@@ -5,6 +5,8 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
@@ -22,6 +24,7 @@ import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import com.krono.app.ui.theme.KronoTokens
+import com.krono.app.ui.theme.adaptiveDialogWidth
 import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -43,7 +46,7 @@ fun PermissionsDialog(
 
     BasicAlertDialog(
         onDismissRequest = onDismiss,
-        modifier         = Modifier.fillMaxWidth(KronoTokens.Spacing.dialogWidthFrac)
+        modifier         = Modifier.adaptiveDialogWidth()
     ) {
         Surface(
             modifier       = Modifier.fillMaxWidth(),
@@ -54,7 +57,8 @@ fun PermissionsDialog(
             Column(
                 modifier            = Modifier
                     .fillMaxWidth()
-                    .padding(KronoTokens.Spacing.dialogPadding),
+                    .padding(KronoTokens.Spacing.dialogPadding)
+                    .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 // ── Cabeçalho ────────────────────────────────
