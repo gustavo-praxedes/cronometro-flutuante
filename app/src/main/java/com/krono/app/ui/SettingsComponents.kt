@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.krono.app.ui.theme.KronoThemeOption
+import com.krono.app.ui.theme.KronoFontOption
 import com.krono.app.ui.theme.KronoTokens
 
 @Composable
@@ -156,6 +157,61 @@ internal fun ThemeSelector(
                 onDismissRequest = { expanded = false }
             ) {
                 KronoThemeOption.entries.forEach { option ->
+                    DropdownMenuItem(
+                        text    = { Text(option.label) },
+                        onClick = {
+                            onChange(option.name)
+                            expanded = false
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+internal fun FontSelector(
+    selectedFont: String,
+    onChange     : (String) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val current  = KronoFontOption.entries.find { it.name == selectedFont }
+        ?: KronoFontOption.SYSTEM_DEFAULT
+
+    Row(
+        modifier              = Modifier.fillMaxWidth(),
+        verticalAlignment     = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text     = "Fonte",
+            style    = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.weight(1f)
+        )
+
+        ExposedDropdownMenuBox(
+            expanded         = expanded,
+            onExpandedChange = { expanded = !expanded },
+            modifier         = Modifier.width(200.dp)
+        ) {
+            OutlinedTextField(
+                value         = current.label,
+                onValueChange = {},
+                readOnly      = true,
+                trailingIcon  = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                shape         = KronoTokens.Shape.badge,
+                modifier      = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable),
+                textStyle     = MaterialTheme.typography.bodyMedium,
+                singleLine    = true
+            )
+
+            ExposedDropdownMenu(
+                expanded         = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                KronoFontOption.entries.forEach { option ->
                     DropdownMenuItem(
                         text    = { Text(option.label) },
                         onClick = {

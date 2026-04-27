@@ -155,6 +155,17 @@ fun SettingsScreen(
 
                 Spacer(Modifier.height(12.dp))
 
+                FontSelector(
+                    selectedFont = config.selectedFont,
+                    onChange     = { font ->
+                        scope.launch {
+                            dataStore.updateConfig(config.copy(selectedFont = font))
+                        }
+                    }
+                )
+
+                Spacer(Modifier.height(12.dp))
+
                 ColorRow(
                     label   = stringResource(R.string.label_background_color),
                     color   = Color(config.backgroundColor).copy(alpha = config.bgOpacity),

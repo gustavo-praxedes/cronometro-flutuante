@@ -22,5 +22,6 @@ data class OverlayConfig(
     val lastUpdateCheck   : Long    = 0L,
     val focusModeEnabled  : Boolean = false,
     val selectedTheme     : String  = "AUTO",
-    val donationPending   : Boolean = false, // Nova flag
+    val selectedFont    : String  = "SYSTEM_DEFAULT",
+    val donationPending   : Boolean = false,
 )

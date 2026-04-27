@@ -42,6 +42,7 @@ import com.krono.app.data.OverlayConfig
 import com.krono.app.data.TimerState
 import com.krono.app.data.toFormattedTime
 import com.krono.app.ui.theme.KronoTokens
+import com.krono.app.ui.theme.timerFontFamily
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -242,7 +243,7 @@ fun FloatingTimerUi(
                     color      = txtColor,
                     fontSize   = timeFontSize,
                     fontWeight = FontWeight.Bold,
-                    fontFamily = FontFamily.Monospace,
+                    fontFamily = timerFontFamily(config.selectedFont),
                     maxLines   = 1,
                     softWrap   = false
                 )

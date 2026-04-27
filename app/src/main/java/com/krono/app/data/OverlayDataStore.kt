@@ -35,6 +35,7 @@ class OverlayDataStore(private val context: Context) {
         val LAST_UPDATE_CHECK  = longPreferencesKey("last_update_check")
         val FOCUS_MODE_ENABLED = booleanPreferencesKey("focus_mode_enabled")
         val SELECTED_THEME     = stringPreferencesKey("selected_theme")
+        val SELECTED_FONT      = stringPreferencesKey("selected_font")
         val DONATION_PENDING   = booleanPreferencesKey("donation_pending")
     }
 
@@ -69,6 +70,7 @@ class OverlayDataStore(private val context: Context) {
                 lastUpdateCheck    = prefs[LAST_UPDATE_CHECK]  ?: 0L,
                 focusModeEnabled   = prefs[FOCUS_MODE_ENABLED] ?: false,
                 selectedTheme      = prefs[SELECTED_THEME]     ?: "AUTO",
+                selectedFont     = prefs[SELECTED_FONT]      ?: "SYSTEM_DEFAULT",
                 donationPending    = prefs[DONATION_PENDING]   ?: false,
             )
         }
@@ -95,6 +97,7 @@ class OverlayDataStore(private val context: Context) {
             prefs[CURRENT_CYCLE_MS]   = config.currentCycleMs
             prefs[FOCUS_MODE_ENABLED] = config.focusModeEnabled
             prefs[SELECTED_THEME]     = config.selectedTheme
+            prefs[SELECTED_FONT]      = config.selectedFont
             prefs[DONATION_PENDING]   = config.donationPending
         }
     }

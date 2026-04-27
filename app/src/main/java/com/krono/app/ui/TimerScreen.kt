@@ -21,10 +21,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.krono.app.data.TimerState
 import com.krono.app.data.toFormattedTime
+import com.krono.app.ui.theme.timerFontFamily
 
 @Composable
 fun TimerScreen(
     timerState     : TimerState,
+    selectedFont  : String = "SYSTEM_DEFAULT",
     onStart        : () -> Unit,
     onPause        : () -> Unit,
     onReset        : () -> Unit,
@@ -79,7 +81,7 @@ fun TimerScreen(
                     ),
                     fontSize = fontSize.sp,
                     fontWeight = FontWeight.Bold,
-                    fontFamily = FontFamily.Monospace,
+                    fontFamily = timerFontFamily(selectedFont),
                     color = MaterialTheme.colorScheme.onBackground,
                     maxLines = 1,
                     softWrap = false,

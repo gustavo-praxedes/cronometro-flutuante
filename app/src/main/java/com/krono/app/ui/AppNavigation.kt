@@ -78,6 +78,7 @@ fun AppNavigation(
             composable(AppRoutes.TIMER) {
                 TimerScreen(
                     timerState     = timerState,
+                    selectedFont  = config.selectedFont,
                     onStart        = { timerViewModel.start() },
                     onPause        = { timerViewModel.pause() },
                     onReset        = onReset,

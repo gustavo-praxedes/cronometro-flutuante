@@ -1,4 +1,5 @@
 # 🔧 Manutenção
+- chore: Refatoração de MainService para separar funções
 - chore: Pastas de IA adicionadas ao gitignore
 - style: Padronização de janelas
 - refactor(ui): aplicar largura adaptativa no ColorPickerDialog
