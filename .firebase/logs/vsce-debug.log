@@ -195,3 +195,5 @@ I0427 14:54:51.072705   11940 dev.go:104] Listening on address (HTTP + gRPC): 12
  {"metadata":{"emulator":{"name":"dataconnect"},"message":"I0427 14:54:51.045213   11940 installsdk.go:55] Package @dataconnect/generated is already installed. Skipping installation\nI0427 14:54:51.046214   11940 load.go:109] Finished reloading\nI0427 14:54:51.072705   11940 dev.go:104] Listening on address (HTTP + gRPC): 127.0.0.1:50001\n"}}
 [debug] [2026-04-27T17:54:51.601Z] I0427 14:54:51.589709   11940 engine.go:209] [projects/emulator/locations/emulator/services/krono dec1] ExecuteGraphqlRead query IntrospectionQuery: succeeded. 
  {"metadata":{"emulator":{"name":"dataconnect"},"message":"I0427 14:54:51.589709   11940 engine.go:209] [projects/emulator/locations/emulator/services/krono dec1] ExecuteGraphqlRead query IntrospectionQuery: succeeded. \n"}}
+[info] [Firebase Plugin] Stopping SQL Connect toolkit
+[warn] !  SQL Connect Emulator has exited upon receiving signal: SIGINT 

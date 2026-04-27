@@ -1,3 +1,6 @@
+# ✨ Novidades
+- feat: Seleção de fontes para o overlay adicionada
+
 # 🔧 Manutenção
 - chore: Refatoração de MainService para separar funções
 - chore: Pastas de IA adicionadas ao gitignore
