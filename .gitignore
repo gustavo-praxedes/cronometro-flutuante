@@ -28,6 +28,6 @@ keystore.properties
 .cxx
 
 #AI
-.agent/
-.claude/
-.opencode/
+.agents
+.claude
+.opencode

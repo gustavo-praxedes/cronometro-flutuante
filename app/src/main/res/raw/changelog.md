@@ -1,4 +1,5 @@
 # 🔧 Manutenção
+- style: Padronização de janelas
 - refactor(ui): aplicar largura adaptativa no ColorPickerDialog
 - refactor(ui): aplicar largura adaptativa no ChangelogDialog
 - refactor(ui): aplicar largura adaptativa e rolagem no DonationDialog
