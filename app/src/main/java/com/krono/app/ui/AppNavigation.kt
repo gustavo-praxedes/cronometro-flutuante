@@ -119,12 +119,4 @@ fun AppNavigation(
             onDismiss                 = { showPermissionsDialog = false }
         )
     }
-
-    // Gerenciamento da Doação: Exibe o diálogo quando a flag donationPending estiver ativa
-    if (config.donationPending) {
-        DonationDialog(
-            onDismiss = { scope.launch { dataStore.resetDonationCycle() } },
-            onDonate  = { scope.launch { dataStore.resetDonationCycle() } }
-        )
-    }
 }

@@ -22,7 +22,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.krono.app.data.OverlayDataStore
 import com.krono.app.data.formatLifetimeDetailed
 import com.krono.app.ui.theme.KronoTokens
 import com.krono.app.ui.theme.adaptiveDialogWidth
@@ -31,16 +30,12 @@ private const val KOFI_URL = "https://ko-fi.com/gustavopraxedes"
 
 @Composable
 fun DonationDialog(
+    totalLifetimeMs: Long,
     onDismiss: () -> Unit,
     onDonate : () -> Unit
 ) {
-    val context   = LocalContext.current
-    val dataStore = remember { OverlayDataStore(context) }
-    val config    by dataStore.configFlow.collectAsState(
-        initial = com.krono.app.data.OverlayConfig()
-    )
-
-    val formattedTime = formatLifetimeDetailed(config.totalLifetimeMs)
+    val context = LocalContext.current
+    val formattedTime = remember(totalLifetimeMs) { formatLifetimeDetailed(totalLifetimeMs) }
 
     Dialog(
         onDismissRequest = onDismiss,

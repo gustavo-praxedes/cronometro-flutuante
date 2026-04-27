@@ -1,4 +1,5 @@
 # 🔧 Manutenção
+- chore: Pastas de IA adicionadas ao gitignore
 - style: Padronização de janelas
 - refactor(ui): aplicar largura adaptativa no ColorPickerDialog
 - refactor(ui): aplicar largura adaptativa no ChangelogDialog

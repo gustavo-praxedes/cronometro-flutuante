@@ -264,6 +264,7 @@ fun SettingsScreen(
 
     if (showDonationDialog) {
         DonationDialog(
+            totalLifetimeMs = config.totalLifetimeMs,
             onDismiss = { showDonationDialog = false },
             onDonate  = {
                 showDonationDialog = false

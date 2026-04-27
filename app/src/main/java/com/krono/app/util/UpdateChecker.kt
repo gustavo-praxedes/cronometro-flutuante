@@ -3,6 +3,7 @@ package com.krono.app.util
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
+import java.io.Serializable
 import java.net.HttpURLConnection
 import java.net.URL
 
@@ -20,7 +21,7 @@ data class UpdateInfo(
     val releaseUrl : String,
     val downloadUrl: String?,
     val changelog  : String
-)
+) : Serializable
 
 sealed class UpdateResult {
     data class UpdateAvailable(val info: UpdateInfo) : UpdateResult()

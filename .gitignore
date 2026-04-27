@@ -6,6 +6,7 @@ app/build/
 .kotlin/
 node_modules/
 build_log.txt
+build_error.log
 
 # IDE - Android Studio / IntelliJ
 .idea/
@@ -31,3 +32,4 @@ keystore.properties
 .agents
 .claude
 .opencode
+skills-lock.json
