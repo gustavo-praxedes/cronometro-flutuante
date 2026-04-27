@@ -1,6 +1,7 @@
 package com.krono.app.ui
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.*
@@ -202,26 +203,54 @@ fun BugReportDialog(onDismiss: () -> Unit) {
 
                 Spacer(Modifier.height(KronoTokens.Spacing.sectionGap))
 
-                // ── Feedbacks (Sucesso/Erro) ──────────────────
-                AnimatedVisibility(visible = submitState is SubmitState.Success) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier          = Modifier.padding(bottom = KronoTokens.Spacing.md)
-                    ) {
-                        Icon(Icons.Default.CheckCircle, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(KronoTokens.Icon.status))
-                        Spacer(Modifier.width(KronoTokens.Spacing.sm))
-                        Text("Relatório enviado. Obrigado!", color = MaterialTheme.colorScheme.primary)
-                    }
-                }
+                 // ── Feedbacks (Sucesso/Erro) ──────────────────
+                 AnimatedVisibility(
+                     visible = submitState is SubmitState.Success,
+                     enter   = fadeIn(
+                         animationSpec = tween(
+                             durationMillis = KronoTokens.Animation.fadeDurationMs,
+                             easing = KronoTokens.Motion.easingNormal
+                         )
+                     ),
+                     exit    = fadeOut(
+                         animationSpec = tween(
+                             durationMillis = KronoTokens.Animation.fadeDurationMs,
+                             easing = KronoTokens.Motion.easingNormal
+                         )
+                     )
+                 ) {
+                     Row(
+                         verticalAlignment = Alignment.CenterVertically,
+                         modifier          = Modifier.padding(bottom = KronoTokens.Spacing.md)
+                     ) {
+                         Icon(Icons.Default.CheckCircle, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(KronoTokens.Icon.status))
+                         Spacer(Modifier.width(KronoTokens.Spacing.sm))
+                         Text("Relatório enviado. Obrigado!", color = MaterialTheme.colorScheme.primary)
+                     }
+                 }
 
-                AnimatedVisibility(visible = submitState is SubmitState.Error) {
-                    Text(
-                        text     = "Falha ao enviar. Verifique sua conexão.",
-                        color    = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.padding(bottom = KronoTokens.Spacing.sm),
-                        style    = MaterialTheme.typography.labelSmall
-                    )
-                }
+                 AnimatedVisibility(
+                     visible = submitState is SubmitState.Error,
+                     enter   = fadeIn(
+                         animationSpec = tween(
+                             durationMillis = KronoTokens.Animation.fadeDurationMs,
+                             easing = KronoTokens.Motion.easingNormal
+                         )
+                     ),
+                     exit    = fadeOut(
+                         animationSpec = tween(
+                             durationMillis = KronoTokens.Animation.fadeDurationMs,
+                             easing = KronoTokens.Motion.easingNormal
+                         )
+                     )
+                 ) {
+                     Text(
+                         text     = "Falha ao enviar. Verifique sua conexão.",
+                         color    = MaterialTheme.colorScheme.error,
+                         modifier = Modifier.padding(bottom = KronoTokens.Spacing.sm),
+                         style    = MaterialTheme.typography.labelSmall
+                     )
+                 }
 
                 // ── Botão Enviar ──────────────────────────────
                 Button(
@@ -243,21 +272,21 @@ fun BugReportDialog(onDismiss: () -> Unit) {
                         .fillMaxWidth()
                         .height(KronoTokens.Button.height),
                     shape = KronoTokens.Shape.button
-                ) {
-                    if (submitState is SubmitState.Loading) {
-                        CircularProgressIndicator(
-                            modifier    = Modifier.size(KronoTokens.Component.buttonSpinner),
-                            strokeWidth = KronoTokens.Stroke.circularIndicator,
-                            color       = MaterialTheme.colorScheme.onPrimary
-                        )
-                        Spacer(Modifier.width(KronoTokens.Button.iconSpacing))
-                        Text("Enviando...")
-                    } else {
-                        Icon(Icons.Default.BugReport, null, modifier = Modifier.size(KronoTokens.Icon.button))
-                        Spacer(Modifier.width(KronoTokens.Button.iconSpacing))
-                        Text("Enviar Relatório", fontWeight = FontWeight.Bold)
-                    }
-                }
+                 ) {
+                     if (submitState is SubmitState.Loading) {
+                         SkeletonLoader.SkeletonButton(
+                             modifier = Modifier
+                                 .width(60.dp)
+                                 .height(KronoTokens.Component.buttonSpinner)
+                         )
+                         Spacer(Modifier.width(KronoTokens.Button.iconSpacing))
+                         Text("Enviando...")
+                     } else {
+                         Icon(Icons.Default.BugReport, null, modifier = Modifier.size(KronoTokens.Icon.button))
+                         Spacer(Modifier.width(KronoTokens.Button.iconSpacing))
+                         Text("Enviar Relatório", fontWeight = FontWeight.Bold)
+                     }
+                 }
             }
         }
     }

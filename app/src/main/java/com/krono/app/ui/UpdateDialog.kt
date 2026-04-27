@@ -1,13 +1,12 @@
 package com.krono.app.ui
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
@@ -25,6 +24,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.krono.app.ui.theme.KronoTokens
 import com.krono.app.ui.theme.adaptiveDialogWidth
+import com.krono.app.ui.SkeletonLoader
 import com.krono.app.util.ApkInstaller
 import com.krono.app.util.DownloadStatus
 import com.krono.app.util.UpdateInfo
@@ -108,14 +108,14 @@ fun UpdateDialog(
                     contentAlignment = Alignment.Center
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(
-                            text       = "Nova Versão Disponível",
-                            style      = MaterialTheme.typography.headlineMedium,
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize   = KronoTokens.Typography.dialogTitle,
-                            textAlign  = TextAlign.Center,
-                            modifier   = Modifier.padding(horizontal = 40.dp)
-                        )
+                     Text(
+                         text       = "Nova Versão Disponível",
+                         style      = MaterialTheme.typography.headlineMedium,
+                         fontWeight = FontWeight.SemiBold,
+                         fontSize   = KronoTokens.Typography.dialogTitle,
+                         textAlign  = TextAlign.Center,
+                         modifier   = Modifier.padding(horizontal = KronoTokens.Spacing.dialogPadding)
+                     )
                         Text(
                             text     = "Versão v$version",
                             style    = MaterialTheme.typography.bodyMedium,
@@ -140,12 +140,22 @@ fun UpdateDialog(
 
                 Spacer(Modifier.height(KronoTokens.Spacing.xl))
 
-                // ── Notificação de Download Iniciado ──────────
-                AnimatedVisibility(
-                    visible = showDownloadStartedMsg,
-                    enter   = fadeIn(),
-                    exit    = fadeOut()
-                ) {
+                 // ── Notificação de Download Iniciado ──────────
+                 AnimatedVisibility(
+                     visible = showDownloadStartedMsg,
+                     enter   = fadeIn(
+                         animationSpec = tween(
+                             durationMillis = KronoTokens.Animation.fadeDurationMs,
+                             easing = KronoTokens.Motion.easingNormal
+                         )
+                     ),
+                     exit    = fadeOut(
+                         animationSpec = tween(
+                             durationMillis = KronoTokens.Animation.fadeDurationMs,
+                             easing = KronoTokens.Motion.easingNormal
+                         )
+                     )
+                 ) {
                     Card(
                         colors   = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.primaryContainer
@@ -245,18 +255,18 @@ fun UpdateDialog(
                                 fontSize   = KronoTokens.Typography.buttonLabel
                             )
                         }
-                        isDownloading -> {
-                            CircularProgressIndicator(
-                                modifier    = Modifier.size(KronoTokens.Component.buttonSpinner),
-                                strokeWidth = KronoTokens.Stroke.circularIndicator,
-                                color       = MaterialTheme.colorScheme.onPrimary
-                            )
-                            Spacer(Modifier.width(KronoTokens.Button.iconSpacing))
-                            Text(
-                                text     = "Baixando...",
-                                fontSize = KronoTokens.Typography.buttonLabel
-                            )
-                        }
+                         isDownloading -> {
+                             SkeletonLoader.SkeletonButton(
+                                 modifier = Modifier
+                                     .width(60.dp)
+                                     .height(KronoTokens.Component.buttonSpinner)
+                             )
+                             Spacer(Modifier.width(KronoTokens.Button.iconSpacing))
+                             Text(
+                                 text     = "Baixando...",
+                                 fontSize = KronoTokens.Typography.buttonLabel
+                             )
+                         }
                         else -> {
                             Icon(
                                 imageVector        = Icons.Default.Download,

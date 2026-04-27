@@ -1,6 +1,7 @@
 package com.krono.app.ui
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.*
@@ -29,6 +30,7 @@ import androidx.compose.ui.window.DialogProperties
 import com.krono.app.BuildConfig
 import com.krono.app.ui.theme.KronoTokens
 import com.krono.app.ui.theme.adaptiveDialogWidth
+import com.krono.app.ui.SkeletonLoader
 import com.krono.app.util.UpdateInfo
 import com.krono.app.util.UpdateResult
 import com.krono.app.util.checkForUpdate
@@ -51,7 +53,13 @@ data class ChangelogItem(val text: String, val type: ItemType)
  * Suporta detecção por cabeçalho (#) ou por prefixo de item (feat:, fix:, etc).
  */
 fun parseChangelog(changelog: String): List<ChangelogItem> {
-    if (changelog.isBlank()) return emptyList()
+    if (changelog.isBlank()) {
+        // Retorna uma mensagem focada em oportunidade quando não há changelog
+        return listOf(ChangelogItem(
+            text = "Esta é a versão inicial do Krono! Explore os recursos e comece a medir seu tempo com precisão.",
+            type = ItemType.FEAT
+        ))
+    }
     val items = mutableListOf<ChangelogItem>()
     var sectionType = ItemType.OTHER
 
@@ -138,14 +146,14 @@ fun ChangelogDialog(
                     modifier         = Modifier.fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text       = "Novidades da Versão ${updateInfo.tagName}",
-                        style      = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize   = KronoTokens.Typography.dialogTitle,
-                        textAlign  = TextAlign.Center,
-                        modifier   = Modifier.padding(horizontal = 40.dp)
-                    )
+                     Text(
+                         text       = "Novidades da Versão ${updateInfo.tagName}",
+                         style      = MaterialTheme.typography.headlineMedium,
+                         fontWeight = FontWeight.SemiBold,
+                         fontSize   = KronoTokens.Typography.dialogTitle,
+                         textAlign  = TextAlign.Center,
+                         modifier   = Modifier.padding(horizontal = KronoTokens.Spacing.dialogPadding)
+                     )
 
                     IconButton(
                         onClick  = onDismiss,
@@ -200,12 +208,22 @@ fun ChangelogDialog(
 
                 Spacer(Modifier.height(KronoTokens.Spacing.sectionGap))
 
-                // ── Botão / Status ────────────────────────────
-                AnimatedVisibility(
-                    visible = !checking,
-                    enter   = fadeIn(),
-                    exit    = fadeOut()
-                ) {
+                 // ── Botão / Status ────────────────────────────
+                 AnimatedVisibility(
+                     visible = !checking,
+                     enter   = fadeIn(
+                         animationSpec = tween(
+                             durationMillis = KronoTokens.Animation.fadeDurationMs,
+                             easing = KronoTokens.Motion.easingNormal
+                         )
+                     ),
+                     exit    = fadeOut(
+                         animationSpec = tween(
+                             durationMillis = KronoTokens.Animation.fadeDurationMs,
+                             easing = KronoTokens.Motion.easingNormal
+                         )
+                     )
+                 ) {
                     val result     = lastResult
                     val isUpToDate = result is UpdateResult.UpToDate ||
                             (result is UpdateResult.UpdateAvailable &&
@@ -267,24 +285,25 @@ fun ChangelogDialog(
                     }
                 }
 
-                // ── Spinner de verificação ────────────────────
-                if (checking) {
-                    Row(
-                        modifier              = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment     = Alignment.CenterVertically
-                    ) {
-                        CircularProgressIndicator(
-                            modifier    = Modifier.size(KronoTokens.Component.inlineSpinner),
-                            strokeWidth = KronoTokens.Stroke.circularIndicator
-                        )
-                        Spacer(Modifier.width(KronoTokens.Spacing.md))
-                        Text(
-                            text  = "Verificando...",
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
-                }
+                 // ── Spinner de verificação ────────────────────
+                 if (checking) {
+                     Row(
+                         modifier              = Modifier.fillMaxWidth(),
+                         horizontalArrangement = Arrangement.Center,
+                         verticalAlignment     = Alignment.CenterVertically
+                     ) {
+                         SkeletonLoader.SkeletonText(
+                             modifier = Modifier
+                                 .width(60.dp)
+                                 .height(KronoTokens.Component.inlineSpinner)
+                         )
+                         Spacer(Modifier.width(KronoTokens.Spacing.md))
+                         Text(
+                             text  = "Verificando...",
+                             style = MaterialTheme.typography.bodyMedium
+                         )
+                     }
+                 }
             }
         }
     }

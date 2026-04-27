@@ -26,3 +26,8 @@ keystore.properties
 /captures
 .externalNativeBuild
 .cxx
+
+#AI
+.agent/
+.claude/
+.opencode/

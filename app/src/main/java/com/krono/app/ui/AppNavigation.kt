@@ -44,7 +44,6 @@ fun AppNavigation(
     val navController = rememberNavController()
     val timerState    by timerViewModel.timerState.collectAsState()
     val context       = LocalContext.current
-    val activity      = context as? Activity
     val scope         = rememberCoroutineScope()
     
     val config by dataStore.configFlow.collectAsState(initial = OverlayConfig())
@@ -118,6 +117,14 @@ fun AppNavigation(
             onRequestOverlay          = onRequestOverlay,
             onRequestInstall          = onRequestInstall,
             onDismiss                 = { showPermissionsDialog = false }
+        )
+    }
+
+    // Gerenciamento da Doação: Exibe o diálogo quando a flag donationPending estiver ativa
+    if (config.donationPending) {
+        DonationDialog(
+            onDismiss = { scope.launch { dataStore.resetDonationCycle() } },
+            onDonate  = { scope.launch { dataStore.resetDonationCycle() } }
         )
     }
 }

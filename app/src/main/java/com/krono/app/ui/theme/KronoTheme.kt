@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.animation.core.CubicBezierEasing
 
 // ============================================================
 // KronoTheme.kt — GIT 7
@@ -133,12 +134,25 @@ object KronoTokens {
         val menuAutoDismissMs  = 5_000
     }
 
-    // ── Opacidades ───────────────────────────────────────────
-    object Alpha {
-        val divider   = 0.5f
-        val disabled  = 0.38f
-        val scrim     = 0.6f
-    }
+     // ── Opacidades ───────────────────────────────────────────
+     object Alpha {
+         val divider   = 0.5f
+         val disabled  = 0.38f
+         val scrim     = 0.6f
+     }
+
+     // ── Animações Avançadas ───────────────────────────────────
+     object Motion {
+         // Durações
+         val durationFast   = 150
+         val durationNormal = 250
+         val durationSlow   = 400
+
+         // Easing curves (usando as funções de easening do Compose)
+         val easingFast    = CubicBezierEasing(0.4f, 0.0f, 0.2f, 1f)
+         val easingNormal  = CubicBezierEasing(0.4f, 0.0f, 0.2f, 1f)
+         val easingSlow    = CubicBezierEasing(0.34f, 1.56f, 0.64f, 1f)
+     }
 
     // ── Tamanhos de Componentes Específicos ─────────────────
     object Component {
@@ -236,7 +250,7 @@ private val SolarizedLightColors = lightColorScheme(
     onSurface        = Color(0xFF586E75),
     surfaceVariant   = Color(0xFFE8E2CF),
     onSurfaceVariant = Color(0xFF839496),
-    outline          = Color(0xFFD3C9A8),
+    outline          = Color(0xFFB09F7D),
 )
 
 @Composable

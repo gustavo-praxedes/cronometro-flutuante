@@ -41,6 +41,7 @@ fun SettingsScreen(
     var showBgPicker          by remember { mutableStateOf(false) }
     var showTextPicker        by remember { mutableStateOf(false) }
     var showAboutDialog       by remember { mutableStateOf(false) }
+    var showDonationDialog    by remember { mutableStateOf(false) }
 
     var changelogInfo by remember { mutableStateOf<UpdateInfo?>(null) }
     var updateInfo    by remember { mutableStateOf<UpdateInfo?>(pendingUpdateInfo) }
@@ -51,6 +52,7 @@ fun SettingsScreen(
 
     Scaffold(
         topBar = {
+            @OptIn(ExperimentalMaterial3Api::class)
             CenterAlignedTopAppBar(
                 title = {
                     Text(
@@ -251,15 +253,21 @@ fun SettingsScreen(
             onDismiss       = { showAboutDialog = false },
             onSupportClick  = {
                 showAboutDialog = false
-                // Simplesmente abre a doação na tela atual
-                scope.launch { 
-                    // Isso ativará o DonationDialog que já está no AppNavigation
-                    dataStore.updateConfig(config.copy(donationPending = true))
-                }
+                showDonationDialog = true
             },
             onShowChangelog = { info ->
                 showAboutDialog = false
                 changelogInfo   = info
+            }
+        )
+    }
+
+    if (showDonationDialog) {
+        DonationDialog(
+            onDismiss = { showDonationDialog = false },
+            onDonate  = {
+                showDonationDialog = false
+                scope.launch { dataStore.resetDonationCycle() }
             }
         )
     }

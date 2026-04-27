@@ -2,6 +2,7 @@ package com.krono.app.ui
 
 import android.os.Build
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.*
@@ -66,16 +67,16 @@ fun PermissionsDialog(
                     modifier         = Modifier.fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text       = "Permissões Necessárias",
-                        style      = MaterialTheme.typography.headlineSmall.copy(
-                            platformStyle = PlatformTextStyle(includeFontPadding = false)
-                        ),
-                        fontWeight = FontWeight.Bold,
-                        fontSize   = KronoTokens.Typography.dialogTitle,
-                        textAlign  = TextAlign.Center,
-                        modifier   = Modifier.padding(horizontal = 40.dp)
-                    )
+                     Text(
+                         text       = "Permissões Necessárias",
+                         style      = MaterialTheme.typography.headlineSmall.copy(
+                             platformStyle = PlatformTextStyle(includeFontPadding = false)
+                         ),
+                         fontWeight = FontWeight.Bold,
+                         fontSize   = KronoTokens.Typography.dialogTitle,
+                         textAlign  = TextAlign.Center,
+                         modifier   = Modifier.padding(horizontal = KronoTokens.Spacing.dialogPadding)
+                     )
 
                     IconButton(
                         onClick  = onDismiss,
@@ -142,12 +143,22 @@ fun PermissionsDialog(
 
                 Spacer(Modifier.height(KronoTokens.Spacing.sectionGap))
 
-                // ── Botão Concluir (aparece quando core OK) ───
-                AnimatedVisibility(
-                    visible = coreGranted,
-                    enter   = fadeIn(),
-                    exit    = fadeOut()
-                ) {
+                 // ── Botão Concluir (aparece quando core OK) ───
+                 AnimatedVisibility(
+                     visible = coreGranted,
+                     enter   = fadeIn(
+                         animationSpec = tween(
+                             durationMillis = KronoTokens.Animation.fadeDurationMs,
+                             easing = KronoTokens.Motion.easingNormal
+                         )
+                     ),
+                     exit    = fadeOut(
+                         animationSpec = tween(
+                             durationMillis = KronoTokens.Animation.fadeDurationMs,
+                             easing = KronoTokens.Motion.easingNormal
+                         )
+                     )
+                 ) {
                     Button(
                         onClick  = onDismiss,
                         modifier = Modifier
