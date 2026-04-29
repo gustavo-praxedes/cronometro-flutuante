@@ -10,10 +10,22 @@ import com.krono.app.ACTION_SHOW_OVERLAY
 import com.krono.app.ACTION_STOP_SERVICE
 import com.krono.app.service.MainService
 import com.krono.app.ACTION_HIDE_OVERLAY
+import com.krono.app.viewmodel.CountdownViewModel
 
 class NotificationActionReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
+        val countdownId = intent.getStringExtra(CountdownViewModel.EXTRA_COUNTDOWN_ID)
+
+        if (countdownId != null) {
+            val serviceIntent = Intent(context, MainService::class.java).apply {
+                action = intent.action
+                putExtra(CountdownViewModel.EXTRA_COUNTDOWN_ID, countdownId)
+            }
+            context.startForegroundService(serviceIntent)
+            return
+        }
+
         val serviceIntent = Intent(context, MainService::class.java).apply {
             action = intent.action
         }
@@ -22,12 +34,8 @@ class NotificationActionReceiver : BroadcastReceiver() {
             ACTION_PLAY,
             ACTION_PAUSE,
             ACTION_RESET,
-            ACTION_STOP_SERVICE -> {
-                context.startForegroundService(serviceIntent)
-            }
-            ACTION_SHOW_OVERLAY -> {
-                context.startForegroundService(serviceIntent)
-            }
+            ACTION_STOP_SERVICE,
+            ACTION_SHOW_OVERLAY,
             ACTION_HIDE_OVERLAY -> {
                 context.startForegroundService(serviceIntent)
             }

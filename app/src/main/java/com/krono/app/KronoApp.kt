@@ -6,6 +6,8 @@ import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
 import com.google.firebase.FirebaseApp
+import com.krono.app.data.CountdownDataStore
+import com.krono.app.viewmodel.CountdownViewModel
 import com.krono.app.viewmodel.TimerViewModel
 
 // Constantes globais do App
@@ -25,6 +27,10 @@ class KronoApp : Application() {
     // Singleton do ViewModel passando a referência da application
     val timerViewModel: TimerViewModel by lazy {
         TimerViewModel(this)
+    }
+
+    val countdownViewModel: CountdownViewModel by lazy {
+        CountdownViewModel(CountdownDataStore(this))
     }
 
     override fun onCreate() {

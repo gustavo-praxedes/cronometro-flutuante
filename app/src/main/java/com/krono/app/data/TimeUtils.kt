@@ -5,7 +5,6 @@ import java.util.Locale
 // ============================================================
 // TimeUtils.kt
 // Funções utilitárias de formatação de tempo.
-// Removida msToHours() — não era utilizada em nenhum lugar.
 // ============================================================
 
 fun Long.toFormattedTime(
@@ -37,6 +36,13 @@ fun Long.toFormattedTime(
     }
 }
 
+// Alias para facilitar o uso nos patches
+object TimeUtils {
+    fun formatSeconds(totalSeconds: Long): String {
+        return formatTimeLimitSeconds(totalSeconds)
+    }
+}
+
 // Converte string "HHHH:MM:SS" para segundos totais.
 // Retorna null se o formato for inválido.
 fun parseTimeLimitInput(input: String): Long? {
@@ -55,14 +61,10 @@ fun formatTimeLimitSeconds(totalSeconds: Long): String {
     val h = totalSeconds / 3600L
     val m = (totalSeconds % 3600L) / 60L
     val s = totalSeconds % 60L
-// Use String.format com Locale.ROOT para evitar problemas de idioma
     return String.format(Locale.ROOT, "%04d:%02d:%02d", h, m, s)
 }
 
 // Formata milissegundos em "HHh MMm SSs" para exibição no diálogo de doação.
-// Exemplos:
-//   43_200_000L → "12h 00m 00s"
-//   90_061_000L → "25h 01m 01s"
 fun formatLifetimeDetailed(totalMs: Long): String {
     if (totalMs <= 0L) return "0h 00m 00s"
     val totalSeconds = totalMs / 1000L

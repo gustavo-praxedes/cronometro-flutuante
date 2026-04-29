@@ -1,17 +1,22 @@
 package com.krono.app.service
 
 import android.app.Notification
+import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationCompat
 import com.krono.app.*
+import com.krono.app.data.CountdownState
 import com.krono.app.data.TimerState
 import com.krono.app.data.toFormattedTime
 import com.krono.app.receiver.NotificationActionReceiver
 import com.krono.app.ui.MainActivity
+import com.krono.app.viewmodel.CountdownViewModel
 
 class NotificationHelper(private val context: Context) {
+
+    private val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
     private val contentPendingIntent: PendingIntent = PendingIntent.getActivity(
         context, 0,
@@ -37,7 +42,6 @@ class NotificationHelper(private val context: Context) {
             )
         }
 
-        // Correção do ID do canal e pequenos erros de referência
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.mipmap.ic_launcher)
             .setContentTitle(context.getString(R.string.notification_title))
@@ -88,5 +92,61 @@ class NotificationHelper(private val context: Context) {
         }
 
         return builder.build()
+    }
+
+    fun buildCountdownNotification(state: CountdownState): Notification {
+        val id = state.config.id
+
+        fun actionIntent(action: String, requestCode: Int): PendingIntent {
+            val i = Intent(context, NotificationActionReceiver::class.java).apply {
+                this.action = action
+                putExtra(CountdownViewModel.EXTRA_COUNTDOWN_ID, id)
+            }
+            return PendingIntent.getBroadcast(
+                context, requestCode, i,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+        }
+
+        val formattedTime = (state.remainingSeconds * 1000L).toFormattedTime(showHours = true, showSeconds = true)
+
+        return NotificationCompat.Builder(context, CHANNEL_ID)
+            .setSmallIcon(R.mipmap.ic_launcher)
+            .setContentTitle(state.config.description.ifBlank { "Cronômetro regressivo" })
+            .setContentText(if (state.isCompleted) "⏰ Concluído!" else formattedTime)
+            .setContentIntent(contentPendingIntent)
+            .setOngoing(!state.isCompleted)
+            .setOnlyAlertOnce(true)
+            .setSilent(true)
+            .addAction(
+                if (state.isRunning) android.R.drawable.ic_media_pause else android.R.drawable.ic_media_play,
+                if (state.isRunning) "Pausar" else "Iniciar",
+                if (state.isRunning) actionIntent(CountdownViewModel.ACTION_COUNTDOWN_PAUSE, id.hashCode() + 1)
+                else actionIntent(CountdownViewModel.ACTION_COUNTDOWN_PLAY, id.hashCode() + 2)
+            )
+            .addAction(
+                android.R.drawable.ic_menu_revert,
+                "Reset",
+                actionIntent(CountdownViewModel.ACTION_COUNTDOWN_RESET, id.hashCode() + 3)
+            )
+            .addAction(
+                android.R.drawable.ic_menu_close_clear_cancel,
+                "Fechar",
+                actionIntent(CountdownViewModel.ACTION_COUNTDOWN_OVERLAY_HIDE, id.hashCode() + 4)
+            )
+            .build()
+    }
+
+    fun postCountdownNotification(state: CountdownState) {
+        val notifId = COUNTDOWN_NOTIF_BASE_ID + state.config.id.hashCode()
+        notificationManager.notify(notifId, buildCountdownNotification(state))
+    }
+
+    fun cancelCountdownNotification(id: String) {
+        notificationManager.cancel(COUNTDOWN_NOTIF_BASE_ID + id.hashCode())
+    }
+
+    companion object {
+        const val COUNTDOWN_NOTIF_BASE_ID = 1000
     }
 }

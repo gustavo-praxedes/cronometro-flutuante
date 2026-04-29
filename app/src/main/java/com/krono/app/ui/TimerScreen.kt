@@ -11,11 +11,11 @@ import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.outlined.Timelapse
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -26,12 +26,13 @@ import com.krono.app.ui.theme.timerFontFamily
 @Composable
 fun TimerScreen(
     timerState     : TimerState,
-    selectedFont  : String = "SYSTEM_DEFAULT",
+    selectedFont   : String = "SYSTEM_DEFAULT",
     onStart        : () -> Unit,
     onPause        : () -> Unit,
     onReset        : () -> Unit,
     onOpenOverlay  : () -> Unit,
-    onOpenSettings : () -> Unit
+    onOpenSettings : () -> Unit,
+    onOpenCountdown: () -> Unit
 ) {
     val isRunning = timerState.isRunning
 
@@ -47,6 +48,12 @@ fun TimerScreen(
                     )
                 },
                 actions = {
+                    IconButton(onClick = onOpenCountdown) {
+                        Icon(
+                            imageVector = Icons.Outlined.Timelapse,
+                            contentDescription = "Cronômetros regressivos"
+                        )
+                    }
                     IconButton(onClick = onOpenSettings) {
                         Icon(
                             imageVector = Icons.Default.Settings,

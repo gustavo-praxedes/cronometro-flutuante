@@ -20,6 +20,7 @@ import com.krono.app.data.OverlayDataStore
 import com.krono.app.data.TimerPreferences
 import com.krono.app.util.KronoNavigator
 import com.krono.app.util.PermissionUtils
+import com.krono.app.viewmodel.CountdownViewModel
 import com.krono.app.viewmodel.TimerViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
@@ -51,6 +52,7 @@ class MainService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStateRe
     private lateinit var overlayManager: OverlayManager
     private lateinit var feedbackManager: FeedbackManager
     private lateinit var wakeLockManager: WakeLockManager
+    private lateinit var countdownManager: CountdownManager
 
     private val viewModel: TimerViewModel get() = (application as KronoApp).timerViewModel
     private var notificationJob: Job? = null
@@ -72,6 +74,14 @@ class MainService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStateRe
         wakeLockManager    = WakeLockManager(this)
         overlayManager     = OverlayManager(this, windowManager, dataStore, viewModel, serviceScope, this, this, this)
 
+        val app = application as KronoApp
+        countdownManager = CountdownManager(
+            context = this,
+            windowManager = windowManager,
+            feedbackManager = feedbackManager,
+            countdownViewModel = app.countdownViewModel
+        )
+
         startForegroundWithNotification()
         timerPrefs.setServiceActive(true)
     }
@@ -79,6 +89,8 @@ class MainService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStateRe
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_START)
         ensureObserversStarted()
+
+        val id = intent?.getStringExtra(CountdownViewModel.EXTRA_COUNTDOWN_ID)
 
         when (intent?.action) {
             ACTION_PLAY -> {
@@ -98,6 +110,14 @@ class MainService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStateRe
                 if (!overlayManager.overlayVisible) showOverlay()
                 KronoNavigator.startFocusMode(this)
             }
+            
+            CountdownViewModel.ACTION_COUNTDOWN_PLAY         -> id?.let { countdownManager.play(it) }
+            CountdownViewModel.ACTION_COUNTDOWN_PAUSE        -> id?.let { countdownManager.pause(it) }
+            CountdownViewModel.ACTION_COUNTDOWN_RESET        -> id?.let { countdownManager.reset(it) }
+            CountdownViewModel.ACTION_COUNTDOWN_OVERLAY_SHOW -> id?.let { countdownManager.showOverlay(it) }
+            CountdownViewModel.ACTION_COUNTDOWN_OVERLAY_HIDE -> id?.let { countdownManager.hideOverlay(it) }
+            CountdownViewModel.ACTION_COUNTDOWN_DESTROY      -> id?.let { countdownManager.destroy(it) }
+
             else -> if (checkPermissions() && !overlayManager.overlayVisible) showOverlay()
         }
         return START_STICKY
@@ -191,6 +211,7 @@ class MainService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStateRe
         timerPrefs.setServiceActive(false)
         wakeLockManager.release()
         overlayManager.removeOverlay()
+        countdownManager.destroyAll()
         stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
     }
@@ -267,6 +288,7 @@ class MainService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStateRe
         timerPrefs.setServiceActive(false)
         wakeLockManager.release()
         overlayManager.removeOverlay()
+        countdownManager.destroyAll()
         feedbackManager.release()
         notificationJob?.cancel()
         serviceScope.cancel()

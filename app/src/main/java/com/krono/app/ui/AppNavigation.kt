@@ -9,6 +9,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.krono.app.KronoApp
 import com.krono.app.data.OverlayDataStore
 import com.krono.app.data.OverlayConfig
 import com.krono.app.util.UpdateInfo
@@ -20,6 +21,7 @@ import kotlinx.coroutines.launch
 object AppRoutes {
     const val TIMER    = "timer"
     const val SETTINGS = "settings"
+    const val COUNTDOWN = "countdown"
 }
 
 @Composable
@@ -83,7 +85,8 @@ fun AppNavigation(
                     onPause        = { timerViewModel.pause() },
                     onReset        = onReset,
                     onOpenOverlay  = onTryStartService,
-                    onOpenSettings = { navController.navigate(AppRoutes.SETTINGS) }
+                    onOpenSettings = { navController.navigate(AppRoutes.SETTINGS) },
+                    onOpenCountdown = { navController.navigate(AppRoutes.COUNTDOWN) }
                 )
             }
 
@@ -105,6 +108,13 @@ fun AppNavigation(
                     onStartFocusMode   = onStartFocusMode,
                     onShowOverlay      = onShowOverlay,
                     onBack             = navigateBack
+                )
+            }
+
+            composable(AppRoutes.COUNTDOWN) {
+                CountdownScreen(
+                    viewModel = (context.applicationContext as KronoApp).countdownViewModel,
+                    onNavigateBack = { navController.popBackStack() }
                 )
             }
         }

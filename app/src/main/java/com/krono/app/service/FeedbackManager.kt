@@ -36,6 +36,25 @@ class FeedbackManager(context: Context) {
         }
     }
 
+    fun onCountdownCompleted() {
+        // Vibração longa (padrão: 3 pulsos)
+        val pattern = longArrayOf(0, 200, 100, 200, 100, 400)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            vibrator?.vibrate(VibrationEffect.createWaveform(pattern, -1))
+        } else {
+            @Suppress("DEPRECATION")
+            vibrator?.vibrate(pattern, -1)
+        }
+        // Beep de conclusão (tom mais alto que o beep padrão)
+        beep(frequency = 880, durationMs = 600)
+    }
+
+    private fun beep(frequency: Int, durationMs: Int) {
+        // ToneGenerator.TONE_PROP_BEEP é fixo. Para frequências customizadas, seria necessário algo mais complexo.
+        // Mantendo simples conforme o patch sugerido, mas usando o ToneGenerator existente.
+        toneGenerator?.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, durationMs)
+    }
+
     fun release() {
         toneGenerator?.release()
         toneGenerator = null
