@@ -38,8 +38,16 @@ fun Long.toFormattedTime(
 
 // Alias para facilitar o uso nos patches
 object TimeUtils {
+    /**
+     * Formata segundos como HH:MM:SS.
+     * Horas sempre 2 dígitos (ex: 01:05:09).
+     * Suporta até 99:59:59.
+     */
     fun formatSeconds(totalSeconds: Long): String {
-        return formatTimeLimitSeconds(totalSeconds)
+        val h = (totalSeconds / 3600).coerceIn(0, 99)
+        val m = (totalSeconds % 3600) / 60
+        val s = totalSeconds % 60
+        return String.format(Locale.ROOT, "%02d:%02d:%02d", h, m, s)
     }
 }
 

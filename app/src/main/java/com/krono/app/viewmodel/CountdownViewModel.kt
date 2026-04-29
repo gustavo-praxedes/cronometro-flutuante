@@ -21,14 +21,13 @@ class CountdownViewModel(
     companion object {
         const val MAX_COUNTDOWNS = 5
 
-        // Actions broadcast to MainService
-        const val ACTION_COUNTDOWN_PLAY    = "com.krono.app.COUNTDOWN_PLAY"
-        const val ACTION_COUNTDOWN_PAUSE   = "com.krono.app.COUNTDOWN_PAUSE"
-        const val ACTION_COUNTDOWN_RESET   = "com.krono.app.COUNTDOWN_RESET"
+        const val ACTION_COUNTDOWN_PLAY         = "com.krono.app.COUNTDOWN_PLAY"
+        const val ACTION_COUNTDOWN_PAUSE        = "com.krono.app.COUNTDOWN_PAUSE"
+        const val ACTION_COUNTDOWN_RESET        = "com.krono.app.COUNTDOWN_RESET"
         const val ACTION_COUNTDOWN_OVERLAY_SHOW = "com.krono.app.COUNTDOWN_OVERLAY_SHOW"
         const val ACTION_COUNTDOWN_OVERLAY_HIDE = "com.krono.app.COUNTDOWN_OVERLAY_HIDE"
-        const val ACTION_COUNTDOWN_DESTROY = "com.krono.app.COUNTDOWN_DESTROY"
-        const val EXTRA_COUNTDOWN_ID = "countdown_id"
+        const val ACTION_COUNTDOWN_DESTROY      = "com.krono.app.COUNTDOWN_DESTROY"
+        const val EXTRA_COUNTDOWN_ID            = "countdown_id"
     }
 
     private val _countdowns = MutableStateFlow<List<CountdownState>>(emptyList())
@@ -39,7 +38,6 @@ class CountdownViewModel(
             dataStore.configs.collect { configs ->
                 val current = _countdowns.value.associateBy { it.config.id }
                 _countdowns.value = configs.map { config ->
-                    // Preserve runtime state if already loaded; otherwise fresh state
                     current[config.id]?.copy(config = config)
                         ?: CountdownState(config = config)
                 }
@@ -54,21 +52,19 @@ class CountdownViewModel(
         viewModelScope.launch {
             val updated = _countdowns.value.map { it.config } + config
             dataStore.save(updated)
-            // StateFlow updated reactively via DataStore collector above
         }
     }
 
     fun updateConfig(config: CountdownConfig) {
         viewModelScope.launch {
             val updated = _countdowns.value.map {
-                if (it.config.id == config.id) it.config else it.config
-            }.map { if (it.id == config.id) config else it }
+                if (it.config.id == config.id) config else it.config
+            }
             dataStore.save(updated)
         }
     }
 
     fun deleteCountdown(context: Context, id: String) {
-        // Stop service-side timer and overlay if active
         sendAction(context, ACTION_COUNTDOWN_DESTROY, id)
         viewModelScope.launch {
             val updated = _countdowns.value
@@ -78,7 +74,7 @@ class CountdownViewModel(
         }
     }
 
-    // ── RUNTIME STATE (local + forward to service) ────────────────────────────
+    // ── Timer control ─────────────────────────────────────────────────────────
 
     fun play(context: Context, id: String) {
         updateRuntime(id) { it.copy(isRunning = true, isCompleted = false) }
@@ -91,9 +87,13 @@ class CountdownViewModel(
     }
 
     fun reset(context: Context, id: String) {
-        updateRuntime(id) { it.copy(isRunning = false, isCompleted = false, remainingSeconds = it.config.totalSeconds) }
+        updateRuntime(id) {
+            it.copy(isRunning = false, isCompleted = false, remainingSeconds = it.config.totalSeconds)
+        }
         sendAction(context, ACTION_COUNTDOWN_RESET, id)
     }
+
+    // ── Overlay ───────────────────────────────────────────────────────────────
 
     fun toggleOverlay(context: Context, id: String) {
         val state = _countdowns.value.find { it.config.id == id } ?: return
@@ -106,12 +106,17 @@ class CountdownViewModel(
         }
     }
 
-    /** Called by MainService when countdown reaches zero */
+    /** Called by CountdownManager when user taps X on overlay */
+    fun forceHideOverlay(context: Context, id: String) {
+        updateRuntime(id) { it.copy(isOverlayVisible = false) }
+    }
+
+    // ── Called by CountdownManager (service side) ─────────────────────────────
+
     fun onCompleted(id: String) {
         updateRuntime(id) { it.copy(isRunning = false, isCompleted = true, remainingSeconds = 0L) }
     }
 
-    /** Called by MainService each tick to sync remaining time */
     fun onTick(id: String, remainingSeconds: Long) {
         updateRuntime(id) { it.copy(remainingSeconds = remainingSeconds) }
     }
@@ -119,14 +124,17 @@ class CountdownViewModel(
     // ── Helpers ───────────────────────────────────────────────────────────────
 
     private fun updateRuntime(id: String, transform: (CountdownState) -> CountdownState) {
-        _countdowns.update { list -> list.map { if (it.config.id == id) transform(it) else it } }
+        _countdowns.update { list ->
+            list.map { if (it.config.id == id) transform(it) else it }
+        }
     }
 
     private fun sendAction(context: Context, action: String, id: String) {
-        val intent = Intent(context, MainService::class.java).apply {
-            this.action = action
-            putExtra(EXTRA_COUNTDOWN_ID, id)
-        }
-        context.startService(intent)
+        context.startService(
+            Intent(context, MainService::class.java).apply {
+                this.action = action
+                putExtra(EXTRA_COUNTDOWN_ID, id)
+            }
+        )
     }
 }

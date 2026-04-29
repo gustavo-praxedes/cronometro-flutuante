@@ -2,6 +2,7 @@
 - feat: Seleção de fontes para o overlay adicionada
 
 # 🔧 Manutenção
+- Primeira implementação do cronômetro regressivo
 - chore: Refatoração de MainService para separar funções
 - chore: Pastas de IA adicionadas ao gitignore
 - style: Padronização de janelas
@@ -15,4 +16,5 @@
 - refactor(ui): adicionar largura adaptativa para dialogos no tema
 
 # 📝 Documentação
+- docs: Documentação atualizada.
 - docs: atualizar changelog com as mudanças de largura adaptativa

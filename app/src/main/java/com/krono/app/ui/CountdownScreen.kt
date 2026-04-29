@@ -1,6 +1,8 @@
 package com.krono.app.ui
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
@@ -19,9 +21,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.outlined.HourglassEmpty
+import androidx.compose.material.icons.filled.HourglassEmpty
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -36,7 +39,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.krono.app.data.CountdownConfig
 import com.krono.app.viewmodel.CountdownViewModel
@@ -50,11 +55,16 @@ fun CountdownScreen(
     val context = LocalContext.current
     val countdowns by viewModel.countdowns.collectAsState()
 
-    // Sheet state: null = closed, non-null = editing/creating
-    var sheetTarget by remember { mutableStateOf<CountdownConfig?>(null) }
-    var sheetOpen by remember { mutableStateOf(false) }
-    // true = create mode, false = edit mode
+    var dialogTarget by remember { mutableStateOf<CountdownConfig?>(null) }
+    var dialogOpen by remember { mutableStateOf(false) }
     var isCreateMode by remember { mutableStateOf(false) }
+
+    // FAB scale animation (20% bigger = 1.2f base size via size modifier)
+    val fabScale by animateFloatAsState(
+        targetValue = 1f,
+        animationSpec = spring(),
+        label = "fab_scale"
+    )
 
     Scaffold(
         topBar = {
@@ -78,12 +88,20 @@ fun CountdownScreen(
             ) {
                 FloatingActionButton(
                     onClick = {
-                        sheetTarget = null
+                        dialogTarget = null
                         isCreateMode = true
-                        sheetOpen = true
-                    }
+                        dialogOpen = true
+                    },
+                    modifier = Modifier
+                        .scale(fabScale)
+                        .size(72.dp),  // default is 56dp; 72dp ≈ +28% bigger
+                    elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 6.dp)
                 ) {
-                    Icon(Icons.Default.Add, contentDescription = "Novo cronômetro")
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Novo cronômetro",
+                        modifier = Modifier.size(32.dp)  // icon scales with FAB
+                    )
                 }
             }
         }
@@ -98,38 +116,31 @@ fun CountdownScreen(
                 EmptyCountdownState(
                     modifier = Modifier.align(Alignment.Center),
                     onAdd = {
-                        sheetTarget = null
+                        dialogTarget = null
                         isCreateMode = true
-                        sheetOpen = true
+                        dialogOpen = true
                     }
                 )
             } else {
                 LazyColumn(
                     contentPadding = PaddingValues(
-                        start = 16.dp,
-                        end = 16.dp,
-                        top = 8.dp,
-                        bottom = 88.dp  // space for FAB
+                        start = 16.dp, end = 16.dp, top = 8.dp, bottom = 96.dp
                     ),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    items(
-                        items = countdowns,
-                        key = { it.config.id }
-                    ) { state ->
+                    items(countdowns, key = { it.config.id }) { state ->
                         CountdownCard(
                             state = state,
                             onEdit = {
-                                sheetTarget = state.config
+                                dialogTarget = state.config
                                 isCreateMode = false
-                                sheetOpen = true
+                                dialogOpen = true
                             },
-                            onToggleOverlay = {
-                                viewModel.toggleOverlay(context, state.config.id)
-                            },
-                            onDelete = {
-                                viewModel.deleteCountdown(context, state.config.id)
-                            }
+                            onPlay = { viewModel.play(context, state.config.id) },
+                            onPause = { viewModel.pause(context, state.config.id) },
+                            onReset = { viewModel.reset(context, state.config.id) },
+                            onToggleOverlay = { viewModel.toggleOverlay(context, state.config.id) },
+                            onDelete = { viewModel.deleteCountdown(context, state.config.id) }
                         )
                     }
                 }
@@ -137,15 +148,14 @@ fun CountdownScreen(
         }
     }
 
-    // Bottom sheet
-    if (sheetOpen) {
-        CountdownConfigSheet(
-            initial = if (isCreateMode) null else sheetTarget,
-            onDismiss = { sheetOpen = false },
+    if (dialogOpen) {
+        CountdownConfigDialog(
+            initial = if (isCreateMode) null else dialogTarget,
+            onDismiss = { dialogOpen = false },
             onConfirm = { config ->
                 if (isCreateMode) viewModel.addCountdown(config)
                 else viewModel.updateConfig(config)
-                sheetOpen = false
+                dialogOpen = false
             }
         )
     }
@@ -157,31 +167,63 @@ private fun EmptyCountdownState(
     onAdd: () -> Unit
 ) {
     Column(
-        modifier = modifier.padding(32.dp),
+        modifier = modifier.padding(40.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Icon(
-            imageVector = Icons.Outlined.HourglassEmpty,
-            contentDescription = null,
-            modifier = Modifier.size(64.dp),
-            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
-        )
-        Spacer(modifier = Modifier.height(16.dp))
+        // Decorative icon with tonal background
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .size(96.dp)
+                .padding(8.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.HourglassEmpty,
+                contentDescription = null,
+                modifier = Modifier.size(72.dp),
+                tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.18f)
+            )
+            Icon(
+                imageVector = Icons.Default.HourglassEmpty,
+                contentDescription = null,
+                modifier = Modifier.size(48.dp),
+                tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.55f)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
+
         Text(
-            text = "Nenhum cronômetro ainda",
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+            text = "Nenhum cronômetro",
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.onSurface,
+            textAlign = TextAlign.Center
         )
+
         Spacer(modifier = Modifier.height(8.dp))
+
         Text(
             text = "Toque em + para criar seu\nprimeiro cronômetro regressivo",
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center
         )
-        Spacer(modifier = Modifier.height(24.dp))
-        FloatingActionButton(onClick = onAdd) {
-            Icon(Icons.Default.Add, contentDescription = "Criar cronômetro")
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        // Inline FAB as CTA
+        FloatingActionButton(
+            onClick = onAdd,
+            modifier = Modifier.size(72.dp),
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+        ) {
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = "Criar cronômetro",
+                modifier = Modifier.size(32.dp)
+            )
         }
     }
 }

@@ -15,20 +15,20 @@ class CountdownManager(
     private val context: Context,
     private val windowManager: WindowManager,
     private val feedbackManager: FeedbackManager,
+    private val notificationHelper: NotificationHelper,
     private val countdownViewModel: CountdownViewModel
 ) {
     private val scope = CoroutineScope(SupervisorJob())
-
-    // id → active coroutine job
     private val activeTimers = mutableMapOf<String, Job>()
 
-    // id → overlay manager instance
+    // id → overlay. Passed as lambda so each overlay can query current peers.
     private val activeOverlays = mutableMapOf<String, CountdownOverlayManager>()
+    private fun peers(): List<CountdownOverlayManager> = activeOverlays.values.toList()
 
-    // ── Timer control ──────────────────────────────────────────────────────
+    // ── Timer ──────────────────────────────────────────────────────────────
 
     fun play(id: String) {
-        val state = currentState(id) ?: return
+        val state = current(id) ?: return
         if (state.isRunning || state.isCompleted) return
 
         activeTimers[id]?.cancel()
@@ -38,7 +38,11 @@ class CountdownManager(
                 delay(1_000)
                 remaining--
                 countdownViewModel.onTick(id, remaining)
-                activeOverlays[id]?.update(currentState(id) ?: return@launch)
+                // Sync overlay UI
+                current(id)?.let { s ->
+                    activeOverlays[id]?.update(s)
+                    if (s.isOverlayVisible) notificationHelper.postCountdownNotification(s)
+                }
             }
             onCompleted(id)
         }
@@ -47,37 +51,48 @@ class CountdownManager(
     fun pause(id: String) {
         activeTimers[id]?.cancel()
         activeTimers.remove(id)
+        current(id)?.let { s ->
+            activeOverlays[id]?.update(s)
+            notificationHelper.postCountdownNotification(s)
+        }
     }
 
     fun reset(id: String) {
         activeTimers[id]?.cancel()
         activeTimers.remove(id)
-        activeOverlays[id]?.update(currentState(id) ?: return)
+        current(id)?.let { s ->
+            activeOverlays[id]?.update(s)
+            notificationHelper.cancelCountdownNotification(id)
+        }
     }
 
-    // ── Overlay control ────────────────────────────────────────────────────
+    // ── Overlay ────────────────────────────────────────────────────────────
 
     fun showOverlay(id: String) {
-        val state = currentState(id) ?: return
-        val index = activeOverlays.size   // next available slot
-
+        val state = current(id) ?: return
         val overlay = activeOverlays.getOrPut(id) {
             CountdownOverlayManager(
                 context = context,
                 windowManager = windowManager,
-                index = index,
-                onPlay  = { play(id) },
-                onPause = { pause(id) },
+                id = id,
+                getPeers = ::peers,
+                onPlay  = { play(id); countdownViewModel.play(context, id) },
+                onPause = { pause(id); countdownViewModel.pause(context, id) },
                 onReset = { reset(id); countdownViewModel.reset(context, id) },
-                onClose = { hideOverlay(id); countdownViewModel.toggleOverlay(context, id) }
+                onClose = {
+                    hideOverlay(id)
+                    countdownViewModel.forceHideOverlay(context, id)
+                }
             )
         }
         overlay.show(state)
+        notificationHelper.postCountdownNotification(state)
     }
 
     fun hideOverlay(id: String) {
         activeOverlays[id]?.hide()
         activeOverlays.remove(id)
+        notificationHelper.cancelCountdownNotification(id)
     }
 
     fun destroy(id: String) {
@@ -94,15 +109,18 @@ class CountdownManager(
         scope.cancel()
     }
 
-    // ── Internal ───────────────────────────────────────────────────────────
+    // ── Helpers ────────────────────────────────────────────────────────────
 
     private fun onCompleted(id: String) {
         activeTimers.remove(id)
         countdownViewModel.onCompleted(id)
-        feedbackManager.onCountdownCompleted()   // vibrate + beep
-        activeOverlays[id]?.update(currentState(id) ?: return)
+        feedbackManager.onCountdownCompleted()
+        current(id)?.let { s ->
+            activeOverlays[id]?.update(s)
+            notificationHelper.postCountdownNotification(s)
+        }
     }
 
-    private fun currentState(id: String): CountdownState? =
+    private fun current(id: String): CountdownState? =
         countdownViewModel.countdowns.value.find { it.config.id == id }
 }

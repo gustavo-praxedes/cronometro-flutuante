@@ -29,6 +29,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.distinctUntilChanged
 import androidx.lifecycle.*
 import androidx.savedstate.*
+import android.provider.Settings
 
 const val ACTION_FOCUS_DISMISSED = "com.krono.app.ACTION_FOCUS_DISMISSED"
 
@@ -79,6 +80,7 @@ class MainService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStateRe
             context = this,
             windowManager = windowManager,
             feedbackManager = feedbackManager,
+            notificationHelper = notificationHelper,
             countdownViewModel = app.countdownViewModel
         )
 
@@ -288,7 +290,6 @@ class MainService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStateRe
         timerPrefs.setServiceActive(false)
         wakeLockManager.release()
         overlayManager.removeOverlay()
-        countdownManager.destroyAll()
         feedbackManager.release()
         notificationJob?.cancel()
         serviceScope.cancel()
