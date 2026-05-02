@@ -2,6 +2,7 @@ package com.krono.app.ui.theme
 
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -11,14 +12,20 @@ import androidx.compose.ui.unit.sp
  */
 object KronoTokens {
 
+    // ── Cores (Fixas/Utilitárias) ───────────────────────────
+    object Colors {
+        val checkerLight = Color(0xFFCCCCCC)
+        val checkerDark  = Color(0xFF999999)
+    }
+
     // ── Formas e Arredondamentos ─────────────────────────────
     object Shape {
         val dialog         = RoundedCornerShape(24.dp)
         val button         = RoundedCornerShape(16.dp)
         val buttonSmall    = RoundedCornerShape(12.dp)
-        val card           = RoundedCornerShape(16.dp)
+        val card           = RoundedCornerShape(20.dp)
         val input          = RoundedCornerShape(12.dp)
-        val badge          = RoundedCornerShape(8.dp)
+        val badge          = RoundedCornerShape(6.dp)
         val progressBar    = RoundedCornerShape(50)
         val iconContainer  = RoundedCornerShape(12.dp)
     }
@@ -27,7 +34,7 @@ object KronoTokens {
     object Button {
         val height         = 56.dp
         val heightSmall    = 44.dp
-        val iconSize       = 20.dp
+        val iconSize       = 24.dp
         val iconSpacing    = 10.dp
         val paddingH       = 24.dp
     }
@@ -49,6 +56,8 @@ object KronoTokens {
         val listItemGap     = 10.dp
         val listIconGap     = 12.dp
         val sectionGap      = 20.dp
+        val cardPaddingH    = 18.dp
+        val cardPaddingV    = 14.dp
     }
 
     // ── Tipografia (Valores Base) ──────────────────────────
@@ -61,6 +70,8 @@ object KronoTokens {
         val statusLabel      = 12.sp
         val errorLabel       = 12.sp
         val bodyText         = 16.sp
+        val timerCard        = 34.sp
+        val timerOverlay     = 40.sp
     }
 
     // ── Tamanhos de Ícones ───────────────────────────────────
@@ -69,14 +80,15 @@ object KronoTokens {
         val dialogHeader  = 24.dp
         val status        = 18.dp
         val small         = 16.dp
-        val button        = 20.dp
+        val button        = 22.dp
         val close         = 32.dp
+        val cardAction    = 24.dp
     }
 
     // ── Elevação e Sombras ───────────────────────────────────
     object Elevation {
         val dialog    = 6.dp
-        val card      = 2.dp
+        val card      = 3.dp
         val flat      = 0.dp
     }
 
@@ -86,6 +98,7 @@ object KronoTokens {
         val circularIndicator = 2.dp
         val divider      = 1.dp
         val cardBorder   = 1.dp
+        val overlayBorder = 0.86.dp
     }
 
     // ── Animações ────────────────────────────────────────────
@@ -97,10 +110,22 @@ object KronoTokens {
 
      // ── Opacidades ───────────────────────────────────────────
      object Alpha {
-         val divider   = 0.5f
-         val disabled  = 0.38f
-         val scrim     = 0.6f
-         val low       = 0.10f
+         val divider      = 0.5f
+         val disabled     = 0.38f
+         val scrim        = 0.6f
+         val low          = 0.10f
+         val medium       = 0.75f
+         val highlight    = 0.12f
+         val glass        = 0.08f
+         val glassBorder  = 0.15f
+         val label        = 0.6f
+         val separator    = 0.3f
+         val iconDisabled = 0.45f
+         val iconEnabled  = 1.0f
+         val entranceInitialScale = 0.88f
+         val dragScaleTarget      = 0.96f
+         val overlayTimerScale    = 0.72f
+         val overlayLuminanceThreshold = 0.45f
      }
 
      // ── Animações Avançadas ───────────────────────────────────
@@ -131,6 +156,36 @@ object KronoTokens {
         val inlineSpinner  = 18.dp
         val buttonSpinner  = 20.dp
         val listItemHeight = 48.dp
+        val colorSwatch    = 36.dp
+        val colorPreview   = 120.dp
+        val colorInputWidth = 180.dp
+        val sliderLabelWidth = 92.dp
+        val sliderValueWidth = 52.dp
+        const val descriptionMaxLen = 40
+    }
+
+    // ── Roda de Seleção (Wheel Picker) ──────────────────────
+    object Wheel {
+        val itemHeight       = 48.dp
+        val columnWidth      = 80.dp
+        val columnInnerWidth = 64.dp
+        val columnFocusWidth = 56.dp
+        val separatorWidth   = 16.dp
+        
+        val labelFontSize     = 10.sp
+        val selectedFontSize  = 26.sp
+        val separatorFontSize = 22.sp
+
+        const val rotationFactor = 20f
+        const val cameraDistance = 8f
+        
+        val scaleSelected    = 1.15f
+        val scaleMedium      = 0.85f
+        val scaleSmall       = 0.7f
+
+        val alphaSelected    = 1.0f
+        val alphaMedium      = 0.4f
+        val alphaSmall       = 0.15f
     }
 
     // ── Overlay (Widget Flutuante) ──────────────────────────
@@ -138,6 +193,7 @@ object KronoTokens {
         const val maxCornerRadiusFloat = 80f
         val defaultCornerRadius = 24.dp
         val minWidth       = 172.dp
+        val maxWidth       = 270.dp
         val paddingH       = 16.dp
         val paddingV       = 16.dp
         val btnSpacing     = 10.dp

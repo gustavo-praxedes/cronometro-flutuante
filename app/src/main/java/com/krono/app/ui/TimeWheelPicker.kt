@@ -1,15 +1,12 @@
 package com.krono.app.ui
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,15 +24,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.krono.app.ui.theme.KronoTokens
 import kotlinx.coroutines.flow.distinctUntilChanged
 
-private const val ITEM_H_DP = 48
-
-/**
- * Slot-machine time picker — HH:MM:SS.
- * Hours 00-99, Minutes 00-59, Seconds 00-59.
- * [onValueChange] fires whenever the user settles on a new value.
- */
 @Composable
 fun TimeWheelPicker(
     totalSeconds: Long,
@@ -46,7 +37,6 @@ fun TimeWheelPicker(
     val initM = ((totalSeconds % 3600) / 60).toInt()
     val initS = (totalSeconds % 60).toInt()
 
-    // Mutable holders updated by each wheel
     val h = remember { androidx.compose.runtime.mutableIntStateOf(initH) }
     val m = remember { androidx.compose.runtime.mutableIntStateOf(initM) }
     val s = remember { androidx.compose.runtime.mutableIntStateOf(initS) }
@@ -55,17 +45,73 @@ fun TimeWheelPicker(
         onValueChange(h.intValue * 3600L + m.intValue * 60L + s.intValue)
     }
 
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = KronoTokens.Spacing.sm),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        WheelColumn(range = 0..99, initial = initH, onSelected = { h.intValue = it; emit() })
-        Separator()
-        WheelColumn(range = 0..59, initial = initM, onSelected = { m.intValue = it; emit() })
-        Separator()
-        WheelColumn(range = 0..59, initial = initS, onSelected = { s.intValue = it; emit() })
+        // Labels Row (Separated from wheels to ensure highlight alignment)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = KronoTokens.Spacing.sm),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(Modifier.width(KronoTokens.Wheel.columnWidth), contentAlignment = Alignment.Center) { WheelLabel("HORAS") }
+            Spacer(Modifier.width(KronoTokens.Wheel.separatorWidth))
+            Box(Modifier.width(KronoTokens.Wheel.columnWidth), contentAlignment = Alignment.Center) { WheelLabel("MINUTOS") }
+            Spacer(Modifier.width(KronoTokens.Wheel.separatorWidth))
+            Box(Modifier.width(KronoTokens.Wheel.columnWidth), contentAlignment = Alignment.Center) { WheelLabel("SEGUNDOS") }
+        }
+
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        ) {
+            // Spatial Depth: Central glass bar with weightless glow
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(KronoTokens.Wheel.itemHeight)
+                    .background(
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = KronoTokens.Alpha.glass),
+                        shape = KronoTokens.Shape.input
+                    )
+                    .border(
+                        width = 1.dp,
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = KronoTokens.Alpha.glassBorder),
+                        shape = KronoTokens.Shape.input
+                    )
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                WheelColumn(range = 0..99, initial = initH, onSelected = { h.intValue = it; emit() })
+                Separator()
+                WheelColumn(range = 0..59, initial = initM, onSelected = { m.intValue = it; emit() })
+                Separator()
+                WheelColumn(range = 0..59, initial = initS, onSelected = { s.intValue = it; emit() })
+            }
+        }
     }
+}
+
+@Composable
+private fun WheelLabel(text: String) {
+    Text(
+        text = text,
+        fontSize = KronoTokens.Wheel.labelFontSize,
+        fontWeight = FontWeight.Bold,
+        color = MaterialTheme.colorScheme.primary.copy(alpha = KronoTokens.Alpha.label),
+        modifier = Modifier.padding(bottom = KronoTokens.Spacing.xs),
+        maxLines = 1,
+        softWrap = false
+    )
 }
 
 @Composable
@@ -73,16 +119,14 @@ private fun WheelColumn(
     range: IntRange,
     initial: Int,
     onSelected: (Int) -> Unit,
-    itemH: Dp = ITEM_H_DP.dp,
+    itemH: Dp = KronoTokens.Wheel.itemHeight,
     visible: Int = 3
 ) {
     val items = range.toList()
-    // +1 because we add a padding item at start
     val initIndex = (initial - range.first).coerceIn(0, items.lastIndex)
     val listState = rememberLazyListState(initialFirstVisibleItemIndex = initIndex)
     val snapBehavior = rememberSnapFlingBehavior(listState)
 
-    // Index of item currently centred in the viewport
     val centredIndex by remember {
         derivedStateOf {
             val info = listState.layoutInfo.visibleItemsInfo
@@ -90,13 +134,12 @@ private fun WheelColumn(
                     listState.layoutInfo.viewportSize.height / 2
             info.minByOrNull { kotlin.math.abs(it.offset + it.size / 2 - viewportCenter) }
                 ?.index
-                ?.minus(1)   // compensate leading padding item
+                ?.minus(1)
                 ?.coerceIn(0, items.lastIndex)
                 ?: initIndex
         }
     }
 
-    // Emit value changes when scroll settles
     LaunchedEffect(listState) {
         snapshotFlow { centredIndex }
             .distinctUntilChanged()
@@ -105,59 +148,66 @@ private fun WheelColumn(
 
     val containerH = itemH * visible
 
-    Box(contentAlignment = Alignment.Center) {
-        // Selection rails
-        HorizontalDivider(
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier.width(KronoTokens.Wheel.columnWidth)
+    ) {
+        // Individual column depth shadow
+        Box(
             modifier = Modifier
-                .width(56.dp)
-                .align(Alignment.Center)
-                .graphicsLayer { translationY = -(itemH.toPx() / 2) },
-            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
-            thickness = 1.5.dp
-        )
-        HorizontalDivider(
-            modifier = Modifier
-                .width(56.dp)
-                .align(Alignment.Center)
-                .graphicsLayer { translationY = itemH.toPx() / 2 },
-            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
-            thickness = 1.5.dp
+                .width(KronoTokens.Wheel.columnFocusWidth)
+                .height(containerH - KronoTokens.Spacing.xs)
+                .background(
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                    shape = KronoTokens.Shape.input
+                )
         )
 
         LazyColumn(
             state = listState,
             flingBehavior = snapBehavior,
             modifier = Modifier
-                .width(56.dp)
+                .width(KronoTokens.Wheel.columnInnerWidth)
                 .height(containerH),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Leading padding
             item { Box(Modifier.height(itemH)) }
 
             items(items.size) { index ->
                 val dist = kotlin.math.abs(index - centredIndex)
-                val alpha = when (dist) { 0 -> 1f; 1 -> 0.45f; else -> 0.18f }
-                val scale = if (dist == 0) 1f else 0.8f
-
+                val alpha = when (dist) { 
+                    0 -> KronoTokens.Wheel.alphaSelected 
+                    1 -> KronoTokens.Wheel.alphaMedium 
+                    else -> KronoTokens.Wheel.alphaSmall 
+                }
+                val scale = when (dist) { 
+                    0 -> KronoTokens.Wheel.scaleSelected 
+                    1 -> KronoTokens.Wheel.scaleMedium 
+                    else -> KronoTokens.Wheel.scaleSmall 
+                }
+                
                 Box(
                     modifier = Modifier
                         .height(itemH)
-                        .alpha(alpha)
-                        .graphicsLayer { scaleX = scale; scaleY = scale },
+                        .graphicsLayer {
+                            this.alpha = alpha
+                            this.scaleX = scale
+                            this.scaleY = scale
+                            this.rotationX = if (dist != 0) (index - centredIndex) * KronoTokens.Wheel.rotationFactor else 0f
+                            this.cameraDistance = KronoTokens.Wheel.cameraDistance * density
+                        },
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text = items[index].toString().padStart(2, '0'),
-                        fontSize = if (dist == 0) 28.sp else 20.sp,
-                        fontWeight = if (dist == 0) FontWeight.Bold else FontWeight.Normal,
-                        color = MaterialTheme.colorScheme.onSurface,
+                        fontSize = KronoTokens.Wheel.selectedFontSize,
+                        fontWeight = if (dist == 0) FontWeight.ExtraBold else FontWeight.Bold,
+                        color = if (dist == 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
                         textAlign = TextAlign.Center
                     )
                 }
             }
 
-            // Trailing padding
             item { Box(Modifier.height(itemH)) }
         }
     }
@@ -167,10 +217,10 @@ private fun WheelColumn(
 private fun Separator() {
     Text(
         ":",
-        fontSize = 24.sp,
-        fontWeight = FontWeight.Bold,
-        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-        modifier = Modifier.width(16.dp),
+        fontSize = KronoTokens.Wheel.separatorFontSize,
+        fontWeight = FontWeight.Black,
+        color = MaterialTheme.colorScheme.primary.copy(alpha = KronoTokens.Alpha.separator),
+        modifier = Modifier.width(KronoTokens.Wheel.separatorWidth),
         textAlign = TextAlign.Center
     )
 }

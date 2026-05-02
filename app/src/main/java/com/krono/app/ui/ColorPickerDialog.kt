@@ -29,6 +29,8 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.krono.app.ui.theme.KronoTokens
 import com.krono.app.ui.theme.adaptiveDialogWidth
+import androidx.compose.material3.IconButton
+import com.krono.app.ui.theme.KronoIcons
 import kotlin.math.roundToInt
 
 @Composable
@@ -108,7 +110,8 @@ fun ColorPickerDialog(
         Surface(
             modifier       = Modifier
                 .adaptiveDialogWidth()
-                .wrapContentHeight(),
+                .wrapContentHeight()
+                .padding(vertical = KronoTokens.Spacing.lg),
             shape          = KronoTokens.Shape.dialog,
             color          = MaterialTheme.colorScheme.surface,
             tonalElevation = KronoTokens.Elevation.dialog
@@ -118,23 +121,45 @@ fun ColorPickerDialog(
                     .padding(KronoTokens.Spacing.dialogPadding)
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(KronoTokens.Spacing.lg)
+                verticalArrangement = Arrangement.spacedBy(KronoTokens.Spacing.sectionGap)
             ) {
-                Text(
-                    text       = title,
-                    style      = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
-                    fontSize   = KronoTokens.Typography.dialogTitle
-                )
+                // Header: Title + Close (Standardized Box layout)
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text       = title,
+                        style      = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                        fontSize   = KronoTokens.Typography.dialogTitle
+                    )
+
+                    IconButton(
+                        onClick  = onDismiss,
+                        modifier = Modifier
+                            .size(KronoTokens.Icon.close)
+                            .align(Alignment.CenterEnd)
+                    ) {
+                        Icon(
+                            imageVector = KronoIcons.Navigation.Close,
+                            contentDescription = "Fechar",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(KronoTokens.Icon.listItem)
+                        )
+                    }
+                }
 
                 Row(
-                    modifier              = Modifier.fillMaxWidth(),
-                    verticalAlignment     = Alignment.Top,
+                    modifier              = Modifier
+                        .fillMaxWidth()
+                        .height(IntrinsicSize.Min),
                     horizontalArrangement = Arrangement.spacedBy(KronoTokens.Spacing.md)
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(width = 80.dp, height = 80.dp)
+                            .fillMaxHeight()
+                            .width(KronoTokens.Component.colorPreview)
                             .clip(KronoTokens.Shape.iconContainer)
                             .border(
                                 width = KronoTokens.Stroke.cardBorder,
@@ -161,7 +186,7 @@ fun ColorPickerDialog(
                                     .take(6)
                                     .uppercase()
                             },
-                            label           = { Text("#HEX") },
+                            placeholder     = { Text("HEX") },
                             prefix          = { Text("#", fontFamily = FontFamily.Monospace) },
                             keyboardOptions = KeyboardOptions(
                                 keyboardType   = KeyboardType.Ascii,
@@ -175,14 +200,14 @@ fun ColorPickerDialog(
                             shape      = KronoTokens.Shape.input,
                             textStyle  = LocalTextStyle.current.copy(
                                 fontFamily = FontFamily.Monospace,
-                                fontSize   = 14.sp
+                                fontSize   = KronoTokens.Typography.buttonLabelSmall
                             ),
                             modifier = Modifier.fillMaxWidth()
                         )
 
                         Row(
                             modifier              = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(KronoTokens.Spacing.xs + 2.dp)
+                            horizontalArrangement = Arrangement.spacedBy(KronoTokens.Spacing.sm)
                         ) {
                             RgbField(
                                 label    = "R",
@@ -296,35 +321,23 @@ fun ColorPickerDialog(
 
                 Spacer(Modifier.height(KronoTokens.Spacing.sm))
 
-                Row(
-                    modifier              = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(KronoTokens.Spacing.md)
+                // Action Confirmar (Full width like others)
+                Button(
+                    onClick  = { onConfirm(Color(previewArgb), opacity) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(KronoTokens.Button.height),
+                    shape = KronoTokens.Shape.button,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor   = MaterialTheme.colorScheme.onPrimary
+                    )
                 ) {
-                    OutlinedButton(
-                        onClick  = onDismiss,
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(KronoTokens.Button.height),
-                        shape = KronoTokens.Shape.button
-                    ) {
-                        Text(
-                            text     = "Cancelar",
-                            fontSize = KronoTokens.Typography.buttonLabel
-                        )
-                    }
-
-                    Button(
-                        onClick  = { onConfirm(Color(previewArgb), opacity) },
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(KronoTokens.Button.height),
-                        shape = KronoTokens.Shape.button
-                    ) {
-                        Text(
-                            text     = "Confirmar",
-                            fontSize = KronoTokens.Typography.buttonLabel
-                        )
-                    }
+                    Text(
+                        text       = "Confirmar",
+                        fontSize   = KronoTokens.Typography.buttonLabel,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             }
         }
@@ -344,16 +357,18 @@ private fun RgbField(
         onValueChange = { input ->
             onChange(input.filter { it.isDigit() }.take(3))
         },
-        label           = { Text(label) },
+        placeholder     = { Text(label) },
+        prefix          = { Text("$label ", style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold)) },
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Number,
             imeAction    = ImeAction.Done
         ),
         keyboardActions = KeyboardActions(onDone = { onDone() }),
         singleLine = true,
+        shape      = KronoTokens.Shape.input,
         textStyle  = LocalTextStyle.current.copy(
             fontFamily = FontFamily.Monospace,
-            fontSize   = 13.sp
+            fontSize   = KronoTokens.Typography.buttonLabelSmall
         ),
         modifier = modifier
     )
@@ -371,11 +386,11 @@ private fun HsbSliderRow(
     Row(
         modifier          = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(KronoTokens.Spacing.sm)
     ) {
         Text(
             text       = label,
-            modifier   = Modifier.width(92.dp), // Largura ajustada para evitar quebra
+            modifier   = Modifier.width(KronoTokens.Component.sliderLabelWidth), // Largura ajustada para evitar quebra
             style      = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.SemiBold,
             softWrap   = false // Força o texto em uma única linha
@@ -403,7 +418,7 @@ private fun HsbSliderRow(
         }
         Text(
             text       = displayValue,
-            modifier   = Modifier.width(52.dp),
+            modifier   = Modifier.width(KronoTokens.Component.sliderValueWidth),
             style      = MaterialTheme.typography.bodySmall,
             fontFamily = FontFamily.Monospace,
             fontWeight = FontWeight.Medium,
@@ -418,10 +433,10 @@ private fun CheckerboardBackground(modifier: Modifier = Modifier) {
     Box(
         modifier = modifier.background(
             Brush.horizontalGradient(
-                0.0f to Color(0xFFCCCCCC),
-                0.5f to Color(0xFFCCCCCC),
-                0.5f to Color(0xFF999999),
-                1.0f to Color(0xFF999999)
+                0.0f to KronoTokens.Colors.checkerLight,
+                0.5f to KronoTokens.Colors.checkerLight,
+                0.5f to KronoTokens.Colors.checkerDark,
+                1.0f to KronoTokens.Colors.checkerDark
             )
         )
     )

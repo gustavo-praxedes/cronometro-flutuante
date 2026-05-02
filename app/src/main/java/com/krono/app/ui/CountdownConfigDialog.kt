@@ -18,6 +18,7 @@ import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -33,10 +34,11 @@ fun CountdownConfigDialog(
     /** Chamado a cada tick do wheel — atualiza card e overlay ao vivo */
     onPreview: ((totalSeconds: Long) -> Unit)? = null
 ) {
-    var description  by remember { mutableStateOf(initial?.description ?: "") }
-    var totalSeconds by remember { mutableLongStateOf(initial?.totalSeconds ?: 0L) }
+    val defaultBg = MaterialTheme.colorScheme.primaryContainer.toArgb()
+    var description   by remember { mutableStateOf(initial?.description ?: "") }
+    var totalSeconds  by remember { mutableLongStateOf(initial?.totalSeconds ?: 0L) }
     var bgColor      by remember {
-        mutableStateOf(Color(initial?.backgroundColor ?: 0xFFB5EAD7.toInt()))
+        mutableStateOf(Color(initial?.backgroundColor ?: defaultBg))
     }
     var showColorPicker by remember { mutableStateOf(false) }
 
@@ -75,7 +77,7 @@ fun CountdownConfigDialog(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = if (isEditMode) "Editar cronômetro" else "Novo cronômetro",
+                        text = if (isEditMode) "Editar timer" else "Novo timer",
                         style = MaterialTheme.typography.headlineSmall.copy(
                             platformStyle = PlatformTextStyle(includeFontPadding = false)
                         ),
@@ -104,54 +106,53 @@ fun CountdownConfigDialog(
                 // ── Campo de descrição ─────────────────────────────────────
                 OutlinedTextField(
                     value         = description,
-                    onValueChange = { if (it.length <= 40) description = it },
+                    onValueChange = { if (it.length <= KronoTokens.Component.descriptionMaxLen) description = it },
                     label         = { Text("Descrição") },
-                    placeholder   = { Text("Ex: Foco, Pausa, Cozinhar...") },
+                    placeholder   = { Text("Ex: Foco, Pausa, Trabalhar ...") },
                     singleLine    = true,
                     keyboardOptions = KeyboardOptions(
                         capitalization = KeyboardCapitalization.Sentences,
                         imeAction      = ImeAction.Done
                     ),
                     shape    = KronoTokens.Shape.input,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    trailingIcon = {
+                        IconButton(
+                            onClick  = { showColorPicker = true },
+                            modifier = Modifier.size(KronoTokens.Button.heightSmall)
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(KronoTokens.Component.colorSwatch)
+                                        .clip(CircleShape)
+                                        .background(bgColor)
+                                )
+                                Icon(
+                                    imageVector        = KronoIcons.Action.Palette,
+                                    contentDescription = "Cor do card",
+                                    tint               = overlayTextColor(bgColor).copy(alpha = KronoTokens.Alpha.medium),
+                                    modifier           = Modifier.size(KronoTokens.Icon.listItem)
+                                )
+                            }
+                        }
+                    },
+                    supportingText = {
+                        Text(
+                            text      = "${description.length}/${KronoTokens.Component.descriptionMaxLen}",
+                            modifier  = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.End
+                        )
+                    }
                 )
 
                 Spacer(Modifier.height(KronoTokens.Spacing.sectionGap))
 
-                // ── Wheel + cor na mesma linha ─────────────────────────────
-                Row(
-                    modifier          = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(KronoTokens.Spacing.sm)
-                ) {
-                    Box(modifier = Modifier.weight(1f)) {
-                        TimeWheelPicker(
-                            totalSeconds  = totalSeconds,
-                            onValueChange = { totalSeconds = it }
-                        )
-                    }
-
-                    // Swatch de cor — círculo com ícone de paleta sobreposto
-                    IconButton(
-                        onClick  = { showColorPicker = true },
-                        modifier = Modifier.size(KronoTokens.Button.heightSmall)
-                    ) {
-                        Box(contentAlignment = Alignment.Center) {
-                            Box(
-                                modifier = Modifier
-                                    .size(36.dp)
-                                    .clip(CircleShape)
-                                    .background(bgColor)
-                            )
-                            Icon(
-                                imageVector        = KronoIcons.Action.Palette,
-                                contentDescription = "Cor do card",
-                                tint               = overlayTextColor(bgColor).copy(alpha = 0.75f),
-                                modifier           = Modifier.size(KronoTokens.Icon.listItem)
-                            )
-                        }
-                    }
-                }
+                // ── Wheel Picker (Ocupando a largura total) ────────────────
+                TimeWheelPicker(
+                    totalSeconds  = totalSeconds,
+                    onValueChange = { totalSeconds = it }
+                )
 
                 Spacer(Modifier.height(KronoTokens.Spacing.sectionGap))
 

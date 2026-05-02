@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -39,6 +40,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+
+import androidx.compose.material3.IconButton
+import com.krono.app.ui.theme.KronoTokens
+import com.krono.app.ui.theme.adaptiveDialogWidth
+import androidx.compose.foundation.layout.wrapContentHeight
 
 private val PASTEL_COLORS = listOf(
     // Pinks & Reds
@@ -74,39 +80,49 @@ fun CountdownColorPickerDialog(
     ) {
         Surface(
             modifier = Modifier
-                .fillMaxWidth(0.9f)
-                .padding(vertical = 16.dp),
-            shape = RoundedCornerShape(24.dp),
-            tonalElevation = 6.dp
+                .adaptiveDialogWidth()
+                .wrapContentHeight()
+                .padding(vertical = KronoTokens.Spacing.lg),
+            shape = KronoTokens.Shape.dialog,
+            tonalElevation = KronoTokens.Elevation.dialog,
+            color = MaterialTheme.colorScheme.surface
         ) {
             Column(
-                modifier = Modifier.padding(20.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                modifier = Modifier.padding(KronoTokens.Spacing.dialogPadding),
+                verticalArrangement = Arrangement.spacedBy(KronoTokens.Spacing.sectionGap)
             ) {
-                // Title + preview
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                // Title + Close (Standardized Box layout)
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        "Cor do card",
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.weight(1f)
+                        text       = "Cor do card",
+                        fontSize   = KronoTokens.Typography.dialogTitle,
+                        fontWeight = FontWeight.Bold,
+                        color      = MaterialTheme.colorScheme.onSurface
                     )
-                    Box(
+
+                    IconButton(
+                        onClick  = onDismiss,
                         modifier = Modifier
-                            .size(32.dp)
-                            .clip(CircleShape)
-                            .background(selected)
-                            .border(2.dp, MaterialTheme.colorScheme.outline, CircleShape)
-                    )
+                            .size(KronoTokens.Icon.close)
+                            .align(Alignment.CenterEnd)
+                    ) {
+                        Icon(
+                            imageVector = KronoIcons.Navigation.Close,
+                            contentDescription = "Fechar",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(KronoTokens.Icon.listItem)
+                        )
+                    }
                 }
 
                 // 32 pastel swatches — 8 columns × 4 rows
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(8),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(KronoTokens.Spacing.sm),
+                    verticalArrangement = Arrangement.spacedBy(KronoTokens.Spacing.sm),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     items(PASTEL_COLORS) { color ->
@@ -114,52 +130,65 @@ fun CountdownColorPickerDialog(
                         Box(
                             contentAlignment = Alignment.Center,
                             modifier = Modifier
-                                .size(32.dp)
+                                .size(KronoTokens.Component.colorSwatch)
                                 .clip(CircleShape)
                                 .background(color)
                                 .then(
                                     if (isSelected)
-                                        Modifier.border(2.5.dp, MaterialTheme.colorScheme.primary, CircleShape)
+                                        Modifier.border(KronoTokens.Stroke.circularIndicator, MaterialTheme.colorScheme.primary, CircleShape)
                                     else
-                                        Modifier.border(1.dp, MaterialTheme.colorScheme.outlineVariant, CircleShape)
+                                        Modifier.border(KronoTokens.Stroke.cardBorder, MaterialTheme.colorScheme.outlineVariant.copy(alpha = KronoTokens.Alpha.low), CircleShape)
                                 )
                                 .clickable { selected = color }
                         ) {
                             if (isSelected) {
                                 Icon(
-                                    KronoIcons.Action.Check,
+                                    imageVector = KronoIcons.Action.Check,
                                     contentDescription = "Selecionado",
                                     tint = overlayTextColor(color),
-                                    modifier = Modifier.size(16.dp)
+                                    modifier = Modifier.size(KronoTokens.Icon.dialogHeader)
                                 )
                             }
                         }
                     }
                 }
 
-                // Custom color option
+                // Custom color option (Small & Symmetrical spacing)
                 TextButton(
-                    onClick = { showCustomPicker = true },
-                    modifier = Modifier.fillMaxWidth()
+                    onClick  = { showCustomPicker = true },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape    = KronoTokens.Shape.buttonSmall,
+                    contentPadding = PaddingValues(KronoTokens.Spacing.sm)
                 ) {
                     Icon(
-                        KronoIcons.Action.Palette,
+                        imageVector = KronoIcons.Action.Palette,
                         contentDescription = null,
-                        modifier = Modifier.size(18.dp)
+                        modifier = Modifier.size(KronoTokens.Icon.small)
                     )
-                    Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-                    Text("Cor personalizada")
+                    Spacer(Modifier.size(KronoTokens.Button.iconSpacing))
+                    Text(
+                        text     = "Cor personalizada",
+                        fontSize = KronoTokens.Typography.statusLabel
+                    )
                 }
 
-                // Actions
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End)
+                // Action Confirmar (Full width like others)
+                Button(
+                    onClick  = { onColorSelected(selected) },
+                    shape    = KronoTokens.Shape.button,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(KronoTokens.Button.height),
+                    colors   = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor   = MaterialTheme.colorScheme.onPrimary
+                    )
                 ) {
-                    TextButton(onClick = onDismiss) { Text("Cancelar") }
-                    Button(onClick = { onColorSelected(selected) }) {
-                        Text("Confirmar")
-                    }
+                    Text(
+                        "Confirmar",
+                        fontSize   = KronoTokens.Typography.buttonLabel,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             }
         }
