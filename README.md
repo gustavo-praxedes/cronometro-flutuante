@@ -126,12 +126,7 @@ Antes de instalar, verifique se o seu dispositivo atende aos requisitos:
 
 [//]: # (CHANGELOG_LATEST_START)
 
-## [3.2.2](https://github.com/gustavo-praxedes/krono/compare/v3.2.1...v3.2.2) (2026-04-24)
-
-
-### 🔧 Manutenção
-
-* Adicionado o google firebase ([64937ed](https://github.com/gustavo-praxedes/krono/commit/64937ed3f5f63cbd9a0753baaee53aa0454f7ace))
+## [3.2.3](https://github.com/gustavo-praxedes/krono/compare/v3.2.2...v3.2.3) (2026-04-24)
 
 [//]: # (CHANGELOG_LATEST_END)
 
