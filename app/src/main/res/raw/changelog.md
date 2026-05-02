@@ -5,6 +5,7 @@
 - fix: Correção de bugs no cronômetro regressivo
 
 # 🔧 Manutenção
+- style: Timer finalizado
 - style: Redefinição da UI.
 - Primeira implementação do cronômetro regressivo
 - chore: Refatoração de MainService para separar funções

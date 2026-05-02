@@ -46,24 +46,21 @@ import com.krono.app.ui.theme.KronoTokens
 import com.krono.app.ui.theme.adaptiveDialogWidth
 import androidx.compose.foundation.layout.wrapContentHeight
 
-private val PASTEL_COLORS = listOf(
-    // Pinks & Reds
-    0xFFFFB3BA, 0xFFFF8FA3, 0xFFE8A0BF, 0xFFF4A7B9,
-    // Oranges
-    0xFFFFDFBA, 0xFFFFCA99, 0xFFFFB347, 0xFFF5C8A0,
-    // Yellows
-    0xFFFFFFBA, 0xFFFFF176, 0xFFFFE680, 0xFFFADA7A,
-    // Greens
-    0xFFBAFFBA, 0xFFB5EAD7, 0xFF9DE8A0, 0xFFADE8B0,
-    // Teals & Cyans
-    0xFFBAFFFF, 0xFFB2EBF2, 0xFF80DEEA, 0xFF9FD8DF,
-    // Blues
-    0xFFBAD4FF, 0xFFB3C8F5, 0xFFA0C4FF, 0xFFBBCFF8,
-    // Purples & Lavenders
-    0xFFE0BAFF, 0xFFD4B0F0, 0xFFCFC1F5, 0xFFD8BFD8,
-    // Browns & Warm Neutrals
-    0xFFF5DEB3, 0xFFEDCBAA, 0xFFD2B48C, 0xFFC4A882,
+private val COLOR_PALETTE = listOf(
+    // Neutrais (Branco, Preto, Cinzas)
+    0xFFFFFFFF, 0xFFF5F5F5, 0xFFCCCCCC, 0xFF808080,
+    0xFF444444, 0xFF222222, 0xFF121212, 0xFF000000,
+    // Cores Quentes & Vibrantes
+    0xFFFF5252, 0xFFFF4081, 0xFFFF9800, 0xFFFFC107,
+    0xFFCD7F32, 0xFF795548, 0xFFF08080, 0xFFFFB3BA,
+    // Cores Frias & Natureza
+    0xFF4CAF50, 0xFF009688, 0xFF00BCD4, 0xFF03A9F4,
+    0xFF448AFF, 0xFF3F51B5, 0xFF607D8B, 0xFFBAFFBA,
+    // Tons Artísticos & Diversos
+    0xFF7C4DFF, 0xFF536DFE, 0xFFE0BAFF, 0xFF98FF98,
+    0xFFE6E6FA, 0xFF708090, 0xFFD2B48C, 0xFFFFD700
 ).map { Color(it.toInt()) }
+
 
 @Composable
 fun CountdownColorPickerDialog(
@@ -125,7 +122,7 @@ fun CountdownColorPickerDialog(
                     verticalArrangement = Arrangement.spacedBy(KronoTokens.Spacing.sm),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    items(PASTEL_COLORS) { color ->
+                    items(COLOR_PALETTE) { color ->
                         val isSelected = color == selected
                         Box(
                             contentAlignment = Alignment.Center,
