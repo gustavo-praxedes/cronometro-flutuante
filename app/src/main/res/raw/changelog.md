@@ -5,6 +5,8 @@
 - fix: Correção de bugs no cronômetro regressivo
 
 # 🔧 Manutenção
+- chore: 3.3.0
+- style: Ajustes finais no countdown.
 - style: Timer finalizado
 - style: Redefinição da UI.
 - Primeira implementação do cronômetro regressivo
