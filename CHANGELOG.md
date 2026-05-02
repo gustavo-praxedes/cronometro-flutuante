@@ -2,6 +2,13 @@
 
 Histórico de mudanças do Krono.
 
+## [3.3.1](https://github.com/gustavo-praxedes/krono/compare/v3.3.0...v3.3.1) (2026-05-02)
+
+
+### 🔧 Manutenção
+
+* Fim da branch ([3e64cee](https://github.com/gustavo-praxedes/krono/commit/3e64cee833607869c74a153d61a35e45f3ef14ef))
+
 ## [3.3.0](https://github.com/gustavo-praxedes/krono/compare/v3.2.3...v3.3.0) (2026-05-02)
 
 

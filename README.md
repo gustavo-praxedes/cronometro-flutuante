@@ -126,7 +126,49 @@ Antes de instalar, verifique se o seu dispositivo atende aos requisitos:
 
 [//]: # (CHANGELOG_LATEST_START)
 
-## [3.2.3](https://github.com/gustavo-praxedes/krono/compare/v3.2.2...v3.2.3) (2026-04-24)
+## [3.3.0](https://github.com/gustavo-praxedes/krono/compare/v3.2.3...v3.3.0) (2026-05-02)
+
+
+### ✨ Novidades
+
+* Seleção de fontes para o overlay adicionada ([aece1e1](https://github.com/gustavo-praxedes/krono/commit/aece1e175c678080da3099c7e817c907c1913508))
+
+
+### 🐛 Correções
+
+* Correção de bugs no cronômetro regressivo ([fc04202](https://github.com/gustavo-praxedes/krono/commit/fc042020cb6f42ef61622a3bc025e57164614641))
+
+
+### ♻️ Refatorações
+
+* **ui:** adicionar largura adaptativa para dialogos no tema ([b96b5ba](https://github.com/gustavo-praxedes/krono/commit/b96b5ba47de56ebd71a1f7b76c0347d4a150c677))
+* **ui:** aplicar largura adaptativa e rolagem no DonationDialog ([a4dcb55](https://github.com/gustavo-praxedes/krono/commit/a4dcb55ed1d73e2baf602d9ecf7acbea282f50f5))
+* **ui:** aplicar largura adaptativa e rolagem no PermissionsDialog ([86f0ff5](https://github.com/gustavo-praxedes/krono/commit/86f0ff5db9aefc443dc1d85539f3ebba1e954c44))
+* **ui:** aplicar largura adaptativa e rolagem no UpdateDialog ([5727854](https://github.com/gustavo-praxedes/krono/commit/5727854daeb2ffd9b6a4405f8487a4fdf3a75e16))
+* **ui:** aplicar largura adaptativa no BugReportDialog ([d20629c](https://github.com/gustavo-praxedes/krono/commit/d20629cbbe71663c66e2bbf1834bb7ac085618c5))
+* **ui:** aplicar largura adaptativa no ChangelogDialog ([5b7c6f3](https://github.com/gustavo-praxedes/krono/commit/5b7c6f3505d4fcef6b279ffb4c42ef618e9f0298))
+* **ui:** aplicar largura adaptativa no ColorPickerDialog ([18db19e](https://github.com/gustavo-praxedes/krono/commit/18db19e822d8e3fd3c2fbea64eb43f7fec40a8a6))
+* **ui:** tornar AboutDialog adaptativo e com rolagem ([9c0170b](https://github.com/gustavo-praxedes/krono/commit/9c0170b00e5e7113e9212d6a7c1c00e743e07442))
+
+
+### 📝 Documentação
+
+* atualizar changelog com as mudanças de largura adaptativa ([68016cf](https://github.com/gustavo-praxedes/krono/commit/68016cf5fd430d4163596fd140724ab39723e3b8))
+* Documentação atualizada. ([175fb90](https://github.com/gustavo-praxedes/krono/commit/175fb90e35de9880470746ad57b60dfc5f44f288))
+
+
+### 🔧 Manutenção
+
+* Pastas de IA adicionadas ao gitignore ([a98f019](https://github.com/gustavo-praxedes/krono/commit/a98f0190da1bbeedf27a9814943ab08b45e54098))
+* Refatoração de MainService para separar funções ([f419242](https://github.com/gustavo-praxedes/krono/commit/f4192427400649d79f503613342043d43aa3466d))
+
+
+### 💄 Estilo
+
+* Ajustes finais no countdown. ([95e5163](https://github.com/gustavo-praxedes/krono/commit/95e5163040487b37eb16e9e3f45027e7930b8f9d))
+* Padronização de janelas ([765cfe3](https://github.com/gustavo-praxedes/krono/commit/765cfe3d085428c43ce64e0bd5f25f634debcfc0))
+* Redefinição da UI. ([35b67e0](https://github.com/gustavo-praxedes/krono/commit/35b67e0c54fb4e3cf6cb197d03f856a4d3b3befd))
+* Timer finalizado ([bf516ef](https://github.com/gustavo-praxedes/krono/commit/bf516efd53022d7f8c79d0c22f73a4f7e8e304d3))
 
 [//]: # (CHANGELOG_LATEST_END)
 
