@@ -7,10 +7,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Download
+import com.krono.app.ui.theme.KronoIcons
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -131,7 +128,7 @@ fun UpdateDialog(
                             .align(Alignment.TopEnd)
                     ) {
                         Icon(
-                            imageVector        = Icons.Default.Close,
+                            imageVector        = KronoIcons.Navigation.Close,
                             contentDescription = "Fechar",
                             tint               = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -169,7 +166,7 @@ fun UpdateDialog(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(
-                                imageVector        = Icons.Default.Download,
+                                imageVector        = KronoIcons.Action.Download,
                                 contentDescription = null,
                                 tint               = MaterialTheme.colorScheme.onPrimaryContainer,
                                 modifier           = Modifier.size(KronoTokens.Icon.status)
@@ -244,7 +241,7 @@ fun UpdateDialog(
                     when {
                         isDownloaded -> {
                             Icon(
-                                imageVector        = Icons.Default.CheckCircle,
+                                imageVector        = KronoIcons.Action.Check,
                                 contentDescription = null,
                                 modifier           = Modifier.size(KronoTokens.Icon.button)
                             )
@@ -269,7 +266,7 @@ fun UpdateDialog(
                          }
                         else -> {
                             Icon(
-                                imageVector        = Icons.Default.Download,
+                                imageVector        = KronoIcons.Action.Download,
                                 contentDescription = null,
                                 modifier           = Modifier.size(KronoTokens.Icon.button)
                             )

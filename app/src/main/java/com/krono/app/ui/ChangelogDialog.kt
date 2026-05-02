@@ -7,16 +7,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Article
-import androidx.compose.material.icons.filled.AutoAwesome
-import androidx.compose.material.icons.filled.BugReport
-import androidx.compose.material.icons.filled.Build
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Speed
+import com.krono.app.ui.theme.KronoIcons
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -38,12 +29,12 @@ import kotlinx.coroutines.launch
 import androidx.compose.ui.unit.dp
 
 enum class ItemType(val icon: ImageVector, val iconTint: androidx.compose.ui.graphics.Color) {
-    FEAT (Icons.Default.AutoAwesome,          androidx.compose.ui.graphics.Color(0xFF10B981)),
-    FIX  (Icons.Default.BugReport,            androidx.compose.ui.graphics.Color(0xFFEF4444)),
-    PERF (Icons.Default.Speed,                androidx.compose.ui.graphics.Color(0xFFF59E0B)),
-    DOCS (Icons.AutoMirrored.Filled.Article,  androidx.compose.ui.graphics.Color(0xFF8B5CF6)),
-    CHORE(Icons.Default.Build,                androidx.compose.ui.graphics.Color(0xFF6B7280)),
-    OTHER(Icons.Default.Check,                androidx.compose.ui.graphics.Color(0xFF3B82F6))
+    FEAT (KronoIcons.Action.Sparkle,          androidx.compose.ui.graphics.Color(0xFF10B981)),
+    FIX  (KronoIcons.Status.Bug,              androidx.compose.ui.graphics.Color(0xFFEF4444)),
+    PERF (KronoIcons.Status.Speed,            androidx.compose.ui.graphics.Color(0xFFF59E0B)),
+    DOCS (KronoIcons.Status.Doc,              androidx.compose.ui.graphics.Color(0xFF8B5CF6)),
+    CHORE(KronoIcons.Status.Build,            androidx.compose.ui.graphics.Color(0xFF6B7280)),
+    OTHER(KronoIcons.Action.Check,            androidx.compose.ui.graphics.Color(0xFF3B82F6))
 }
 
 data class ChangelogItem(val text: String, val type: ItemType)
@@ -162,7 +153,7 @@ fun ChangelogDialog(
                             .align(Alignment.CenterEnd)
                     ) {
                         Icon(
-                            imageVector        = Icons.Default.Close,
+                            imageVector        = KronoIcons.Navigation.Close,
                             contentDescription = "Fechar",
                             tint               = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -232,7 +223,7 @@ fun ChangelogDialog(
                     if (isUpToDate) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
-                                imageVector        = Icons.Default.CheckCircle,
+                                imageVector        = KronoIcons.Action.Check,
                                 contentDescription = null,
                                 tint               = MaterialTheme.colorScheme.primary,
                                 modifier           = Modifier.size(KronoTokens.Icon.status)
@@ -271,7 +262,7 @@ fun ChangelogDialog(
                             )
                         ) {
                             Icon(
-                                imageVector        = Icons.Default.Refresh,
+                                imageVector        = KronoIcons.Action.Reset,
                                 contentDescription = null,
                                 modifier           = Modifier.size(KronoTokens.Icon.button)
                             )

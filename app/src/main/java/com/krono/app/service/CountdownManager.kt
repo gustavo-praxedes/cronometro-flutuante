@@ -19,57 +19,59 @@ class CountdownManager(
     private val countdownViewModel: CountdownViewModel
 ) {
     private val scope = CoroutineScope(SupervisorJob())
+
+    // id → running coroutine
     private val activeTimers = mutableMapOf<String, Job>()
 
-    // id → overlay. Passed as lambda so each overlay can query current peers.
+    // id → remaining seconds (manager-owned, avoids race with ViewModel ticks)
+    private val remainingMap = mutableMapOf<String, Long>()
+
+    // id → overlay instance
     private val activeOverlays = mutableMapOf<String, CountdownOverlayManager>()
     private fun peers(): List<CountdownOverlayManager> = activeOverlays.values.toList()
 
     // ── Timer ──────────────────────────────────────────────────────────────
 
     fun play(id: String) {
-        val state = current(id) ?: return
-        if (state.isRunning || state.isCompleted) return
+        if (activeTimers[id]?.isActive == true) return
+        val state = vmState(id) ?: return
+        if (state.isCompleted) return
 
-        activeTimers[id]?.cancel()
+        val startRemaining = remainingMap.getOrPut(id) { state.remainingSeconds }
+
         activeTimers[id] = scope.launch {
-            var remaining = state.remainingSeconds
+            var remaining = startRemaining
             while (remaining > 0) {
-                delay(1_000)
+                delay(1_000L)
                 remaining--
+                remainingMap[id] = remaining
                 countdownViewModel.onTick(id, remaining)
-                // Sync overlay UI
-                current(id)?.let { s ->
-                    activeOverlays[id]?.update(s)
-                    if (s.isOverlayVisible) notificationHelper.postCountdownNotification(s)
-                }
+                syncOverlay(id)
             }
-            onCompleted(id)
+            if (remaining <= 0) complete(id)
         }
     }
 
     fun pause(id: String) {
         activeTimers[id]?.cancel()
         activeTimers.remove(id)
-        current(id)?.let { s ->
-            activeOverlays[id]?.update(s)
-            notificationHelper.postCountdownNotification(s)
-        }
+        syncOverlay(id)
+        vmState(id)?.let { if (it.isOverlayVisible) notificationHelper.postCountdownNotification(it) }
     }
 
     fun reset(id: String) {
         activeTimers[id]?.cancel()
         activeTimers.remove(id)
-        current(id)?.let { s ->
-            activeOverlays[id]?.update(s)
-            notificationHelper.cancelCountdownNotification(id)
-        }
+        val total = vmState(id)?.config?.totalSeconds ?: return
+        remainingMap[id] = total
+        syncOverlay(id)
+        notificationHelper.cancelCountdownNotification(id)
     }
 
     // ── Overlay ────────────────────────────────────────────────────────────
 
     fun showOverlay(id: String) {
-        val state = current(id) ?: return
+        val state = vmState(id) ?: return
         val overlay = activeOverlays.getOrPut(id) {
             CountdownOverlayManager(
                 context = context,
@@ -81,12 +83,11 @@ class CountdownManager(
                 onReset = { reset(id); countdownViewModel.reset(context, id) },
                 onClose = {
                     hideOverlay(id)
-                    countdownViewModel.forceHideOverlay(context, id)
+                    countdownViewModel.forceHideOverlay(id)
                 }
             )
         }
         overlay.show(state)
-        notificationHelper.postCountdownNotification(state)
     }
 
     fun hideOverlay(id: String) {
@@ -95,32 +96,42 @@ class CountdownManager(
         notificationHelper.cancelCountdownNotification(id)
     }
 
+    /**
+     * Called when ViewModel state changes externally (e.g. live preview from wheel).
+     * Pushes latest state to overlay without touching the timer.
+     */
+    fun syncOverlay(id: String) {
+        val state = vmState(id) ?: return
+        activeOverlays[id]?.update(state)
+    }
+
     fun destroy(id: String) {
         activeTimers[id]?.cancel()
         activeTimers.remove(id)
+        remainingMap.remove(id)
         hideOverlay(id)
     }
 
     fun destroyAll() {
         activeTimers.values.forEach { it.cancel() }
         activeTimers.clear()
+        remainingMap.clear()
         activeOverlays.values.forEach { it.hide() }
         activeOverlays.clear()
         scope.cancel()
     }
 
-    // ── Helpers ────────────────────────────────────────────────────────────
+    // ── Internal ───────────────────────────────────────────────────────────
 
-    private fun onCompleted(id: String) {
+    private fun complete(id: String) {
         activeTimers.remove(id)
+        remainingMap[id] = 0L
         countdownViewModel.onCompleted(id)
         feedbackManager.onCountdownCompleted()
-        current(id)?.let { s ->
-            activeOverlays[id]?.update(s)
-            notificationHelper.postCountdownNotification(s)
-        }
+        syncOverlay(id)
+        vmState(id)?.let { notificationHelper.postCountdownNotification(it) }
     }
 
-    private fun current(id: String): CountdownState? =
+    private fun vmState(id: String): CountdownState? =
         countdownViewModel.countdowns.value.find { it.config.id == id }
 }

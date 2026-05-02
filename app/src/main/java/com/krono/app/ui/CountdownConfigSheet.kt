@@ -13,8 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Palette
+import com.krono.app.ui.theme.KronoIcons
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -129,7 +128,7 @@ fun CountdownConfigSheet(
                                 .background(bgColor)
                         )
                         Icon(
-                            imageVector = Icons.Default.Palette,
+                            imageVector = KronoIcons.Action.Palette,
                             contentDescription = "Escolher cor",
                             tint = MaterialTheme.colorScheme.primary
                         )

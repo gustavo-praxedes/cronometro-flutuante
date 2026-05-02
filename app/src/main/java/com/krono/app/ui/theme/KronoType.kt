@@ -24,12 +24,16 @@ private val firaCodeFont      = GoogleFont("Fira Code")
 private val anonymousProFont  = GoogleFont("Anonymous Pro")
 private val robotoMonoFont    = GoogleFont("Roboto Mono")
 private val spaceMonoFont     = GoogleFont("Space Mono")
+private val chivoMonoFont     = GoogleFont("Chivo Mono")
+private val azeretMonoFont    = GoogleFont("Azeret Mono")
 
 val JetBrainsMono = FontFamily(Font(googleFont = jetbrainsMonoFont, fontProvider = provider, weight = FontWeight.Bold))
 val FiraCode      = FontFamily(Font(googleFont = firaCodeFont,      fontProvider = provider, weight = FontWeight.Bold))
 val AnonymousPro  = FontFamily(Font(googleFont = anonymousProFont,  fontProvider = provider, weight = FontWeight.Bold))
 val RobotoMono    = FontFamily(Font(googleFont = robotoMonoFont,    fontProvider = provider, weight = FontWeight.Bold))
 val SpaceMono     = FontFamily(Font(googleFont = spaceMonoFont,     fontProvider = provider, weight = FontWeight.Bold))
+val ChivoMono     = FontFamily(Font(googleFont = chivoMonoFont,     fontProvider = provider, weight = FontWeight.Bold))
+val AzeretMono    = FontFamily(Font(googleFont = azeretMonoFont,    fontProvider = provider, weight = FontWeight.Bold))
 
 // ── Tipografia Padrão ────────────────────────────────────────
 val AppTypography = Typography(
@@ -53,6 +57,8 @@ fun timerFontFamily(selectedFont: String): FontFamily {
         KronoFontOption.ANONYMOUS_PRO  -> AnonymousPro
         KronoFontOption.ROBOTO_MONO    -> RobotoMono
         KronoFontOption.COMMIT_MONO    -> SpaceMono
+        KronoFontOption.CHIVO_MONO     -> ChivoMono
+        KronoFontOption.AZERET_MONO    -> AzeretMono
         else -> FontFamily.Monospace
     }
 }
@@ -62,7 +68,7 @@ fun timerFontFamily(selectedFont: String): FontFamily {
  */
 val TimerDisplayStyle = TextStyle(
     fontFamily = FontFamily.Monospace,
-    fontWeight = FontWeight.Bold,
+    fontWeight = FontWeight.Normal,
     fontSize = 40.sp,
     letterSpacing = 0.sp
 )

@@ -8,25 +8,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Pause
-import androidx.compose.material.icons.filled.PictureInPicture
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Replay
-import androidx.compose.material.icons.outlined.PictureInPicture
+import com.krono.app.ui.theme.KronoIcons
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -58,7 +48,6 @@ fun CountdownCard(
     modifier: Modifier = Modifier
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
-
     val bgColor = Color(state.config.backgroundColor)
     val textColor = overlayTextColor(bgColor)
 
@@ -75,38 +64,34 @@ fun CountdownCard(
         colors = CardDefaults.cardColors(containerColor = containerColor),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
+        Column(modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp)) {
 
-            // ── Top row: description + badge + menu ────────────────────────
+            // ── Row 1: description + badge + ⋮ ───────────────────────────
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     text = state.config.description.ifBlank { "Sem título" },
-                    style = MaterialTheme.typography.titleSmall,
+                    style = MaterialTheme.typography.labelLarge,
                     fontWeight = FontWeight.SemiBold,
-                    color = textColor,
+                    color = textColor.copy(alpha = 0.8f),
                     maxLines = 1,
                     modifier = Modifier.weight(1f)
                 )
-
                 if (state.isCompleted) {
-                    Spacer(modifier = Modifier.width(6.dp))
-                    CompletedBadge(textColor = textColor)
+                    Spacer(Modifier.width(6.dp))
+                    CompletedBadge(textColor)
                 }
-
-                // ⋮ menu
                 Box {
                     IconButton(
                         onClick = { menuExpanded = true },
-                        modifier = Modifier.size(36.dp)
+                        modifier = Modifier.size(32.dp)
                     ) {
                         Icon(
-                            imageVector = Icons.Default.MoreVert,
-                            contentDescription = "Opções",
-                            tint = textColor.copy(alpha = 0.6f),
-                            modifier = Modifier.size(20.dp)
+                            KronoIcons.Action.More, "Opções",
+                            tint = textColor.copy(alpha = 0.55f),
+                            modifier = Modifier.size(18.dp)
                         )
                     }
                     DropdownMenu(
@@ -117,8 +102,7 @@ fun CountdownCard(
                             text = { Text("Excluir", color = MaterialTheme.colorScheme.error) },
                             leadingIcon = {
                                 Icon(
-                                    Icons.Default.Delete,
-                                    contentDescription = null,
+                                    KronoIcons.Action.Delete, null,
                                     tint = MaterialTheme.colorScheme.error
                                 )
                             },
@@ -128,35 +112,20 @@ fun CountdownCard(
                 }
             }
 
-            // ── Time display ───────────────────────────────────────────────
-            Spacer(modifier = Modifier.height(2.dp))
-            Text(
-                text = TimeUtils.formatSeconds(state.remainingSeconds),
-                fontSize = 32.sp,
-                fontWeight = FontWeight.Bold,
-                color = textColor,
-                letterSpacing = 1.sp
-            )
-
-            // ── Divider ────────────────────────────────────────────────────
-            Spacer(modifier = Modifier.height(10.dp))
-            HorizontalDivider(color = textColor.copy(alpha = 0.15f))
-            Spacer(modifier = Modifier.height(6.dp))
-
-            // ── Controls row: play/pause · reset · overlay ─────────────────
+            // ── Row 2: controls (LEFT) + time display (RIGHT) ─────────────
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(0.dp)
             ) {
-                // Play / Pause
+                // Play/Pause
                 IconButton(
                     onClick = { if (state.isRunning) onPause() else onPlay() },
                     modifier = Modifier.size(40.dp)
                 ) {
                     Icon(
-                        imageVector = if (state.isRunning) Icons.Default.Pause else Icons.Default.PlayArrow,
-                        contentDescription = if (state.isRunning) "Pausar" else "Iniciar",
+                        if (state.isRunning) KronoIcons.Action.Pause else KronoIcons.Action.Play,
+                        if (state.isRunning) "Pausar" else "Iniciar",
                         tint = textColor,
                         modifier = Modifier.size(24.dp)
                     )
@@ -168,14 +137,11 @@ fun CountdownCard(
                     modifier = Modifier.size(40.dp)
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Replay,
-                        contentDescription = "Reiniciar",
+                        KronoIcons.Action.Reset, "Reiniciar",
                         tint = textColor,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(22.dp)
                     )
                 }
-
-                Spacer(modifier = Modifier.weight(1f))
 
                 // Overlay toggle
                 IconButton(
@@ -183,15 +149,23 @@ fun CountdownCard(
                     modifier = Modifier.size(40.dp)
                 ) {
                     Icon(
-                        imageVector = if (state.isOverlayVisible)
-                            Icons.Filled.PictureInPicture
-                        else
-                            Icons.Outlined.PictureInPicture,
-                        contentDescription = if (state.isOverlayVisible) "Ocultar overlay" else "Mostrar overlay",
-                        tint = textColor.copy(alpha = if (state.isOverlayVisible) 1f else 0.5f),
-                        modifier = Modifier.size(22.dp)
+                        KronoIcons.Feature.Overlay,
+                        if (state.isOverlayVisible) "Ocultar overlay" else "Mostrar overlay",
+                        tint = textColor.copy(alpha = if (state.isOverlayVisible) 1f else 0.45f),
+                        modifier = Modifier.size(20.dp)
                     )
                 }
+
+                Spacer(Modifier.weight(1f))
+
+                // Time display — right side
+                Text(
+                    text = TimeUtils.formatSeconds(state.remainingSeconds),
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = textColor,
+                    letterSpacing = 0.5.sp
+                )
             }
         }
     }
@@ -200,22 +174,21 @@ fun CountdownCard(
 @Composable
 private fun CompletedBadge(textColor: Color) {
     Surface(
-        color = Color.White.copy(alpha = 0.25f),
+        color = Color.White.copy(alpha = 0.22f),
         shape = RoundedCornerShape(4.dp)
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+            modifier = Modifier.padding(horizontal = 5.dp, vertical = 2.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(3.dp)
         ) {
             Icon(
-                imageVector = Icons.Default.Check,
-                contentDescription = null,
+                KronoIcons.Action.Check, null,
                 tint = textColor,
                 modifier = Modifier.size(10.dp)
             )
             Text(
-                text = "Concluído",
+                "Concluído",
                 color = textColor,
                 fontSize = 10.sp,
                 fontWeight = FontWeight.Medium

@@ -42,6 +42,7 @@ object KronoTokens {
         val xxl  = 24.dp
         val xxxl = 32.dp
 
+        val listBottomPadding = 100.dp
         val dialogPadding   = 20.dp
         val dialogWidthFrac = 0.92f
         val maxDialogWidth  = 440.dp
@@ -99,6 +100,7 @@ object KronoTokens {
          val divider   = 0.5f
          val disabled  = 0.38f
          val scrim     = 0.6f
+         val low       = 0.10f
      }
 
      // ── Animações Avançadas ───────────────────────────────────
@@ -111,6 +113,18 @@ object KronoTokens {
          val easingNormal  = CubicBezierEasing(0.4f, 0.0f, 0.2f, 1f)
          val easingSlow    = CubicBezierEasing(0.34f, 1.56f, 0.64f, 1f)
      }
+
+    // ── Floating Action Button (FAB) ────────────────────────
+    object FAB {
+        val size           = 68.dp
+        val iconSize       = 30.dp
+    }
+
+    // ── Ícones de Estado ────────────────────────────────────
+    object StateIcon {
+        val emptyLarge     = 88.dp
+        val emptyMedium    = 52.dp
+    }
 
     // ── Tamanhos de Componentes Específicos ─────────────────
     object Component {
@@ -135,5 +149,14 @@ object KronoTokens {
         val quickBtnSize   = 34.dp
         val quickIconSize  = 26.dp
         val menuTimeoutMs  = 5000L
+    }
+
+    // ── Bottom Bar (Navegação) ──────────────────────────────
+    object BottomBar {
+        val height         = 78.dp
+        val iconSize       = 24.dp
+        val labelSize      = 12.sp
+        val alphaContainer = 0.20f
+        val alphaSelected  = 0.46f
     }
 }

@@ -6,12 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.OpenInNew
-import androidx.compose.material.icons.filled.BugReport
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Code
-import androidx.compose.material.icons.filled.Favorite
+import com.krono.app.ui.theme.KronoIcons
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -91,7 +86,7 @@ fun AboutDialog(
                             .align(Alignment.CenterEnd)
                     ) {
                         Icon(
-                            imageVector        = Icons.Default.Close,
+                            imageVector        = KronoIcons.Navigation.Close,
                             contentDescription = "Fechar",
                             tint               = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -121,7 +116,7 @@ fun AboutDialog(
                     shape  = KronoTokens.Shape.button
                 ) {
                     Icon(
-                        imageVector        = Icons.Default.Favorite,
+                        imageVector        = KronoIcons.Status.Favorite,
                         contentDescription = null,
                         modifier           = Modifier.size(KronoTokens.Icon.button)
                     )
@@ -144,7 +139,7 @@ fun AboutDialog(
                     shape = KronoTokens.Shape.button
                 ) {
                     Icon(
-                        imageVector        = Icons.Default.BugReport,
+                        imageVector        = KronoIcons.Status.Bug,
                         contentDescription = null,
                         modifier           = Modifier.size(KronoTokens.Icon.button)
                     )
@@ -172,7 +167,7 @@ fun AboutDialog(
                     shape = KronoTokens.Shape.button
                 ) {
                     Icon(
-                        imageVector        = Icons.Default.Code,
+                        imageVector        = KronoIcons.Status.Source,
                         contentDescription = null,
                         modifier           = Modifier.size(KronoTokens.Icon.button)
                     )
@@ -209,7 +204,7 @@ fun AboutDialog(
                     }
 
                     Icon(
-                        imageVector        = Icons.AutoMirrored.Filled.OpenInNew,
+                        imageVector        = KronoIcons.Navigation.OpenExternal,
                         contentDescription = null,
                         tint               = MaterialTheme.colorScheme.primary,
                         modifier           = Modifier.size(KronoTokens.Icon.dialogHeader)

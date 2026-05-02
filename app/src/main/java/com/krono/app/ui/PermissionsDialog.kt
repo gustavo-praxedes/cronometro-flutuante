@@ -8,13 +8,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Download
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.outlined.Circle
+import com.krono.app.ui.theme.KronoIcons
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -85,7 +79,7 @@ fun PermissionsDialog(
                             .align(Alignment.CenterEnd)
                     ) {
                         Icon(
-                            imageVector        = Icons.Default.Close,
+                            imageVector        = KronoIcons.Navigation.Close,
                             contentDescription = "Fechar",
                             tint               = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -109,7 +103,7 @@ fun PermissionsDialog(
                 // ── Permissão: Notificações (Android 13+) ────
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     PermissionItem(
-                        icon        = Icons.Default.Notifications,
+                        icon        = KronoIcons.Action.Notification,
                         title       = "Notificações",
                         description = "Exibe o cronômetro na barra de status.",
                         granted     = hasNotificationPermission,
@@ -121,7 +115,7 @@ fun PermissionsDialog(
 
                 // ── Permissão: Overlay ────────────────────────
                 PermissionItem(
-                    icon        = Icons.Default.Settings,
+                    icon        = KronoIcons.Action.Settings,
                     title       = "Exibir sobre outros apps",
                     description = "Permite flutuar o widget sobre qualquer app.",
                     granted     = hasOverlayPermission,
@@ -133,7 +127,7 @@ fun PermissionsDialog(
 
                 // ── Permissão: Instalar APK (opcional) ───────
                 PermissionItem(
-                    icon        = Icons.Default.Download,
+                    icon        = KronoIcons.Action.Download,
                     title       = "Instalar atualizações",
                     description = "Opcional. Permite instalar novas versões direto no app.",
                     granted     = hasInstallPermission,
@@ -167,7 +161,7 @@ fun PermissionsDialog(
                         shape = KronoTokens.Shape.button
                     ) {
                         Icon(
-                            imageVector        = Icons.Default.CheckCircle,
+                            imageVector        = KronoIcons.Action.Check,
                             contentDescription = null,
                             modifier           = Modifier.size(KronoTokens.Icon.button)
                         )
@@ -255,7 +249,7 @@ private fun PermissionItem(
             Spacer(Modifier.width(KronoTokens.Spacing.md))
 
             Icon(
-                imageVector        = if (granted) Icons.Default.CheckCircle else Icons.Outlined.Circle,
+                imageVector        = if (granted) KronoIcons.Action.Check else KronoIcons.Status.Unchecked,
                 contentDescription = null,
                 tint               = checkTint,
                 modifier           = Modifier.size(KronoTokens.Icon.status)

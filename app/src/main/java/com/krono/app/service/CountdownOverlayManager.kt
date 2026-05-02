@@ -4,13 +4,8 @@ import android.content.Context
 import android.graphics.PixelFormat
 import android.graphics.Rect
 import android.view.Gravity
-import android.view.MotionEvent
-import android.view.View
 import android.view.WindowManager
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.ComposeView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
@@ -24,10 +19,11 @@ import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.krono.app.data.CountdownState
-import com.krono.app.data.OverlayConfig
-import com.krono.app.data.OverlayDataStore
 import com.krono.app.ui.CountdownOverlayUi
 import com.krono.app.ui.theme.KronoTheme
+import com.krono.app.ui.theme.KronoThemeOption
+import kotlin.math.abs
+import kotlin.math.roundToInt
 
 class CountdownOverlayManager(
     private val context: Context,
@@ -40,13 +36,13 @@ class CountdownOverlayManager(
     private val onClose: () -> Unit
 ) : LifecycleOwner, ViewModelStoreOwner, SavedStateRegistryOwner {
 
-    // ── Lifecycle ──────────────────────────────────────────────────────────
+    // ── Lifecycle boilerplate ──────────────────────────────────────────────
     private val lifecycleRegistry = LifecycleRegistry(this)
     override val lifecycle: Lifecycle get() = lifecycleRegistry
-    private val _viewModelStore = ViewModelStore()
-    override val viewModelStore: ViewModelStore get() = _viewModelStore
-    private val savedStateRegistryController = SavedStateRegistryController.create(this)
-    override val savedStateRegistry: SavedStateRegistry get() = savedStateRegistryController.savedStateRegistry
+    private val _vmStore = ViewModelStore()
+    override val viewModelStore: ViewModelStore get() = _vmStore
+    private val ssController = SavedStateRegistryController.create(this)
+    override val savedStateRegistry: SavedStateRegistry get() = ssController.savedStateRegistry
 
     // ── State ──────────────────────────────────────────────────────────────
     private var composeView: ComposeView? = null
@@ -58,27 +54,30 @@ class CountdownOverlayManager(
     var overlayH: Int = 0; private set
     private var params: WindowManager.LayoutParams? = null
 
-    private val dataStore = OverlayDataStore(context)
+    // ── Helpers ────────────────────────────────────────────────────────────
+    private val density get() = context.resources.displayMetrics.density
+    private val screenW get() = context.resources.displayMetrics.widthPixels
+    private val screenH get() = context.resources.displayMetrics.heightPixels
 
-    // ── Smart initial Y ────────────────────────────────────────────────────
+    // Snap threshold: 24dp from edge
+    private val edgeSnapPx get() = (24 * density).roundToInt()
+    // Magnet distance: 28dp gap triggers snap-to-peer
+    private val magnetPx get() = (28 * density).roundToInt()
+
+    // ── Smart initial position — find free slot ────────────────────────────
 
     private fun findFreeY(): Int {
-        val dm = context.resources.displayMetrics
-        val density = dm.density
-        val screenH = dm.heightPixels
-        val slotH = (190 * density).toInt()
-        val marginX = (16 * density).toInt()
-        val startY = (200 * density).toInt()
-        val estW = (260 * density).toInt()
+        val slotH = (160 * density).roundToInt()
+        val startY = (160 * density).roundToInt()
+        val startX = (16 * density).roundToInt()
+        val estW   = (260 * density).roundToInt()
 
         var candidate = startY
         while (candidate + slotH < screenH) {
-            val rect = Rect(marginX, candidate, marginX + estW, candidate + slotH)
-            val blocked = getPeers().filter { it.id != id }.any { peer ->
-                Rect.intersects(rect, peer.getBounds())
-            }
+            val test = Rect(startX, candidate, startX + estW, candidate + slotH)
+            val blocked = getPeers().filter { it.id != id }.any { Rect.intersects(test, it.getBounds()) }
             if (!blocked) return candidate
-            candidate += slotH
+            candidate += slotH + (8 * density).roundToInt()
         }
         return startY
     }
@@ -97,64 +96,79 @@ class CountdownOverlayManager(
         this.x = x; this.y = y
     }
 
-    // ── Drag + snap + push ─────────────────────────────────────────────────
-
-    private fun attachDrag(view: View) {
-        val dm = context.resources.displayMetrics
-        val screenW = dm.widthPixels
-        val screenH = dm.heightPixels
-        val density = dm.density
-        val snap = (24 * density).toInt()
-
-        var initRawX = 0f; var initRawY = 0f
-        var initPX = 0; var initPY = 0
-
-        view.setOnTouchListener { _, event ->
-            when (event.action) {
-                MotionEvent.ACTION_DOWN -> {
-                    initRawX = event.rawX; initRawY = event.rawY
-                    initPX = params?.x ?: 0; initPY = params?.y ?: 0
-                    false  // allow click events to propagate to Compose
-                }
-                MotionEvent.ACTION_MOVE -> {
-                    val dx = (event.rawX - initRawX).toInt()
-                    val dy = (event.rawY - initRawY).toInt()
-                    if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return@setOnTouchListener false
-                    val newX = (initPX + dx).coerceIn(0, screenW - overlayW)
-                    val newY = (initPY + dy).coerceIn(0, screenH - overlayH)
-                    moveTo(newX, newY)
-                    true
-                }
-                MotionEvent.ACTION_UP -> {
-                    val cx = params?.x ?: 0
-                    val snappedX = when {
-                        cx < snap -> 0
-                        cx > screenW - overlayW - snap -> screenW - overlayW
-                        else -> cx
-                    }
-                    moveTo(snappedX, params?.y ?: 0)
-                    pushPeers()
-                    false
-                }
-                else -> false
-            }
-        }
-    }
+    // ── Move ───────────────────────────────────────────────────────────────
 
     fun moveTo(x: Int, y: Int) {
-        posX = x; posY = y
+        posX = x.coerceIn(0, (screenW - overlayW).coerceAtLeast(0))
+        posY = y.coerceIn(0, (screenH - overlayH).coerceAtLeast(0))
         params?.let { p ->
-            p.x = x; p.y = y
+            p.x = posX; p.y = posY
             composeView?.let { v -> runCatching { windowManager.updateViewLayout(v, p) } }
         }
     }
 
-    /** After dropping, push any peer that now overlaps this overlay downward */
-    private fun pushPeers() {
-        val myRect = getBounds()
-        getPeers().filter { it.id != id }.forEach { peer ->
-            if (Rect.intersects(myRect, peer.getBounds())) {
-                peer.moveTo(peer.posX, posY + overlayH + 16)
+    // Called from Compose drag gesture (pixels from the Composable's local coords)
+    fun onDrag(dx: Float, dy: Float) {
+        moveTo(posX + dx.roundToInt(), posY + dy.roundToInt())
+    }
+
+    fun onDragEnd() {
+        snapToEdge()
+        applyMagnetism()
+    }
+
+    // ── Snap to nearest screen edge ────────────────────────────────────────
+
+    private fun snapToEdge() {
+        val cx = posX
+        val snappedX = when {
+            cx < edgeSnapPx -> 0
+            cx > screenW - overlayW - edgeSnapPx -> screenW - overlayW
+            else -> cx
+        }
+        moveTo(snappedX, posY)
+    }
+
+    // ── Magnetic snap to peers ─────────────────────────────────────────────
+
+    /**
+     * After drag ends:
+     * 1. If gap between this and a peer < [magnetPx] → snap flush (magnetic glue)
+     * 2. If overlapping → push this below the peer
+     * 3. Then push any peer this overlay now covers downward
+     */
+    private fun applyMagnetism() {
+        val peers = getPeers().filter { it.id != id }
+
+        for (peer in peers) {
+            val pRect = peer.getBounds()
+
+            if (Rect.intersects(getBounds(), pRect)) {
+                // Overlapping → push this below peer
+                moveTo(posX, pRect.bottom + (4 * density).roundToInt())
+                return
+            }
+
+            val gapBelow = posY - pRect.bottom      // gap if this is below peer
+            val gapAbove = pRect.top - (posY + overlayH) // gap if this is above peer
+
+            when {
+                gapBelow in 0..magnetPx -> {
+                    moveTo(posX, pRect.bottom + (2 * density).roundToInt())
+                    return
+                }
+                gapAbove in 0..magnetPx -> {
+                    moveTo(posX, pRect.top - overlayH - (2 * density).roundToInt())
+                    return
+                }
+            }
+        }
+
+        // Final position: push any peer now underneath this overlay
+        val finalRect = getBounds()
+        for (peer in peers) {
+            if (Rect.intersects(finalRect, peer.getBounds())) {
+                peer.moveTo(peer.posX, posY + overlayH + (4 * density).roundToInt())
             }
         }
     }
@@ -164,12 +178,13 @@ class CountdownOverlayManager(
     fun show(state: CountdownState) {
         if (composeView != null) { update(state); return }
 
-        savedStateRegistryController.performRestore(null)
+        ssController.performRestore(null)
         lifecycleRegistry.currentState = Lifecycle.State.CREATED
 
         overlayState.value = state
-        posX = 16
+        posX = (16 * density).roundToInt()
         posY = findFreeY()
+
         val lp = buildParams(posX, posY)
         params = lp
 
@@ -179,15 +194,16 @@ class CountdownOverlayManager(
             setViewTreeSavedStateRegistryOwner(this@CountdownOverlayManager)
 
             setContent {
-                val config by dataStore.configFlow.collectAsState(initial = OverlayConfig())
-                KronoTheme(selectedTheme = config.selectedTheme) {
+                KronoTheme(selectedTheme = KronoThemeOption.AUTO.name) {
                     overlayState.value?.let { s ->
                         CountdownOverlayUi(
                             state = s,
                             onPlay = onPlay,
                             onPause = onPause,
                             onReset = onReset,
-                            onClose = onClose
+                            onClose = onClose,
+                            onDrag = { dx, dy -> onDrag(dx, dy) },
+                            onDragEnd = { onDragEnd() }
                         )
                     }
                 }
@@ -199,7 +215,6 @@ class CountdownOverlayManager(
             }
         }
 
-        attachDrag(composeView!!)
         windowManager.addView(composeView, lp)
         lifecycleRegistry.currentState = Lifecycle.State.RESUMED
     }
@@ -214,7 +229,7 @@ class CountdownOverlayManager(
         if (lifecycleRegistry.currentState != Lifecycle.State.DESTROYED) {
             lifecycleRegistry.currentState = Lifecycle.State.DESTROYED
         }
-        _viewModelStore.clear()
+        _vmStore.clear()
     }
 
     fun getBounds(): Rect = Rect(posX, posY, posX + overlayW, posY + overlayH)

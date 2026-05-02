@@ -1,45 +1,31 @@
 package com.krono.app.ui
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Pause
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Replay
+import com.krono.app.ui.theme.KronoIcons
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.krono.app.data.CountdownState
 import com.krono.app.data.TimeUtils
+import com.krono.app.ui.theme.KronoTokens
 
 @Composable
 fun CountdownOverlayUi(
@@ -48,122 +34,174 @@ fun CountdownOverlayUi(
     onPause: () -> Unit,
     onReset: () -> Unit,
     onClose: () -> Unit,
+    onDrag: (dx: Float, dy: Float) -> Unit,
+    onDragEnd: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val bgColor = Color(state.config.backgroundColor)
+    val bgColor   = Color(state.config.backgroundColor)
     val textColor = overlayTextColor(bgColor)
 
-    // Completed: pulsing red border
-    val infiniteTransition = rememberInfiniteTransition(label = "pulse")
-    val pulseAlpha by infiniteTransition.animateFloat(
-        initialValue = 0.6f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(600),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "pulse_alpha"
-    )
+    // ── Animação de entrada — idêntica ao FloatingTimerUi ─────────────────
+    val entranceScale = remember { Animatable(0.88f) }
+    val entranceAlpha = remember { Animatable(0f) }
 
-    val containerColor by animateColorAsState(
-        targetValue = if (state.isCompleted) Color(0xFFB00020) else bgColor,
-        label = "bg"
-    )
-
-    Column(
-        modifier = modifier
-            .defaultMinSize(minWidth = 200.dp)
-            .clip(RoundedCornerShape(14.dp))
-            .background(containerColor)
-            .then(
-                if (state.isCompleted) Modifier.drawBehind {
-                    drawRoundRect(
-                        color = Color.White.copy(alpha = pulseAlpha * 0.3f),
-                        cornerRadius = androidx.compose.ui.geometry.CornerRadius(14.dp.toPx())
-                    )
-                } else Modifier
+    LaunchedEffect(Unit) {
+        launch {
+            entranceScale.animateTo(
+                targetValue = 1f,
+                animationSpec = spring(dampingRatio = 0.40f, stiffness = Spring.StiffnessLow)
             )
-            .padding(horizontal = 14.dp, vertical = 10.dp)
+        }
+        launch {
+            entranceAlpha.animateTo(
+                targetValue = 1f,
+                animationSpec = tween(durationMillis = 400, easing = LinearOutSlowInEasing)
+            )
+        }
+    }
+
+    // ── Estado de arraste ──────────────────────────────────────────────────
+    var isDragging by remember { mutableStateOf(false) }
+    val dragScale by animateFloatAsState(
+        targetValue = if (isDragging) 0.96f else 1f,
+        animationSpec = spring(dampingRatio = 0.6f, stiffness = Spring.StiffnessLow),
+        label = "dragScale"
+    )
+
+    // ── Tokens — idênticos ao FloatingTimerUi ─────────────────────────────
+    val currentScale  = entranceScale.value
+    val cornerRadius  = (KronoTokens.Overlay.defaultCornerRadius.value * currentScale)
+        .coerceAtMost(KronoTokens.Overlay.maxCornerRadiusFloat).dp
+    val shape         = RoundedCornerShape(cornerRadius)
+    val paddingH      = (KronoTokens.Overlay.paddingH.value * currentScale).dp
+    val paddingV      = (KronoTokens.Overlay.paddingV.value * currentScale).dp
+    val btnTopPadding = (KronoTokens.Overlay.btnTopPadding.value * currentScale).dp
+    val iconSizeDp    = (KronoTokens.Overlay.iconSize.value * currentScale).dp
+    val btnSize       = (KronoTokens.Overlay.buttonSize.value * currentScale).dp
+    val minWidth      = (KronoTokens.Overlay.minWidth.value * currentScale).dp
+    val maxWidth      = 270.dp   // hard cap — descrição longa não estica além disso
+
+    // ── Borda animada (running = primary, parado = sutil) ────────────────
+    val borderColor by animateColorAsState(
+        targetValue = if (state.isRunning)
+            MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
+        else
+            textColor.copy(alpha = 0.15f),
+        animationSpec = tween(600),
+        label = "borderColor"
+    )
+
+    // ── Fundo animado (concluído = vermelho) ──────────────────────────────
+    val containerBg by animateColorAsState(
+        targetValue = if (state.isCompleted) Color(0xFFB00020) else bgColor,
+        animationSpec = tween(KronoTokens.Motion.durationNormal),
+        label = "bg_color"
+    )
+
+    Box(
+        modifier = modifier
+            .wrapContentSize()
+            .graphicsLayer {
+                val finalScale = currentScale * dragScale
+                scaleX = finalScale
+                scaleY = finalScale
+                alpha = entranceAlpha.value
+                this.shape = shape
+                clip = true
+            }
+            .background(containerBg, shape)
+            .border(width = 0.86.dp, color = borderColor, shape = shape)
+            .pointerInput(Unit) {
+                detectDragGestures(
+                    onDragStart  = { isDragging = true },
+                    onDragEnd    = { isDragging = false; onDragEnd() },
+                    onDragCancel = { isDragging = false; onDragEnd() },
+                    onDrag       = { change, dragAmount ->
+                        change.consume()
+                        onDrag(dragAmount.x, dragAmount.y)
+                    }
+                )
+            }
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onTap = { if (state.isRunning) onPause() else onPlay() },
+                    onDoubleTap = { onReset() }
+                )
+            }
     ) {
-        // ── Row 1: Description (top-left) + Close (top-right) ──────────────
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            modifier = Modifier
+                .widthIn(min = minWidth, max = maxWidth)
+                .padding(horizontal = paddingH, vertical = paddingV),
+            horizontalAlignment = Alignment.Start
         ) {
+            // ── Linha 1: Descrição ─────────────────────────────────────────
+            // Quebra linha se longa, máx 2 linhas dentro do cap de largura
             Text(
                 text = state.config.description.ifBlank { "Cronômetro" },
-                color = textColor.copy(alpha = 0.85f),
-                style = MaterialTheme.typography.labelLarge,  // larger than before
-                fontSize = 13.sp,
+                color = textColor.copy(alpha = 0.72f),
+                fontSize = (KronoTokens.Typography.statusLabel.value * currentScale).sp,
                 fontWeight = FontWeight.Medium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.fillMaxWidth()
             )
-            Spacer(modifier = Modifier.width(8.dp))
-            IconButton(
-                onClick = onClose,
-                modifier = Modifier.size(28.dp)
+
+            Spacer(modifier = Modifier.height(btnTopPadding))
+
+// ── Linha 2: Tempo + botões ────────────────────────────────────────────
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = btnTopPadding),  // KronoTokens.Overlay.btnTopPadding
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    imageVector = Icons.Default.Close,
-                    contentDescription = "Fechar",
-                    tint = textColor.copy(alpha = 0.5f),
-                    modifier = Modifier.size(14.dp)
+                // Tempo
+                Text(
+                    text = TimeUtils.formatSeconds(state.remainingSeconds),
+                    color = textColor,
+                    fontSize = (KronoTokens.Overlay.timerFontSize.value * 0.72f * currentScale).sp,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    softWrap = false
                 )
-            }
-        }
 
-        Spacer(modifier = Modifier.height(2.dp))
+                // Play / Pause
+                AnimatedIconButton(
+                    onClick = { if (state.isRunning) onPause() else onPlay() },
+                    modifier = Modifier.size(btnSize)
+                ) {
+                    Icon(
+                        imageVector = if (state.isRunning) KronoIcons.Action.Pause else KronoIcons.Action.Play,
+                        contentDescription = if (state.isRunning) "Pausar" else "Iniciar",
+                        tint = if (state.isRunning) MaterialTheme.colorScheme.primary else textColor,
+                        modifier = Modifier.size(iconSizeDp)
+                    )
+                }
 
-        // ── Row 2: Time display ────────────────────────────────────────────
-        Text(
-            text = TimeUtils.formatSeconds(state.remainingSeconds),
-            color = textColor,
-            fontSize = 30.sp,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = 1.sp,
-            modifier = Modifier.align(Alignment.Start)
-        )
+                // Reset
+                AnimatedIconButton(
+                    onClick = onReset,
+                    modifier = Modifier.size(btnSize)
+                ) {
+                    Icon(KronoIcons.Action.Reset, "Reset", tint = textColor, modifier = Modifier.size(iconSizeDp))
+                }
 
-        Spacer(modifier = Modifier.height(4.dp))
-
-        // ── Row 3: Controls ────────────────────────────────────────────────
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(2.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Play / Pause
-            IconButton(
-                onClick = { if (state.isRunning) onPause() else onPlay() },
-                modifier = Modifier.size(36.dp)
-            ) {
-                Icon(
-                    imageVector = if (state.isRunning) Icons.Default.Pause else Icons.Default.PlayArrow,
-                    contentDescription = if (state.isRunning) "Pausar" else "Iniciar",
-                    tint = textColor,
-                    modifier = Modifier.size(22.dp)
-                )
-            }
-
-            // Reset
-            IconButton(
-                onClick = onReset,
-                modifier = Modifier.size(36.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Replay,
-                    contentDescription = "Reiniciar",
-                    tint = textColor,
-                    modifier = Modifier.size(22.dp)
-                )
+                // Fechar
+                AnimatedIconButton(
+                    onClick = onClose,
+                    modifier = Modifier.size(btnSize)
+                ) {
+                    Icon(KronoIcons.Navigation.Close, "Fechar", tint = textColor.copy(alpha = 0.6f), modifier = Modifier.size(iconSizeDp))
+                }
             }
         }
     }
 }
 
-/** Luminance-based readable text color */
+/** Retorna cor legível baseada na luminância do fundo */
 internal fun overlayTextColor(bg: Color): Color {
     val lum = 0.299f * bg.red + 0.587f * bg.green + 0.114f * bg.blue
-    return if (lum > 0.5f) Color(0xFF1C1B1F) else Color(0xFFECECEC)
+    return if (lum > 0.45f) Color(0xFF1C1B1F) else Color(0xFFECECEC)
 }

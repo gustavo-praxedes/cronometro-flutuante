@@ -8,10 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.BugReport
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Close
+import com.krono.app.ui.theme.KronoIcons
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -117,7 +114,7 @@ fun BugReportDialog(onDismiss: () -> Unit) {
                             .align(Alignment.CenterEnd)
                     ) {
                         Icon(
-                            imageVector        = Icons.Default.Close,
+                            imageVector        = KronoIcons.Navigation.Close,
                             contentDescription = "Fechar",
                             tint               = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -223,7 +220,7 @@ fun BugReportDialog(onDismiss: () -> Unit) {
                          verticalAlignment = Alignment.CenterVertically,
                          modifier          = Modifier.padding(bottom = KronoTokens.Spacing.md)
                      ) {
-                         Icon(Icons.Default.CheckCircle, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(KronoTokens.Icon.status))
+                         Icon(KronoIcons.Action.Check, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(KronoTokens.Icon.status))
                          Spacer(Modifier.width(KronoTokens.Spacing.sm))
                          Text("Relatório enviado. Obrigado!", color = MaterialTheme.colorScheme.primary)
                      }
@@ -282,7 +279,7 @@ fun BugReportDialog(onDismiss: () -> Unit) {
                          Spacer(Modifier.width(KronoTokens.Button.iconSpacing))
                          Text("Enviando...")
                      } else {
-                         Icon(Icons.Default.BugReport, null, modifier = Modifier.size(KronoTokens.Icon.button))
+                         Icon(KronoIcons.Status.Bug, null, modifier = Modifier.size(KronoTokens.Icon.button))
                          Spacer(Modifier.width(KronoTokens.Button.iconSpacing))
                          Text("Enviar Relatório", fontWeight = FontWeight.Bold)
                      }

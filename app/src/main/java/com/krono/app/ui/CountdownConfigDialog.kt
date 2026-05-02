@@ -1,177 +1,200 @@
 package com.krono.app.ui
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Palette
-import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.verticalScroll
+import com.krono.app.ui.theme.KronoIcons
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.text.PlatformTextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.krono.app.data.CountdownConfig
+import com.krono.app.ui.theme.KronoTokens
+import com.krono.app.ui.theme.adaptiveDialogWidth
 
 @Composable
 fun CountdownConfigDialog(
-    initial: CountdownConfig?,           // null = create mode
+    initial: CountdownConfig?,
     onDismiss: () -> Unit,
-    onConfirm: (CountdownConfig) -> Unit
+    onConfirm: (CountdownConfig) -> Unit,
+    /** Chamado a cada tick do wheel — atualiza card e overlay ao vivo */
+    onPreview: ((totalSeconds: Long) -> Unit)? = null
 ) {
-    var description by remember { mutableStateOf(initial?.description ?: "") }
-    var totalSeconds by remember { mutableLongStateOf(initial?.totalSeconds ?: 300L) }
-    var bgColor by remember {
-        mutableStateOf(Color(initial?.backgroundColor ?: 0xFF1E1E2E.toInt()))
+    var description  by remember { mutableStateOf(initial?.description ?: "") }
+    var totalSeconds by remember { mutableLongStateOf(initial?.totalSeconds ?: 0L) }
+    var bgColor      by remember {
+        mutableStateOf(Color(initial?.backgroundColor ?: 0xFFB5EAD7.toInt()))
     }
     var showColorPicker by remember { mutableStateOf(false) }
 
+    val isEditMode = initial != null
+
+    // Preview ao vivo — dispara a cada mudança de totalSeconds
+    LaunchedEffect(totalSeconds) {
+        if (isEditMode) onPreview?.invoke(totalSeconds)
+    }
+
     Dialog(
-        onDismissRequest = onDismiss,
+        onDismissRequest = {
+            if (isEditMode) onPreview?.invoke(initial!!.totalSeconds) // reverte preview
+            onDismiss()
+        },
         properties = DialogProperties(usePlatformDefaultWidth = false)
     ) {
         Surface(
-            modifier = Modifier
-                .fillMaxWidth(0.9f)
-                .padding(vertical = 24.dp),
-            shape = RoundedCornerShape(24.dp),
-            tonalElevation = 6.dp
+            modifier       = Modifier
+                .adaptiveDialogWidth()
+                .wrapContentHeight(),
+            shape          = KronoTokens.Shape.dialog,
+            color          = MaterialTheme.colorScheme.surface,
+            tonalElevation = KronoTokens.Elevation.dialog
         ) {
             Column(
-                modifier = Modifier.padding(24.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                modifier = Modifier
+                    .padding(KronoTokens.Spacing.dialogPadding)
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // ── Title ──────────────────────────────────────────────────
-                Text(
-                    text = if (initial == null) "Novo cronômetro" else "Editar cronômetro",
-                    style = MaterialTheme.typography.titleLarge
-                )
 
-                // ── Description ────────────────────────────────────────────
+                // ── Header: título + X ─────────────────────────────────────
+                Box(
+                    modifier         = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = if (isEditMode) "Editar cronômetro" else "Novo cronômetro",
+                        style = MaterialTheme.typography.headlineSmall.copy(
+                            platformStyle = PlatformTextStyle(includeFontPadding = false)
+                        ),
+                        fontWeight = FontWeight.Bold,
+                        fontSize   = KronoTokens.Typography.dialogTitle
+                    )
+                    IconButton(
+                        onClick  = {
+                            if (isEditMode) onPreview?.invoke(initial!!.totalSeconds)
+                            onDismiss()
+                        },
+                        modifier = Modifier
+                            .size(KronoTokens.Icon.close)
+                            .align(Alignment.CenterEnd)
+                    ) {
+                        Icon(
+                            imageVector        = KronoIcons.Navigation.Close,
+                            contentDescription = "Fechar",
+                            tint               = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+
+                Spacer(Modifier.height(KronoTokens.Spacing.sectionGap))
+
+                // ── Campo de descrição ─────────────────────────────────────
                 OutlinedTextField(
-                    value = description,
+                    value         = description,
                     onValueChange = { if (it.length <= 40) description = it },
-                    label = { Text("Descrição") },
-                    placeholder = { Text("Ex: Tempo de foco, Pausa...") },
-                    singleLine = true,
+                    label         = { Text("Descrição") },
+                    placeholder   = { Text("Ex: Foco, Pausa, Cozinhar...") },
+                    singleLine    = true,
                     keyboardOptions = KeyboardOptions(
                         capitalization = KeyboardCapitalization.Sentences,
-                        imeAction = ImeAction.Done
+                        imeAction      = ImeAction.Done
                     ),
+                    shape    = KronoTokens.Shape.input,
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                // ── Wheel picker ───────────────────────────────────────────
-                Column {
-                    Text(
-                        text = "Tempo (hh : mm : ss)",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    TimeWheelPicker(
-                        totalSeconds = totalSeconds,
-                        onValueChange = { totalSeconds = it }
-                    )
-                }
+                Spacer(Modifier.height(KronoTokens.Spacing.sectionGap))
 
-                // ── Color picker row ───────────────────────────────────────
+                // ── Wheel + cor na mesma linha ─────────────────────────────
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
+                    modifier          = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(KronoTokens.Spacing.sm)
                 ) {
-                    Text(
-                        text = "Cor do card",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.weight(1f)
-                    )
-                    IconButton(onClick = { showColorPicker = true }) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(6.dp)
-                        ) {
+                    Box(modifier = Modifier.weight(1f)) {
+                        TimeWheelPicker(
+                            totalSeconds  = totalSeconds,
+                            onValueChange = { totalSeconds = it }
+                        )
+                    }
+
+                    // Swatch de cor — círculo com ícone de paleta sobreposto
+                    IconButton(
+                        onClick  = { showColorPicker = true },
+                        modifier = Modifier.size(KronoTokens.Button.heightSmall)
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
                             Box(
                                 modifier = Modifier
-                                    .size(24.dp)
+                                    .size(36.dp)
                                     .clip(CircleShape)
                                     .background(bgColor)
                             )
                             Icon(
-                                imageVector = Icons.Default.Palette,
-                                contentDescription = "Escolher cor",
-                                tint = MaterialTheme.colorScheme.primary
+                                imageVector        = KronoIcons.Action.Palette,
+                                contentDescription = "Cor do card",
+                                tint               = overlayTextColor(bgColor).copy(alpha = 0.75f),
+                                modifier           = Modifier.size(KronoTokens.Icon.listItem)
                             )
                         }
                     }
                 }
 
-                // ── Actions ────────────────────────────────────────────────
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End)
+                Spacer(Modifier.height(KronoTokens.Spacing.sectionGap))
+
+                // ── Botão confirmar ────────────────────────────────────────
+                Button(
+                    onClick  = {
+                        val config = (initial ?: CountdownConfig(
+                            description     = description,
+                            totalSeconds    = totalSeconds,
+                            backgroundColor = bgColor.toArgb()
+                        )).copy(
+                            description     = description,
+                            totalSeconds    = totalSeconds,
+                            backgroundColor = bgColor.toArgb()
+                        )
+                        onConfirm(config)
+                    },
+                    enabled  = totalSeconds > 0L,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(KronoTokens.Button.height),
+                    shape  = KronoTokens.Shape.button,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor   = MaterialTheme.colorScheme.onPrimary
+                    )
                 ) {
-                    TextButton(onClick = onDismiss) { Text("Cancelar") }
-                    Button(
-                        onClick = {
-                            val config = (initial ?: CountdownConfig(
-                                description = description,
-                                totalSeconds = totalSeconds,
-                                backgroundColor = bgColor.toArgb()
-                            )).copy(
-                                description = description,
-                                totalSeconds = totalSeconds,
-                                backgroundColor = bgColor.toArgb()
-                            )
-                            onConfirm(config)
-                        },
-                        enabled = totalSeconds > 0L
-                    ) {
-                        Text(if (initial == null) "Criar" else "Salvar")
-                    }
+                    Text(
+                        text       = if (isEditMode) "Salvar" else "Criar",
+                        fontSize   = KronoTokens.Typography.buttonLabel,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             }
         }
     }
 
+    // Seletor de cor pastel
     if (showColorPicker) {
-        ColorPickerDialog(
-            title = "Escolher Cor",
-            initialColor = bgColor,
-            initialOpacity = 1f,
-            onConfirm = { color, _ -> 
-                bgColor = color
-                showColorPicker = false 
-            },
-            onDismiss = { showColorPicker = false }
+        CountdownColorPickerDialog(
+            currentColor    = bgColor,
+            onDismiss       = { showColorPicker = false },
+            onColorSelected = { bgColor = it; showColorPicker = false }
         )
     }
 }

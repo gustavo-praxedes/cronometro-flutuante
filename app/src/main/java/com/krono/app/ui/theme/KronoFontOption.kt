@@ -7,4 +7,6 @@ enum class KronoFontOption(val label: String, val fontFamily: String) {
     ANONYMOUS_PRO ("Anonymous Pro", "anonymous"),
     ROBOTO_MONO ("Roboto Mono", "roboto"),
     COMMIT_MONO ("Commit Mono", "commit"),
+    CHIVO_MONO  ("Chivo Mono", "chivo"),
+    AZERET_MONO ("Azeret Mono", "azeret"),
 }

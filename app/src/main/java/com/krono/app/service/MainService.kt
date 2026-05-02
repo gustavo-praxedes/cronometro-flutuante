@@ -118,6 +118,7 @@ class MainService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStateRe
             CountdownViewModel.ACTION_COUNTDOWN_RESET        -> id?.let { countdownManager.reset(it) }
             CountdownViewModel.ACTION_COUNTDOWN_OVERLAY_SHOW -> id?.let { countdownManager.showOverlay(it) }
             CountdownViewModel.ACTION_COUNTDOWN_OVERLAY_HIDE -> id?.let { countdownManager.hideOverlay(it) }
+            CountdownViewModel.ACTION_COUNTDOWN_SYNC         -> id?.let { countdownManager.syncOverlay(it) }
             CountdownViewModel.ACTION_COUNTDOWN_DESTROY      -> id?.let { countdownManager.destroy(it) }
 
             else -> if (checkPermissions() && !overlayManager.overlayVisible) showOverlay()

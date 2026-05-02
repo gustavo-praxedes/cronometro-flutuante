@@ -13,31 +13,24 @@ import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.LightMode
-import androidx.compose.material.icons.filled.MoreHoriz
-import androidx.compose.material.icons.filled.OpenInNew
-import androidx.compose.material.icons.filled.VolumeUp
-import androidx.compose.material.icons.filled.Pause
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.TrackChanges
+import com.krono.app.ui.theme.KronoIcons
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.krono.app.R
 import com.krono.app.data.OverlayConfig
 import com.krono.app.data.TimerState
 import com.krono.app.data.toFormattedTime
@@ -265,7 +258,7 @@ fun FloatingTimerUi(
                             modifier = Modifier.size(btnSize)
                         ) {
                             Icon(
-                                imageVector        = if (currentIsRunning) Icons.Default.Pause else Icons.Default.PlayArrow,
+                                imageVector        = if (currentIsRunning) KronoIcons.Action.Pause else KronoIcons.Action.Play,
                                 contentDescription = if (currentIsRunning) "Pausar" else "Iniciar",
                                 tint               = if (currentIsRunning) MaterialTheme.colorScheme.primary else txtColor.copy(alpha = 1f),
                                 modifier           = Modifier.size(iconSizeDp)
@@ -279,7 +272,7 @@ fun FloatingTimerUi(
                             },
                             modifier = Modifier.size(btnSize)
                         ) {
-                            Icon(Icons.Default.Refresh, "Reset", tint = txtColor, modifier = Modifier.size(iconSizeDp))
+                            Icon(KronoIcons.Action.Reset, "Reset", tint = txtColor, modifier = Modifier.size(iconSizeDp))
                         }
 
                         AnimatedIconButton(
@@ -289,14 +282,14 @@ fun FloatingTimerUi(
                             },
                             modifier = Modifier.size(btnSize)
                         ) {
-                            Icon(Icons.Default.Settings, "Config", tint = txtColor, modifier = Modifier.size(iconSizeDp))
+                            Icon(KronoIcons.Navigation.Menu, "Config", tint = txtColor, modifier = Modifier.size(iconSizeDp))
                         }
 
                         AnimatedIconButton(
                             onClick  = onClose,
                             modifier = Modifier.size(btnSize)
                         ) {
-                            Icon(Icons.Default.Close, "Fechar", tint = txtColor, modifier = Modifier.size(iconSizeDp))
+                            Icon(KronoIcons.Navigation.Close, "Fechar", tint = txtColor, modifier = Modifier.size(iconSizeDp))
                         }
                     }
                 }
@@ -336,16 +329,16 @@ fun FloatingTimerUi(
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment     = Alignment.CenterVertically
                         ) {
-                            QuickOptionIcon(Icons.Default.TrackChanges, config.focusModeEnabled, txtColor, quickBtnSize, quickIconSize) {
+                            QuickOptionIcon(KronoIcons.Action.Focus, config.focusModeEnabled, txtColor, quickBtnSize, quickIconSize) {
                                 resetMenuTimer(); onToggleFocus()
                             }
-                            QuickOptionIcon(Icons.Default.LightMode, config.keepScreenOn, txtColor, quickBtnSize, quickIconSize) {
+                            QuickOptionIcon(KronoIcons.Action.Light, config.keepScreenOn, txtColor, quickBtnSize, quickIconSize) {
                                 resetMenuTimer(); onToggleKeepScreenOn()
                             }
-                            QuickOptionIcon(Icons.Default.OpenInNew, config.autoLaunch, txtColor, quickBtnSize, quickIconSize) {
+                            QuickOptionIcon(KronoIcons.Feature.Overlay, config.autoLaunch, txtColor, quickBtnSize, quickIconSize) {
                                 resetMenuTimer(); onToggleAutoLaunch()
                             }
-                            QuickOptionIcon(Icons.Default.VolumeUp, config.isBeepEnabled, txtColor, quickBtnSize, quickIconSize) {
+                            QuickOptionIcon(KronoIcons.Action.Volume, config.isBeepEnabled, txtColor, quickBtnSize, quickIconSize) {
                                 resetMenuTimer(); onToggleBeep()
                             }
                         }
@@ -353,7 +346,7 @@ fun FloatingTimerUi(
                 }
 
                 Icon(
-                    imageVector = Icons.Default.MoreHoriz,
+                    imageVector = KronoIcons.Action.MoreHoriz,
                     contentDescription = "Menu",
                     tint = txtColor.copy(alpha = 0.4f),
                     modifier = Modifier

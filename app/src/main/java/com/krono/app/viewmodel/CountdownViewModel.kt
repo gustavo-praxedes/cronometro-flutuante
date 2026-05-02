@@ -19,7 +19,7 @@ class CountdownViewModel(
 ) : ViewModel() {
 
     companion object {
-        const val MAX_COUNTDOWNS = 5
+        const val MAX_COUNTDOWNS = 20
 
         const val ACTION_COUNTDOWN_PLAY         = "com.krono.app.COUNTDOWN_PLAY"
         const val ACTION_COUNTDOWN_PAUSE        = "com.krono.app.COUNTDOWN_PAUSE"
@@ -27,6 +27,8 @@ class CountdownViewModel(
         const val ACTION_COUNTDOWN_OVERLAY_SHOW = "com.krono.app.COUNTDOWN_OVERLAY_SHOW"
         const val ACTION_COUNTDOWN_OVERLAY_HIDE = "com.krono.app.COUNTDOWN_OVERLAY_HIDE"
         const val ACTION_COUNTDOWN_DESTROY      = "com.krono.app.COUNTDOWN_DESTROY"
+        /** Empurra estado atual do ViewModel para o overlay ativo (preview ao vivo) */
+        const val ACTION_COUNTDOWN_SYNC         = "com.krono.app.COUNTDOWN_SYNC"
         const val EXTRA_COUNTDOWN_ID            = "countdown_id"
     }
 
@@ -50,31 +52,47 @@ class CountdownViewModel(
     fun addCountdown(config: CountdownConfig) {
         if (_countdowns.value.size >= MAX_COUNTDOWNS) return
         viewModelScope.launch {
-            val updated = _countdowns.value.map { it.config } + config
-            dataStore.save(updated)
+            dataStore.save(_countdowns.value.map { it.config } + config)
         }
     }
 
     fun updateConfig(config: CountdownConfig) {
         viewModelScope.launch {
-            val updated = _countdowns.value.map {
+            dataStore.save(_countdowns.value.map {
                 if (it.config.id == config.id) config else it.config
-            }
-            dataStore.save(updated)
+            })
         }
     }
 
     fun deleteCountdown(context: Context, id: String) {
         sendAction(context, ACTION_COUNTDOWN_DESTROY, id)
         viewModelScope.launch {
-            val updated = _countdowns.value
-                .filter { it.config.id != id }
-                .map { it.config }
-            dataStore.save(updated)
+            dataStore.save(_countdowns.value.filter { it.config.id != id }.map { it.config })
         }
     }
 
-    // ── Timer control ─────────────────────────────────────────────────────────
+    // ── Preview ao vivo (wheel no dialog) ────────────────────────────────────
+
+    /**
+     * Atualiza [remainingSeconds] no card e overlay sem persistir.
+     * Chamado a cada tick do TimeWheelPicker enquanto o dialog está aberto.
+     */
+    fun previewRemaining(id: String?, seconds: Long) {
+        if (id == null) return
+        updateRuntime(id) { it.copy(remainingSeconds = seconds) }
+        // Nota: o CountdownScreen também dispara ACTION_COUNTDOWN_SYNC via startService
+        // para que o CountdownManager.syncOverlay() atualize o overlay ativo.
+    }
+
+    /**
+     * Reverte o preview ao estado original (chamado ao cancelar o dialog).
+     */
+    fun revertPreview(id: String?) {
+        if (id == null) return
+        updateRuntime(id) { it.copy(remainingSeconds = it.config.totalSeconds) }
+    }
+
+    // ── Timer ─────────────────────────────────────────────────────────────────
 
     fun play(context: Context, id: String) {
         updateRuntime(id) { it.copy(isRunning = true, isCompleted = false) }
@@ -96,22 +114,21 @@ class CountdownViewModel(
     // ── Overlay ───────────────────────────────────────────────────────────────
 
     fun toggleOverlay(context: Context, id: String) {
-        val state = _countdowns.value.find { it.config.id == id } ?: return
-        if (state.isOverlayVisible) {
-            updateRuntime(id) { it.copy(isOverlayVisible = false) }
-            sendAction(context, ACTION_COUNTDOWN_OVERLAY_HIDE, id)
-        } else {
-            updateRuntime(id) { it.copy(isOverlayVisible = true) }
-            sendAction(context, ACTION_COUNTDOWN_OVERLAY_SHOW, id)
-        }
+        val visible = _countdowns.value.find { it.config.id == id }?.isOverlayVisible ?: return
+        updateRuntime(id) { it.copy(isOverlayVisible = !visible) }
+        sendAction(
+            context,
+            if (visible) ACTION_COUNTDOWN_OVERLAY_HIDE else ACTION_COUNTDOWN_OVERLAY_SHOW,
+            id
+        )
     }
 
-    /** Called by CountdownManager when user taps X on overlay */
-    fun forceHideOverlay(context: Context, id: String) {
+    /** Chamado pelo X do overlay — sem context, manager já tratou o service side */
+    fun forceHideOverlay(id: String) {
         updateRuntime(id) { it.copy(isOverlayVisible = false) }
     }
 
-    // ── Called by CountdownManager (service side) ─────────────────────────────
+    // ── Chamados pelo CountdownManager ────────────────────────────────────────
 
     fun onCompleted(id: String) {
         updateRuntime(id) { it.copy(isRunning = false, isCompleted = true, remainingSeconds = 0L) }

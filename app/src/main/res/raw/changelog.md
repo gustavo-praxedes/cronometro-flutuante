@@ -1,6 +1,9 @@
 # ✨ Novidades
 - feat: Seleção de fontes para o overlay adicionada
 
+# 🐛 Correções
+- fix: Correção de bugs no cronômetro regressivo
+
 # 🔧 Manutenção
 - Primeira implementação do cronômetro regressivo
 - chore: Refatoração de MainService para separar funções

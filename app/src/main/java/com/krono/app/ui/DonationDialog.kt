@@ -6,9 +6,7 @@ import android.net.Uri
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Coffee
+import com.krono.app.ui.theme.KronoIcons
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -76,7 +74,7 @@ fun DonationDialog(
                             .align(Alignment.CenterEnd)
                     ) {
                         Icon(
-                            imageVector        = Icons.Default.Close,
+                            imageVector        = KronoIcons.Navigation.Close,
                             contentDescription = "Fechar",
                             tint               = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -120,7 +118,7 @@ fun DonationDialog(
                     )
                 ) {
                     Icon(
-                        imageVector        = Icons.Default.Coffee,
+                        imageVector        = KronoIcons.Status.Coffee,
                         contentDescription = null,
                         modifier           = Modifier.size(KronoTokens.Icon.button)
                     )

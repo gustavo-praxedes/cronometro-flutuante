@@ -22,6 +22,6 @@ data class OverlayConfig(
     val lastUpdateCheck   : Long    = 0L,
     val focusModeEnabled  : Boolean = false,
     val selectedTheme     : String  = "AUTO",
-    val selectedFont    : String  = "SYSTEM_DEFAULT",
+    val selectedFont    : String  = "CHIVO_MONO",
     val donationPending   : Boolean = false,
 )
