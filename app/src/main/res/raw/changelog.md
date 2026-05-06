@@ -7,6 +7,7 @@
 - fix: Bug introduzido na refatoração corrigido
 
 # 🔧 Manutenção
+- chore: add settings strings and icons
 - refactor: decouple MainService from StopwatchViewModel via ToolRegistry
 - refactor: migrate TimerScreen and FloatingTimerUi to stopwatch feature
 - refactor: migrate TimerViewModel to StopwatchViewModel
