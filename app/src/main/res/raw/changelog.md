@@ -1,4 +1,5 @@
 # ✨ Novidades
+- feat: integrate About, Support, Changelog, Updates as settings panels
 - feat: add AppearancePanel, BehaviorPanel, OverlayPanel
 - feat: add SettingsDestination sealed class
 - feat: add CountdownTool
