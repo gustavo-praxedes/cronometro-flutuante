@@ -1,0 +1,18 @@
+MainService.kt:110:75 Unresolved reference 'showOverlayIfHidden'.
+MainService.kt:219:24 Unresolved reference 'hideOverlay'.
+MainService.kt:229:24 Unresolved reference 'removeOverlay'.
+MainService.kt:288:32 Unresolved reference 'applyKeepScreenOn'.
+MainService.kt:315:24 Unresolved reference 'removeOverlay'.
+OverlayManager.kt:58:17 Unresolved reference 'showOverlayIfHidden'.
+OverlayManager.kt:84:66 Unresolved reference 'mutableStateOf'.
+OverlayManager.kt:94:46 Unresolved reference 'handleDrag'.
+OverlayManager.kt:95:39 Unresolved reference 'saveOverlayPosition'.
+OverlayManager.kt:118:64 Unresolved reference 'setOverlayFocusable'.
+OverlayManager.kt:124:9 Unresolved reference 'view'.
+OverlayManager.kt:125:9 Unresolved reference 'view'.
+OverlayManager.kt:126:9 Unresolved reference 'view'.
+OverlayManager.kt:128:23 Unresolved reference 'view'.
+OverlayManager.kt:130:35 Unresolved reference 'view'.
+OverlayManager.kt:176:5 Modifier 'private' is not applicable to 'local function'.
+OverlayManager.kt:211:5 Modifier 'private' is not applicable to 'local function'.
+OverlayManager.kt:228:2 Syntax error: Missing '}.

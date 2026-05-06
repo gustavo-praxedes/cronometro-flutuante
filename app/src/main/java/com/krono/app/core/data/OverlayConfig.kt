@@ -22,6 +22,7 @@ data class OverlayConfig(
     val lastUpdateCheck   : Long    = 0L,
     val focusModeEnabled  : Boolean = false,
     val selectedTheme     : String  = "AUTO",
-    val selectedFont    : String  = "CHIVO_MONO",
+    val selectedFont      : String  = "CHIVO_MONO",
     val donationPending   : Boolean = false,
+    val activeToolId      : String  = "stopwatch"
 )

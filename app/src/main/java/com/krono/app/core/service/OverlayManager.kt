@@ -1,14 +1,13 @@
 package com.krono.app.core.service
 
 import android.content.Context
-import android.content.Intent
 import android.graphics.PixelFormat
 import android.view.Gravity
 import android.view.WindowManager
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.ComposeView
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.setViewTreeLifecycleOwner
@@ -19,15 +18,16 @@ import com.krono.app.core.data.OverlayConfig
 import com.krono.app.core.data.OverlayDataStore
 import com.krono.app.feature.stopwatch.StopwatchOverlay
 import com.krono.app.core.ui.theme.KronoTheme
-import com.krono.app.feature.stopwatch.StopwatchViewModel
+import com.krono.app.core.tool.ToolState
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class OverlayManager(
     private val context: Context,
     private val windowManager: WindowManager,
     private val dataStore: OverlayDataStore,
-    private val viewModel: StopwatchViewModel,
+    private val activeToolState: () -> StateFlow<ToolState>?,
     private val serviceScope: CoroutineScope,
     private val lifecycleOwner: LifecycleOwner,
     private val viewModelStoreOwner: ViewModelStoreOwner,
@@ -78,41 +78,44 @@ class OverlayManager(
         val view = ComposeView(context).apply {
             setContent {
                 val config by dataStore.configFlow.collectAsState(initial = OverlayConfig())
-                val StopwatchState by viewModel.StopwatchState.collectAsState()
+                val toolStateFlow = activeToolState()
+                val state by (toolStateFlow?.collectAsState() ?: mutableStateOf(null))
 
                 KronoTheme(selectedTheme = config.selectedTheme) {
-                    StopwatchOverlay(
-                        state = StopwatchState,
-                        config = config,
-                        onStart = onStart,
-                        onPause = onPause,
-                        onReset = onReset,
-                        onDrag = { dx, dy -> handleDrag(dx, dy) },
-                        onDragEnd = { saveOverlayPosition() },
-                        onClose = onClose,
-                        onSettings = onSettings,
-                        onToggleFocus = {
-                            serviceScope.launch {
-                                dataStore.updateConfig(config.copy(focusModeEnabled = !config.focusModeEnabled))
-                            }
-                        },
-                        onToggleKeepScreenOn = {
-                            serviceScope.launch {
-                                dataStore.updateConfig(config.copy(keepScreenOn = !config.keepScreenOn))
-                            }
-                        },
-                        onToggleAutoLaunch = {
-                            serviceScope.launch {
-                                dataStore.updateConfig(config.copy(autoLaunch = !config.autoLaunch))
-                            }
-                        },
-                        onToggleBeep = {
-                            serviceScope.launch {
-                                dataStore.updateConfig(config.copy(isBeepEnabled = !config.isBeepEnabled))
-                            }
-                        },
-                        onMenuVisibilityChange = { menuOpen -> setOverlayFocusable(menuOpen) }
-                    )
+                    (state as? com.krono.app.feature.stopwatch.StopwatchState)?.let { swState ->
+                        StopwatchOverlay(
+                            state = swState,
+                            config = config,
+                            onStart = onStart,
+                            onPause = onPause,
+                            onReset = onReset,
+                            onDrag = { dx, dy -> handleDrag(dx, dy) },
+                            onDragEnd = { saveOverlayPosition() },
+                            onClose = onClose,
+                            onSettings = onSettings,
+                            onToggleFocus = {
+                                serviceScope.launch {
+                                    dataStore.updateConfig(config.copy(focusModeEnabled = !config.focusModeEnabled))
+                                }
+                            },
+                            onToggleKeepScreenOn = {
+                                serviceScope.launch {
+                                    dataStore.updateConfig(config.copy(keepScreenOn = !config.keepScreenOn))
+                                }
+                            },
+                            onToggleAutoLaunch = {
+                                serviceScope.launch {
+                                    dataStore.updateConfig(config.copy(autoLaunch = !config.autoLaunch))
+                                }
+                            },
+                            onToggleBeep = {
+                                serviceScope.launch {
+                                    dataStore.updateConfig(config.copy(isBeepEnabled = !config.isBeepEnabled))
+                                }
+                            },
+                            onMenuVisibilityChange = { menuOpen -> setOverlayFocusable(menuOpen) }
+                        )
+                    }
                 }
             }
         }

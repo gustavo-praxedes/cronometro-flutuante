@@ -37,6 +37,7 @@ class OverlayDataStore(private val context: Context) {
         val SELECTED_THEME     = stringPreferencesKey("selected_theme")
         val SELECTED_FONT      = stringPreferencesKey("selected_font")
         val DONATION_PENDING   = booleanPreferencesKey("donation_pending")
+        val ACTIVE_TOOL_ID     = stringPreferencesKey("active_tool_id")
     }
 
     val configFlow: Flow<OverlayConfig> = context.dataStore.data
@@ -72,6 +73,7 @@ class OverlayDataStore(private val context: Context) {
                 selectedTheme      = prefs[SELECTED_THEME]     ?: "AUTO",
                 selectedFont     = prefs[SELECTED_FONT]      ?: "SYSTEM_DEFAULT",
                 donationPending    = prefs[DONATION_PENDING]   ?: false,
+                activeToolId       = prefs[ACTIVE_TOOL_ID]     ?: "stopwatch"
             )
         }
 
@@ -99,6 +101,7 @@ class OverlayDataStore(private val context: Context) {
             prefs[SELECTED_THEME]     = config.selectedTheme
             prefs[SELECTED_FONT]      = config.selectedFont
             prefs[DONATION_PENDING]   = config.donationPending
+            prefs[ACTIVE_TOOL_ID]     = config.activeToolId
         }
     }
 

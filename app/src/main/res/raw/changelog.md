@@ -1,4 +1,5 @@
 # ✨ Novidades
+- feat: add StopwatchTool and StopwatchSettings
 - feat: add shared KronoTimerDisplay and KronoControlButtons
 
 # 🐛 Correções

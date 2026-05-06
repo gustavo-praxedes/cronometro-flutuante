@@ -129,7 +129,7 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch {
             val config = dataStore.configFlow.first()
             val intent = Intent(this@MainActivity, MainService::class.java).apply {
-                if (config.focusModeEnabled) action = com.krono.app.ACTION_START_FOCUS
+                action = if (config.focusModeEnabled) com.krono.app.ACTION_START_FOCUS else ACTION_SHOW_OVERLAY
             }
             startForegroundService(intent)
             moveTaskToBack(true)
