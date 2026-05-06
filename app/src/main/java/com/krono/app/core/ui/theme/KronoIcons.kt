@@ -4,6 +4,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.automirrored.rounded.Article
 import androidx.compose.material.icons.automirrored.rounded.OpenInNew
+import androidx.compose.material.icons.outlined.Favorite
+import androidx.compose.material.icons.outlined.History
+import androidx.compose.material.icons.outlined.HourglassBottom
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Palette
+import androidx.compose.material.icons.outlined.SystemUpdate
+import androidx.compose.material.icons.outlined.Tune
+import androidx.compose.material.icons.outlined.WebAsset
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.BugReport
@@ -97,6 +105,18 @@ object KronoIcons {
         val Timer: ImageVector        = Icons.Rounded.Timer
         val Hourglass: ImageVector    = Icons.Rounded.HourglassTop
         val HourglassBottom: ImageVector = Icons.Rounded.HourglassBottom
+        val Countdown: ImageVector    = Icons.Outlined.HourglassBottom
+    }
+
+    // ── Settings ─────────────────────────────────────────────
+    object Settings {
+        val Appearance: ImageVector  = Icons.Outlined.Palette
+        val Behavior: ImageVector    = Icons.Outlined.Tune
+        val Overlay: ImageVector     = Icons.Outlined.WebAsset
+        val Heart: ImageVector       = Icons.Outlined.Favorite
+        val History: ImageVector     = Icons.Outlined.History
+        val Update: ImageVector      = Icons.Outlined.SystemUpdate
+        val Info: ImageVector         = Icons.Outlined.Info
     }
 }
 
