@@ -1,4 +1,5 @@
 # ✨ Novidades
+- feat: add AppearancePanel, BehaviorPanel, OverlayPanel
 - feat: add SettingsDestination sealed class
 - feat: add CountdownTool
 - feat: add StopwatchTool and StopwatchSettings
