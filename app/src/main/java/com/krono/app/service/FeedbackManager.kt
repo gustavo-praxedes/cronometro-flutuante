@@ -7,7 +7,7 @@ import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
-import com.krono.app.data.OverlayConfig
+import com.krono.app.core.data.OverlayConfig
 
 class FeedbackManager(context: Context) {
 

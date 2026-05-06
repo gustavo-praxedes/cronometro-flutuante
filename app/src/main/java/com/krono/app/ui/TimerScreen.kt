@@ -14,8 +14,8 @@ import androidx.compose.ui.graphics.Color // Importado para usar Color.White ou 
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.krono.app.data.TimerState
-import com.krono.app.data.toFormattedTime
+import com.krono.app.core.data.TimerState
+import com.krono.app.core.data.toFormattedTime
 import com.krono.app.ui.theme.timerFontFamily
 
 @OptIn(ExperimentalMaterial3Api::class)

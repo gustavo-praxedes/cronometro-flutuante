@@ -1,4 +1,4 @@
-package com.krono.app.data
+package com.krono.app.core.data
 
 import android.content.Context
 import android.content.SharedPreferences

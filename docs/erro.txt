@@ -1,0 +1,126 @@
+KronoTimerDisplay - 9:27 UnRes. ref. 'toFormattedTime'.
+KronoTimerDisplay - 27:26 UnRes. ref. 'toFormattedTime'.
+BootReceiver - 6:27 UnRes. ref. 'TimerPref.s'.
+BootReceiver - 25:26 UnRes. ref. 'TimerPref.s'.
+FeedbackManager - 10:27 UnRes. ref. 'OverlayConfig'.
+FeedbackManager - 28:33 UnRes. ref. 'OverlayConfig'.
+FeedbackManager - 29:20 UnRes. ref. 'isBeepEnabled'.
+FeedbackManager - 32:20 UnRes. ref. 'isVibrationEnabled'.
+AppNavigation - 35:27 UnRes. ref. 'OverlayConfig'.
+AppNavigation - 36:27 UnRes. ref. 'OverlayDataStore'.
+AppNavigation - 78:33 UnRes. ref. 'OverlayDataStore'.
+AppNavigation - 99:23 Property delegate must have a 'getValue(Nothing?, KProperty0<ERROR CLASS: Cannot infer argument for type parameter T>)' method. None of the following functions is applicable:
+fun <T> State<T>.getValue(thisObj: Any?, property: KProperty<*>): T
+AppNavigation - 99:26 Cannot infer type for this parameter. Specify it explicitly.
+AppNavigation - 99:36 UnRes. ref. 'configFlow'.
+AppNavigation - 99:47 Cannot infer type for this parameter. Specify it explicitly.
+AppNavigation - 99:72 UnRes. ref. 'OverlayConfig'.
+AppNavigation - 117:29 UnRes. ref. 'configFlow'.
+AppNavigation - 117:40 Cannot infer type for this parameter. Specify it explicitly.
+AppNavigation - 118:17 UnRes. ref. 'autoLaunch'.
+AppNavigation - 156:45 UnRes. ref. 'selectedFont'.
+CountdownCard - 18:27 UnRes. ref. 'TimeUtils'.
+CountdownCard - 116:37 UnRes. ref. 'TimeUtils'.
+CountdownOverlayUi - 26:27 UnRes. ref. 'TimeUtils'.
+CountdownOverlayUi - 159:34 UnRes. ref. 'TimeUtils'.
+MainActivity - 21:27 UnRes. ref. 'OverlayConfig'.
+MainActivity - 22:27 UnRes. ref. 'OverlayDataStore'.
+MainActivity - 38:37 UnRes. ref. 'OverlayDataStore'.
+MainActivity - 80:21 UnRes. ref. 'OverlayDataStore'.
+MainActivity - 88:24 Property delegate must have a 'getValue(Nothing?, KProperty0<ERROR CLASS: Cannot infer argument for type parameter T>)' method. None of the following functions is applicable:
+fun <T> State<T>.getValue(thisObj: Any?, property: KProperty<*>): T
+MainActivity - 88:27 Cannot infer type for this parameter. Specify it explicitly.
+MainActivity - 88:37 UnRes. ref. 'configFlow'.
+MainActivity - 88:48 Cannot infer type for this parameter. Specify it explicitly.
+MainActivity - 88:73 UnRes. ref. 'OverlayConfig'.
+MainActivity - 90:47 UnRes. ref. 'selectedTheme'.
+MainActivity - 130:36 UnRes. ref. 'configFlow'.
+MainActivity - 130:47 Cannot infer type for this parameter. Specify it explicitly.
+MainActivity - 132:28 UnRes. ref. 'focusModeEnabled'.
+SettingsScreen - 18:27 UnRes. ref. 'OverlayConfig'.
+SettingsScreen - 19:27 UnRes. ref. 'OverlayDataStore'.
+SettingsScreen - 29:25 UnRes. ref. 'OverlayDataStore'.
+SettingsScreen - 36:33 UnRes. ref. 'configFlow'.
+SettingsScreen - 36:44 Cannot infer type for this parameter. Specify it explicitly.
+SettingsScreen - 36:69 UnRes. ref. 'OverlayConfig'.
+SettingsScreen - 88:78 UnRes. ref. 'autoLaunch'.
+SettingsScreen - 89:46 UnRes. ref. 'updateConfig'.
+SettingsScreen - 89:66 UnRes. ref. 'copy'.
+SettingsScreen - 91:77 UnRes. ref. 'showHours'.
+SettingsScreen - 92:40 UnRes. ref. 'showSeconds'.
+SettingsScreen - 93:46 UnRes. ref. 'updateConfig'.
+SettingsScreen - 93:66 UnRes. ref. 'copy'.
+SettingsScreen - 95:79 UnRes. ref. 'showSeconds'.
+SettingsScreen - 96:40 UnRes. ref. 'showHours'.
+SettingsScreen - 97:46 UnRes. ref. 'updateConfig'.
+SettingsScreen - 97:66 UnRes. ref. 'copy'.
+SettingsScreen - 99:79 UnRes. ref. 'showButtons'.
+SettingsScreen - 100:46 UnRes. ref. 'updateConfig'.
+SettingsScreen - 100:66 UnRes. ref. 'copy'.
+SettingsScreen - 102:76 UnRes. ref. 'keepScreenOn'.
+SettingsScreen - 103:46 UnRes. ref. 'updateConfig'.
+SettingsScreen - 103:66 UnRes. ref. 'copy'.
+SettingsScreen - 105:77 UnRes. ref. 'focusModeEnabled'.
+SettingsScreen - 106:46 UnRes. ref. 'updateConfig'.
+SettingsScreen - 106:66 UnRes. ref. 'copy'.
+SettingsScreen - 109:79 UnRes. ref. 'isBeepEnabled'.
+SettingsScreen - 110:46 UnRes. ref. 'updateConfig'.
+SettingsScreen - 110:66 UnRes. ref. 'copy'.
+SettingsScreen - 112:84 UnRes. ref. 'isVibrationEnabled'.
+SettingsScreen - 113:46 UnRes. ref. 'updateConfig'.
+SettingsScreen - 113:66 UnRes. ref. 'copy'.
+SettingsScreen - 119:47 UnRes. ref. 'timeLimitSeconds'.
+SettingsScreen - 121:50 UnRes. ref. 'updateConfig'.
+SettingsScreen - 121:70 UnRes. ref. 'copy'.
+SettingsScreen - 138:44 UnRes. ref. 'selectedTheme'.
+SettingsScreen - 144:39 UnRes. ref. 'updateConfig'.
+SettingsScreen - 145:40 UnRes. ref. 'copy'.
+SettingsScreen - 158:43 UnRes. ref. 'selectedFont'.
+SettingsScreen - 161:39 UnRes. ref. 'updateConfig'.
+SettingsScreen - 161:59 UnRes. ref. 'copy'.
+SettingsScreen - 170:44 UnRes. ref. 'backgroundColor'.
+SettingsScreen - 170:81 UnRes. ref. 'bgOpacity'.
+SettingsScreen - 176:44 UnRes. ref. 'textColor'.
+SettingsScreen - 176:75 UnRes. ref. 'textOpacity'.
+SettingsScreen - 184:39 UnRes. ref. 'scale'.
+SettingsScreen - 188:73 UnRes. ref. 'scale'.
+SettingsScreen - 189:59 UnRes. ref. 'updateConfig'.
+SettingsScreen - 189:79 UnRes. ref. 'copy'.
+SettingsScreen - 196:39 UnRes. ref. 'cornerRadius'.
+SettingsScreen - 200:42 UnRes. ref. 'cornerRadius'.
+SettingsScreen - 201:59 UnRes. ref. 'updateConfig'.
+SettingsScreen - 201:79 UnRes. ref. 'copy'.
+SettingsScreen - 224:43 UnRes. ref. 'backgroundColor'.
+SettingsScreen - 225:37 UnRes. ref. 'bgOpacity'.
+SettingsScreen - 228:31 UnRes. ref. 'updateConfig'.
+SettingsScreen - 228:51 UnRes. ref. 'copy'.
+SettingsScreen - 233:31 UnRes. ref. 'updateConfig'.
+SettingsScreen - 233:51 UnRes. ref. 'copy'.
+SettingsScreen - 244:43 UnRes. ref. 'textColor'.
+SettingsScreen - 245:37 UnRes. ref. 'textOpacity'.
+SettingsScreen - 248:31 UnRes. ref. 'updateConfig'.
+SettingsScreen - 248:51 UnRes. ref. 'copy'.
+SettingsScreen - 253:31 UnRes. ref. 'updateConfig'.
+SettingsScreen - 253:51 UnRes. ref. 'copy'.
+SettingsScreen - 277:38 UnRes. ref. 'totalLifetimeMs'.
+SettingsScreen - 281:42 UnRes. ref. 'resetDonationCycle'.
+TransparentProxyActivity - 16:27 UnRes. ref. 'OverlayConfig'.
+TransparentProxyActivity - 17:27 UnRes. ref. 'OverlayDataStore'.
+TransparentProxyActivity - 32:37 UnRes. ref. 'OverlayDataStore'.
+TransparentProxyActivity - 66:21 UnRes. ref. 'OverlayDataStore'.
+TransparentProxyActivity - 80:22 Cannot infer type for this parameter. Specify it explicitly.
+TransparentProxyActivity - 80:22 Not enough information to infer type argument for 'T'.
+TransparentProxyActivity - 80:46 UnRes. ref. 'configFlow'.
+TransparentProxyActivity - 80:57 Cannot infer type for this parameter. Specify it explicitly.
+TransparentProxyActivity - 80:57 Not enough information to infer type argument for 'T'.
+TransparentProxyActivity - 82:20 UnRes. ref. 'autoLaunch'.
+TransparentProxyActivity - 99:24 Property delegate must have a 'getValue(Nothing?, KProperty0<ERROR CLASS: Cannot infer argument for type parameter T>)' method. None of the following functions is applicable:
+fun <T> State<T>.getValue(thisObj: Any?, property: KProperty<*>): T
+TransparentProxyActivity - 99:27 Cannot infer type for this parameter. Specify it explicitly.
+TransparentProxyActivity - 99:37 UnRes. ref. 'configFlow'.
+TransparentProxyActivity - 99:48 Cannot infer type for this parameter. Specify it explicitly.
+TransparentProxyActivity - 99:73 UnRes. ref. 'OverlayConfig'.
+TransparentProxyActivity - 112:47 UnRes. ref. 'selectedTheme'.
+TransparentProxyActivity - 129:54 UnRes. ref. 'totalLifetimeMs'.
+TransparentProxyActivity - 132:47 UnRes. ref. 'resetDonationCycle'.
+TransparentProxyActivity - 138:47 UnRes. ref. 'resetDonationCycle'.

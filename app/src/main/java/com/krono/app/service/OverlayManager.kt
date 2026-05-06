@@ -15,8 +15,8 @@ import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.lifecycle.setViewTreeViewModelStoreOwner
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
-import com.krono.app.data.OverlayConfig
-import com.krono.app.data.OverlayDataStore
+import com.krono.app.core.data.OverlayConfig
+import com.krono.app.core.data.OverlayDataStore
 import com.krono.app.ui.FloatingTimerUi
 import com.krono.app.ui.theme.KronoTheme
 import com.krono.app.viewmodel.TimerViewModel

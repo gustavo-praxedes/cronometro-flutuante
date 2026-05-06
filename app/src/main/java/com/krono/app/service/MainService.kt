@@ -15,9 +15,9 @@ import com.krono.app.ACTION_START_FOCUS
 import com.krono.app.ACTION_STOP_SERVICE
 import com.krono.app.KronoApp
 import com.krono.app.NOTIFICATION_ID
-import com.krono.app.data.OverlayConfig
-import com.krono.app.data.OverlayDataStore
-import com.krono.app.data.TimerPreferences
+import com.krono.app.core.data.OverlayConfig
+import com.krono.app.core.data.OverlayDataStore
+import com.krono.app.core.data.TimerPreferences
 import com.krono.app.util.KronoNavigator
 import com.krono.app.util.PermissionUtils
 import com.krono.app.viewmodel.CountdownViewModel

@@ -15,8 +15,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.krono.app.R
-import com.krono.app.data.OverlayConfig
-import com.krono.app.data.OverlayDataStore
+import com.krono.app.core.data.OverlayConfig
+import com.krono.app.core.data.OverlayDataStore
 import com.krono.app.ui.theme.KronoThemeOption
 import com.krono.app.ui.theme.overlayColorsForTheme
 import com.krono.app.util.UpdateInfo

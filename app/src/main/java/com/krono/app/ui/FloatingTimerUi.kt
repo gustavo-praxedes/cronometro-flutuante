@@ -31,49 +31,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.krono.app.R
-import com.krono.app.data.OverlayConfig
-import com.krono.app.data.TimerState
-import com.krono.app.data.toFormattedTime
+import com.krono.app.core.data.OverlayConfig
+import com.krono.app.core.data.TimerState
+import com.krono.app.core.data.toFormattedTime
+import com.krono.app.core.ui.components.KronoTimerDisplay
+import com.krono.app.core.ui.components.KronoControlButtons
+import com.krono.app.core.ui.components.AnimatedIconButton
 import com.krono.app.ui.theme.KronoTokens
 import com.krono.app.ui.theme.timerFontFamily
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-@Composable
-fun AnimatedIconButton(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    content: @Composable () -> Unit
-) {
-    val interactionSource = remember { MutableInteractionSource() }
-    val isPressed by interactionSource.collectIsPressedAsState()
-    val scale by animateFloatAsState(
-        targetValue = if (isPressed) 0.85f else 1f,
-        animationSpec = spring(
-            dampingRatio = 0.6f,
-            stiffness = Spring.StiffnessMedium
-        ),
-        label = "btnScale"
-    )
-    val alpha by animateFloatAsState(
-        targetValue = if (isPressed) 0.6f else 1f,
-        animationSpec = tween(150),
-        label = "btnAlpha"
-    )
 
-    IconButton(
-        onClick = onClick,
-        modifier = modifier.graphicsLayer {
-            scaleX = scale
-            scaleY = scale
-            this.alpha = alpha
-        },
-        enabled = enabled,
-        interactionSource = interactionSource,
-        content = content
-    )
-}
 
 @Composable
 fun FloatingTimerUi(
@@ -228,70 +197,38 @@ fun FloatingTimerUi(
                 modifier = Modifier.width(IntrinsicSize.Max),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text       = timerState.elapsedMs.toFormattedTime(
-                        showHours   = config.showHours,
-                        showSeconds = config.showSeconds
-                    ),
-                    color      = txtColor,
-                    fontSize   = timeFontSize,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = timerFontFamily(config.selectedFont),
-                    maxLines   = 1,
-                    softWrap   = false
+                KronoTimerDisplay(
+                    elapsedMs = timerState.elapsedMs,
+                    showHours = config.showHours,
+                    showSeconds = config.showSeconds,
+                    selectedFont = config.selectedFont,
+                    scale = scale,
+                    currentScale = currentScale,
+                    textColor = txtColor
                 )
 
+
                 val MainButtonRow = @Composable {
-                    Row(
-                        modifier              = Modifier
-                            .fillMaxWidth()
-                            .padding(top = btnTopPadding),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment     = Alignment.CenterVertically
-                    ) {
-                        AnimatedIconButton(
-                            onClick  = {
-                                if (menuVisible) resetMenuTimer()
-                                if (currentIsRunning) currentOnPause() else currentOnStart()
-                            },
-                            enabled  = !timerState.isAtLimit,
-                            modifier = Modifier.size(btnSize)
-                        ) {
-                            Icon(
-                                imageVector        = if (currentIsRunning) KronoIcons.Action.Pause else KronoIcons.Action.Play,
-                                contentDescription = if (currentIsRunning) "Pausar" else "Iniciar",
-                                tint               = if (currentIsRunning) MaterialTheme.colorScheme.primary else txtColor.copy(alpha = 1f),
-                                modifier           = Modifier.size(iconSizeDp)
-                            )
-                        }
-
-                        AnimatedIconButton(
-                            onClick  = {
-                                if (menuVisible) resetMenuTimer()
-                                currentOnReset()
-                            },
-                            modifier = Modifier.size(btnSize)
-                        ) {
-                            Icon(KronoIcons.Action.Reset, "Reset", tint = txtColor, modifier = Modifier.size(iconSizeDp))
-                        }
-
-                        AnimatedIconButton(
-                            onClick  = {
-                                menuVisible = false
-                                currentOnSettings()
-                            },
-                            modifier = Modifier.size(btnSize)
-                        ) {
-                            Icon(KronoIcons.Navigation.Menu, "Config", tint = txtColor, modifier = Modifier.size(iconSizeDp))
-                        }
-
-                        AnimatedIconButton(
-                            onClick  = onClose,
-                            modifier = Modifier.size(btnSize)
-                        ) {
-                            Icon(KronoIcons.Navigation.Close, "Fechar", tint = txtColor, modifier = Modifier.size(iconSizeDp))
-                        }
-                    }
+                    KronoControlButtons(
+                        isRunning = currentIsRunning,
+                        isAtLimit = timerState.isAtLimit,
+                        scale = scale,
+                        currentScale = currentScale,
+                        textColor = txtColor,
+                        onStartPause = {
+                            if (menuVisible) resetMenuTimer()
+                            if (currentIsRunning) currentOnPause() else currentOnStart()
+                        },
+                        onReset = {
+                            if (menuVisible) resetMenuTimer()
+                            currentOnReset()
+                        },
+                        onSettings = {
+                            menuVisible = false
+                            currentOnSettings()
+                        },
+                        onClose = onClose
+                    )
                 }
 
                 if (config.showButtons) {

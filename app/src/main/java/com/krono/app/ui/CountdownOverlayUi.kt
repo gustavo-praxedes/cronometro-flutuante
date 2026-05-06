@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.sp
 import com.krono.app.data.CountdownState
 import com.krono.app.ui.theme.KronoIcons
 import com.krono.app.ui.theme.KronoTokens
-import com.krono.app.data.TimeUtils
+import com.krono.app.core.data.TimeUtils
 import kotlinx.coroutines.launch
 
 @Composable

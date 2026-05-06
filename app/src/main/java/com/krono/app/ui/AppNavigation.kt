@@ -32,8 +32,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.krono.app.KronoApp
 import com.krono.app.R
-import com.krono.app.data.OverlayConfig
-import com.krono.app.data.OverlayDataStore
+import com.krono.app.core.data.OverlayConfig
+import com.krono.app.core.data.OverlayDataStore
 import com.krono.app.util.UpdateInfo
 import com.krono.app.viewmodel.TimerViewModel
 import kotlinx.coroutines.flow.SharedFlow

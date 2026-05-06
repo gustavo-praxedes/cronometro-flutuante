@@ -20,7 +20,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.krono.app.data.formatLifetimeDetailed
+import com.krono.app.core.data.formatLifetimeDetailed
 import com.krono.app.ui.theme.KronoTokens
 import com.krono.app.ui.theme.adaptiveDialogWidth
 

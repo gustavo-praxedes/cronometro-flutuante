@@ -3,8 +3,8 @@ package com.krono.app.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.krono.app.data.TimerPreferences
-import com.krono.app.data.TimerState
+import com.krono.app.core.data.TimerPreferences
+import com.krono.app.core.data.TimerState
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow

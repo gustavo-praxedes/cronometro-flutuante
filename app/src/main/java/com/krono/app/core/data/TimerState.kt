@@ -1,4 +1,4 @@
-package com.krono.app.data
+package com.krono.app.core.data
 
 // ============================================================
 // TimerState.kt

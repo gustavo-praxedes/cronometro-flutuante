@@ -18,8 +18,8 @@ import androidx.lifecycle.lifecycleScope
 import com.krono.app.ACTION_RESET
 import com.krono.app.ACTION_SHOW_OVERLAY
 import com.krono.app.KronoApp
-import com.krono.app.data.OverlayConfig
-import com.krono.app.data.OverlayDataStore
+import com.krono.app.core.data.OverlayConfig
+import com.krono.app.core.data.OverlayDataStore
 import com.krono.app.service.MainService
 import com.krono.app.ui.theme.KronoTheme
 import com.krono.app.util.UpdateInfo

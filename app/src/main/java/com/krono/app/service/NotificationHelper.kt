@@ -8,8 +8,8 @@ import android.content.Intent
 import androidx.core.app.NotificationCompat
 import com.krono.app.*
 import com.krono.app.data.CountdownState
-import com.krono.app.data.TimerState
-import com.krono.app.data.toFormattedTime
+import com.krono.app.core.data.TimerState
+import com.krono.app.core.data.toFormattedTime
 import com.krono.app.receiver.NotificationActionReceiver
 import com.krono.app.ui.MainActivity
 import com.krono.app.viewmodel.CountdownViewModel

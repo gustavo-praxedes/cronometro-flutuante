@@ -1,4 +1,4 @@
-package com.krono.app.data
+package com.krono.app.core.data
 
 data class OverlayConfig(
     val backgroundColor   : Int     = android.graphics.Color.WHITE,
