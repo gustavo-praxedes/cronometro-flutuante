@@ -22,8 +22,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
-import com.krono.app.ui.theme.KronoIcons
-import com.krono.app.ui.theme.KronoTokens
+import com.krono.app.core.ui.theme.KronoIcons
+import com.krono.app.core.ui.theme.KronoTokens
 
 @Composable
 fun AnimatedIconButton(

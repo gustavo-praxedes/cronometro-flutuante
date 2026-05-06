@@ -1,4 +1,4 @@
-package com.krono.app.ui.theme
+package com.krono.app.core.ui.theme
 
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.foundation.shape.RoundedCornerShape

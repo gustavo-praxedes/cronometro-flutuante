@@ -1,4 +1,4 @@
-package com.krono.app.ui.theme
+package com.krono.app.core.ui.theme
 
 enum class KronoFontOption(val label: String, val fontFamily: String) {
     SYSTEM_DEFAULT ("Sistema (Padrão)", "default"),

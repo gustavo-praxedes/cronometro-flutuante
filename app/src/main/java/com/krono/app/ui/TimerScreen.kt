@@ -5,7 +5,7 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import com.krono.app.ui.theme.KronoIcons
+import com.krono.app.core.ui.theme.KronoIcons
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.krono.app.core.data.TimerState
 import com.krono.app.core.data.toFormattedTime
-import com.krono.app.ui.theme.timerFontFamily
+import com.krono.app.core.ui.theme.timerFontFamily
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

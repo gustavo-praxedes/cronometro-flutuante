@@ -9,8 +9,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 // --- Imports de Ícones e Vetores (Unificados) ---
-import com.krono.app.ui.theme.KronoIcons
-import com.krono.app.ui.theme.KronoTokens
+import com.krono.app.core.ui.theme.KronoIcons
+import com.krono.app.core.ui.theme.KronoTokens
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 // ------------------------------------------------
@@ -156,7 +156,7 @@ fun AppNavigation(
                     selectedFont   = config.selectedFont,
                     onStart        = { timerViewModel.start() },
                     onPause        = { timerViewModel.pause() },
-                    onReset        = onReset,
+                    onReset        = { timerViewModel.reset() },
                     onOpenOverlay  = onTryStartService,
                     onOpenSettings = { navController.navigate(AppRoutes.SETTINGS) }
                 )

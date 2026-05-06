@@ -1,4 +1,4 @@
-package com.krono.app.ui.theme
+package com.krono.app.core.ui.theme
 
 enum class KronoThemeOption(val label: String) {
     AUTO             ("Automático"),

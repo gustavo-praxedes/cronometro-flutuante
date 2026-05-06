@@ -13,7 +13,7 @@ import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import com.krono.app.ui.theme.KronoIcons
+import com.krono.app.core.ui.theme.KronoIcons
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -37,8 +37,8 @@ import com.krono.app.core.data.toFormattedTime
 import com.krono.app.core.ui.components.KronoTimerDisplay
 import com.krono.app.core.ui.components.KronoControlButtons
 import com.krono.app.core.ui.components.AnimatedIconButton
-import com.krono.app.ui.theme.KronoTokens
-import com.krono.app.ui.theme.timerFontFamily
+import com.krono.app.core.ui.theme.KronoTokens
+import com.krono.app.core.ui.theme.timerFontFamily
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -168,21 +168,6 @@ fun FloatingTimerUi(
                         change.consume()
                         onDrag(dragAmount.x, dragAmount.y)
                         if (menuVisible) resetMenuTimer()
-                    }
-                )
-            }
-            .pointerInput(Unit) {
-                detectTapGestures(
-                    onTap = {
-                        if (menuVisible) {
-                            menuVisible = false
-                        } else {
-                            if (currentIsRunning) currentOnPause() else currentOnStart()
-                        }
-                    },
-                    onDoubleTap = {
-                        menuVisible = false
-                        currentOnReset()
                     }
                 )
             }

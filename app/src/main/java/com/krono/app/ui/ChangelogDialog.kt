@@ -7,7 +7,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import com.krono.app.ui.theme.KronoIcons
+import com.krono.app.core.ui.theme.KronoIcons
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -19,8 +19,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.krono.app.BuildConfig
-import com.krono.app.ui.theme.KronoTokens
-import com.krono.app.ui.theme.adaptiveDialogWidth
+import com.krono.app.core.ui.theme.KronoTokens
+import com.krono.app.core.ui.theme.adaptiveDialogWidth
 import com.krono.app.ui.SkeletonLoader
 import com.krono.app.util.UpdateInfo
 import com.krono.app.util.UpdateResult

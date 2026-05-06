@@ -8,7 +8,7 @@ import com.krono.app.ACTION_PLAY
 import com.krono.app.ACTION_RESET
 import com.krono.app.ACTION_SHOW_OVERLAY
 import com.krono.app.ACTION_STOP_SERVICE
-import com.krono.app.service.MainService
+import com.krono.app.core.service.MainService
 import com.krono.app.ACTION_HIDE_OVERLAY
 import com.krono.app.viewmodel.CountdownViewModel
 

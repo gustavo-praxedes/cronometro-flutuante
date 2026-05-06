@@ -6,7 +6,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import com.krono.app.ui.theme.KronoIcons
+import com.krono.app.core.ui.theme.KronoIcons
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -23,8 +23,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.krono.app.data.CountdownConfig
-import com.krono.app.ui.theme.KronoTokens
-import com.krono.app.ui.theme.adaptiveDialogWidth
+import com.krono.app.core.ui.theme.KronoTokens
+import com.krono.app.core.ui.theme.adaptiveDialogWidth
 
 @Composable
 fun CountdownConfigDialog(

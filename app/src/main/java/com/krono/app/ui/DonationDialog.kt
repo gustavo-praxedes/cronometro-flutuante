@@ -6,7 +6,7 @@ import android.net.Uri
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import com.krono.app.ui.theme.KronoIcons
+import com.krono.app.core.ui.theme.KronoIcons
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -21,8 +21,8 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.krono.app.core.data.formatLifetimeDetailed
-import com.krono.app.ui.theme.KronoTokens
-import com.krono.app.ui.theme.adaptiveDialogWidth
+import com.krono.app.core.ui.theme.KronoTokens
+import com.krono.app.core.ui.theme.adaptiveDialogWidth
 
 private const val KOFI_URL = "https://ko-fi.com/gustavopraxedes"
 

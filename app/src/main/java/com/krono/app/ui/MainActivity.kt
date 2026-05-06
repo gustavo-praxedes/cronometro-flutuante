@@ -20,8 +20,8 @@ import com.krono.app.ACTION_SHOW_OVERLAY
 import com.krono.app.KronoApp
 import com.krono.app.core.data.OverlayConfig
 import com.krono.app.core.data.OverlayDataStore
-import com.krono.app.service.MainService
-import com.krono.app.ui.theme.KronoTheme
+import com.krono.app.core.service.MainService
+import com.krono.app.core.ui.theme.KronoTheme
 import com.krono.app.util.UpdateInfo
 import com.krono.app.viewmodel.TimerViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow

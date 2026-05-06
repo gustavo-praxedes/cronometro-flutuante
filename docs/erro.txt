@@ -1,0 +1,2 @@
+1. button reset, overlay em stopwatch não funciona
+2. button play, pause, reset, overlay em countdown não funciona

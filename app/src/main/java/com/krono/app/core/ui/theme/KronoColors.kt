@@ -1,8 +1,9 @@
-package com.krono.app.ui.theme
+package com.krono.app.core.ui.theme
 
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.graphics.Color
+import kotlin.Pair
 
 // ── Dark Modern ──────────────────────────────────────────────
 val DarkModernColors = darkColorScheme(

@@ -21,8 +21,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.krono.app.data.CountdownState
-import com.krono.app.ui.theme.KronoIcons
-import com.krono.app.ui.theme.KronoTokens
+import com.krono.app.core.ui.theme.KronoIcons
+import com.krono.app.core.ui.theme.KronoTokens
 import com.krono.app.core.data.TimeUtils
 import kotlinx.coroutines.launch
 
@@ -124,12 +124,6 @@ fun CountdownOverlayUi(
                     }
                 )
             }
-            .pointerInput(Unit) {
-                detectTapGestures(
-                    onTap = { if (state.isRunning) onPause() else onPlay() },
-                    onDoubleTap = { onReset() }
-                )
-            }
     ) {
         Column(
             modifier = Modifier
@@ -219,9 +213,9 @@ private fun AnimatedIconButton(
     modifier : Modifier = Modifier,
     content  : @Composable () -> Unit
 ) {
-    Box(
-        modifier       = modifier.pointerInput(Unit) { detectTapGestures(onTap = { onClick() }) },
-        contentAlignment = Alignment.Center
+    IconButton(
+        onClick  = onClick,
+        modifier = modifier
     ) {
         content()
     }

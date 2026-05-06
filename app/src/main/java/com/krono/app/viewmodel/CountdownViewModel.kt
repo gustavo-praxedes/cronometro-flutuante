@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.krono.app.data.CountdownConfig
 import com.krono.app.data.CountdownDataStore
 import com.krono.app.data.CountdownState
-import com.krono.app.service.MainService
+import com.krono.app.core.service.MainService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

@@ -7,8 +7,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.krono.app.core.data.toFormattedTime
-import com.krono.app.ui.theme.KronoTokens
-import com.krono.app.ui.theme.timerFontFamily
+import com.krono.app.core.ui.theme.KronoTokens
+import com.krono.app.core.ui.theme.timerFontFamily
 
 @Composable
 fun KronoTimerDisplay(

@@ -1,4 +1,4 @@
-package com.krono.app.service
+package com.krono.app.core.service
 
 import android.annotation.SuppressLint
 import android.app.Service

@@ -1,4 +1,4 @@
-package com.krono.app.service
+package com.krono.app.core.service
 
 import android.content.Context
 import android.graphics.PixelFormat
@@ -20,8 +20,8 @@ import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.krono.app.data.CountdownState
 import com.krono.app.ui.CountdownOverlayUi
-import com.krono.app.ui.theme.KronoTheme
-import com.krono.app.ui.theme.KronoThemeOption
+import com.krono.app.core.ui.theme.KronoTheme
+import com.krono.app.core.ui.theme.KronoThemeOption
 import kotlin.math.abs
 import kotlin.math.roundToInt
 

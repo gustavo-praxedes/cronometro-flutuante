@@ -42,7 +42,7 @@
 
         <!-- Foreground Service central -->
         <service
-            android:name=".service.MainService"
+            android:name=".core.service.MainService"
             android:exported="false"
             android:foregroundServiceType="specialUse"
             android:stopWithTask="false" />

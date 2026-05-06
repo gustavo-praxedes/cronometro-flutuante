@@ -1,4 +1,4 @@
-package com.krono.app.service
+package com.krono.app.core.service
 
 import android.content.Context
 import android.content.Intent
@@ -18,7 +18,7 @@ import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.krono.app.core.data.OverlayConfig
 import com.krono.app.core.data.OverlayDataStore
 import com.krono.app.ui.FloatingTimerUi
-import com.krono.app.ui.theme.KronoTheme
+import com.krono.app.core.ui.theme.KronoTheme
 import com.krono.app.viewmodel.TimerViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch

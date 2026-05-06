@@ -4,7 +4,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import com.krono.app.ui.theme.KronoIcons
+import com.krono.app.core.ui.theme.KronoIcons
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -17,10 +17,11 @@ import androidx.compose.ui.unit.sp
 import com.krono.app.R
 import com.krono.app.core.data.OverlayConfig
 import com.krono.app.core.data.OverlayDataStore
-import com.krono.app.ui.theme.KronoThemeOption
-import com.krono.app.ui.theme.overlayColorsForTheme
+import com.krono.app.core.ui.theme.KronoThemeOption
+import com.krono.app.core.ui.theme.overlayColorsForTheme
 import com.krono.app.util.UpdateInfo
 import kotlinx.coroutines.launch
+import kotlin.Pair
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)

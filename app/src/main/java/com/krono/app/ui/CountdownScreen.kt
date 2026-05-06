@@ -18,9 +18,9 @@ import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import com.krono.app.data.CountdownConfig
-import com.krono.app.service.MainService
-import com.krono.app.ui.theme.KronoIcons
-import com.krono.app.ui.theme.KronoTokens
+import com.krono.app.core.service.MainService
+import com.krono.app.core.ui.theme.KronoIcons
+import com.krono.app.core.ui.theme.KronoTokens
 import com.krono.app.viewmodel.CountdownViewModel
 import androidx.compose.ui.graphics.Color
 

@@ -20,7 +20,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
-import com.krono.app.service.ACTION_FOCUS_DISMISSED
+import com.krono.app.core.service.ACTION_FOCUS_DISMISSED
 import kotlinx.coroutines.delay
 
 // ============================================================

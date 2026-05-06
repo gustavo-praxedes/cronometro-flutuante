@@ -4,7 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import com.krono.app.core.data.TimerPreferences
-import com.krono.app.service.MainService
+import com.krono.app.core.service.MainService
 
 // ============================================================
 // BootReceiver.kt

@@ -12,9 +12,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.krono.app.ui.theme.KronoThemeOption
-import com.krono.app.ui.theme.KronoFontOption
-import com.krono.app.ui.theme.KronoTokens
+import com.krono.app.core.ui.theme.KronoThemeOption
+import com.krono.app.core.ui.theme.KronoFontOption
+import com.krono.app.core.ui.theme.KronoTokens
 
 @Composable
 internal fun ToggleRow(

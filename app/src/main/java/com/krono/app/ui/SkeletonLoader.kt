@@ -16,7 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.krono.app.ui.theme.KronoTokens
+import com.krono.app.core.ui.theme.KronoTokens
 
 /**
  * Skeleton loader shimmer effect components
