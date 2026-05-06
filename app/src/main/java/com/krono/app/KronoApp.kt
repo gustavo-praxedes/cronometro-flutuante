@@ -9,6 +9,9 @@ import com.google.firebase.FirebaseApp
 import com.krono.app.data.CountdownDataStore
 import com.krono.app.viewmodel.CountdownViewModel
 import com.krono.app.feature.stopwatch.StopwatchViewModel
+import com.krono.app.feature.stopwatch.StopwatchTool
+import com.krono.app.core.tool.ToolRegistry
+import com.krono.app.core.data.OverlayDataStore
 
 // Constantes globais do App
 const val NOTIFICATION_ID         = 1
@@ -45,6 +48,9 @@ class KronoApp : Application() {
 
         // 2. Cria o canal de notificação
         createNotificationChannel()
+
+        // 3. Registra as ferramentas
+        ToolRegistry.register(StopwatchTool(OverlayDataStore(this), StopwatchViewModel))
     }
 
     private fun createNotificationChannel() {
