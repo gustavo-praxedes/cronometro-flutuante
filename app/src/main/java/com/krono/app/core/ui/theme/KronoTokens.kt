@@ -106,6 +106,7 @@ object KronoTokens {
         val fadeDurationMs     = 200
         val toastDurationMs    = 3_000
         val menuAutoDismissMs  = 5_000
+        val slideDurationMs    = 300
     }
 
      // ── Opacidades ───────────────────────────────────────────

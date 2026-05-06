@@ -17,7 +17,7 @@ import com.krono.app.core.ui.theme.KronoFontOption
 import com.krono.app.core.ui.theme.KronoTokens
 
 @Composable
-internal fun ToggleRow(
+fun ToggleRow(
     label   : String,
     checked : Boolean,
     onChange: (Boolean) -> Unit
@@ -39,7 +39,7 @@ internal fun ToggleRow(
 }
 
 @Composable
-internal fun ColorRow(
+fun ColorRow(
     label  : String,
     color  : Color,
     onClick: () -> Unit
@@ -117,7 +117,7 @@ internal fun AppearanceSlider(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun ThemeSelector(
+fun ThemeSelector(
     selectedTheme: String,
     onChange     : (String) -> Unit
 ) {
@@ -172,7 +172,7 @@ internal fun ThemeSelector(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun FontSelector(
+fun FontSelector(
     selectedFont: String,
     onChange     : (String) -> Unit
 ) {

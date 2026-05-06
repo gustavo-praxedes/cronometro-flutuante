@@ -36,6 +36,7 @@ import com.krono.app.core.data.OverlayConfig
 import com.krono.app.core.data.OverlayDataStore
 import com.krono.app.util.UpdateInfo
 import com.krono.app.feature.countdown.CountdownScreen
+import com.krono.app.ui.settings.SettingsScreen
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
