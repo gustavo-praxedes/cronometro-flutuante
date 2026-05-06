@@ -1,4 +1,4 @@
-package com.krono.app.data
+package com.krono.app.feature.countdown
 
 import android.content.Context
 import androidx.datastore.preferences.core.edit

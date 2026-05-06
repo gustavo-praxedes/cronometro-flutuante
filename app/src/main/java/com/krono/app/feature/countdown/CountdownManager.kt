@@ -1,9 +1,9 @@
-package com.krono.app.core.service
+package com.krono.app.feature.countdown
 
 import android.content.Context
 import android.view.WindowManager
-import com.krono.app.data.CountdownState
-import com.krono.app.viewmodel.CountdownViewModel
+import com.krono.app.core.service.FeedbackManager
+import com.krono.app.core.service.NotificationHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob

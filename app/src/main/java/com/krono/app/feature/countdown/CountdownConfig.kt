@@ -1,4 +1,4 @@
-package com.krono.app.data
+package com.krono.app.feature.countdown
 
 import android.graphics.Color
 import kotlinx.serialization.Serializable

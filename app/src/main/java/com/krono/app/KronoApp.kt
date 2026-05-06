@@ -6,8 +6,9 @@ import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
 import com.google.firebase.FirebaseApp
-import com.krono.app.data.CountdownDataStore
-import com.krono.app.viewmodel.CountdownViewModel
+import com.krono.app.feature.countdown.CountdownDataStore
+import com.krono.app.feature.countdown.CountdownTool
+import com.krono.app.feature.countdown.CountdownViewModel
 import com.krono.app.feature.stopwatch.StopwatchViewModel
 import com.krono.app.feature.stopwatch.StopwatchTool
 import com.krono.app.core.tool.ToolRegistry
@@ -51,6 +52,7 @@ class KronoApp : Application() {
 
         // 3. Registra as ferramentas
         ToolRegistry.register(StopwatchTool(OverlayDataStore(this), StopwatchViewModel))
+        ToolRegistry.register(CountdownTool(countdownViewModel))
     }
 
     private fun createNotificationChannel() {

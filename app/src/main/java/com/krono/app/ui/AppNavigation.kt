@@ -10,6 +10,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import com.krono.app.core.ui.theme.KronoIcons
 import com.krono.app.core.ui.theme.KronoTokens
+import com.krono.app.feature.stopwatch.StopwatchViewModel
 import com.krono.app.feature.stopwatch.StopwatchScreen
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
@@ -34,7 +35,7 @@ import com.krono.app.R
 import com.krono.app.core.data.OverlayConfig
 import com.krono.app.core.data.OverlayDataStore
 import com.krono.app.util.UpdateInfo
-import com.krono.app.feature.stopwatch.StopwatchViewModel
+import com.krono.app.feature.countdown.CountdownScreen
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch

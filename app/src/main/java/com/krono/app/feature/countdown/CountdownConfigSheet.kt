@@ -1,4 +1,4 @@
-package com.krono.app.ui
+package com.krono.app.feature.countdown
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -38,7 +38,9 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
-import com.krono.app.data.CountdownConfig
+import com.krono.app.ui.TimeLimitField
+import com.krono.app.ui.ColorPickerDialog
+import com.krono.app.feature.countdown.CountdownConfig
 import com.krono.app.core.ui.theme.KronoTokens
 
 @OptIn(ExperimentalMaterial3Api::class)

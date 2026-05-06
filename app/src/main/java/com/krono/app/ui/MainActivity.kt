@@ -132,7 +132,9 @@ class MainActivity : ComponentActivity() {
                 action = if (config.focusModeEnabled) com.krono.app.ACTION_START_FOCUS else ACTION_SHOW_OVERLAY
             }
             startForegroundService(intent)
-            moveTaskToBack(true)
+            android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                moveTaskToBack(true)
+            }, 100)
         }
     }
 

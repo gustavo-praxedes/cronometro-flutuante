@@ -1,4 +1,4 @@
-package com.krono.app.ui
+package com.krono.app.feature.countdown
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.spring
@@ -11,10 +11,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import com.krono.app.data.CountdownState
+import com.krono.app.feature.countdown.CountdownState
 import com.krono.app.core.ui.theme.KronoIcons
 import com.krono.app.core.ui.theme.KronoTokens
-import com.krono.app.ui.overlayTextColor
+import com.krono.app.feature.countdown.overlayTextColor
 import com.krono.app.core.data.TimeUtils
 import kotlin.math.roundToInt
 

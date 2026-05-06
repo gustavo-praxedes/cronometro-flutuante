@@ -1,4 +1,4 @@
-package com.krono.app.ui
+package com.krono.app.feature.countdown
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -22,7 +22,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.krono.app.data.CountdownConfig
+import com.krono.app.feature.countdown.CountdownConfig
+import com.krono.app.ui.TimeWheelPicker
 import com.krono.app.core.ui.theme.KronoTokens
 import com.krono.app.core.ui.theme.adaptiveDialogWidth
 

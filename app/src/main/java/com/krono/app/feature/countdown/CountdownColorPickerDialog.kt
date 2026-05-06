@@ -1,4 +1,4 @@
-package com.krono.app.ui
+package com.krono.app.feature.countdown
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import com.krono.app.core.ui.theme.KronoIcons
+import com.krono.app.core.ui.theme.KronoTokens
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -42,7 +43,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 
 import androidx.compose.material3.IconButton
-import com.krono.app.core.ui.theme.KronoTokens
+import com.krono.app.ui.ColorPickerDialog
 import com.krono.app.core.ui.theme.adaptiveDialogWidth
 import androidx.compose.foundation.layout.wrapContentHeight
 

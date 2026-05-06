@@ -1,22 +1,27 @@
-package com.krono.app.viewmodel
+package com.krono.app.feature.countdown
 
 import android.content.Context
 import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.krono.app.data.CountdownConfig
-import com.krono.app.data.CountdownDataStore
-import com.krono.app.data.CountdownState
+import com.krono.app.feature.countdown.CountdownConfig
+import com.krono.app.feature.countdown.CountdownDataStore
+import com.krono.app.feature.countdown.CountdownState
 import com.krono.app.core.service.MainService
+import com.krono.app.core.tool.ToolViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.SharingStarted
+import com.krono.app.core.tool.ToolState
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class CountdownViewModel(
     private val dataStore: CountdownDataStore
-) : ViewModel() {
+) : ViewModel(), ToolViewModel {
 
     companion object {
         const val MAX_COUNTDOWNS = 20
@@ -30,6 +35,31 @@ class CountdownViewModel(
         /** Empurra estado atual do ViewModel para o overlay ativo (preview ao vivo) */
         const val ACTION_COUNTDOWN_SYNC         = "com.krono.app.COUNTDOWN_SYNC"
         const val EXTRA_COUNTDOWN_ID            = "countdown_id"
+    }
+
+    override val toolState: StateFlow<ToolState>
+        get() = _countdowns
+            .map { list -> list.firstOrNull() ?: CountdownState(CountdownConfig()) }
+            .stateIn(viewModelScope, SharingStarted.Eagerly, CountdownState(CountdownConfig()))
+
+    override fun start() {
+        _countdowns.value.firstOrNull()?.let { state ->
+            updateRuntime(state.config.id) { it.copy(isRunning = true, isCompleted = false) }
+        }
+    }
+
+    override fun pause() {
+        _countdowns.value.firstOrNull()?.let { state ->
+            updateRuntime(state.config.id) { it.copy(isRunning = false) }
+        }
+    }
+
+    override fun reset() {
+        _countdowns.value.firstOrNull()?.let { state ->
+            updateRuntime(state.config.id) {
+                it.copy(isRunning = false, isCompleted = false, remainingSeconds = it.config.totalSeconds)
+            }
+        }
     }
 
     private val _countdowns = MutableStateFlow<List<CountdownState>>(emptyList())

@@ -1,4 +1,4 @@
-package com.krono.app.ui
+package com.krono.app.feature.countdown
 
 import android.content.Intent
 import androidx.compose.animation.AnimatedVisibility
@@ -17,11 +17,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import com.krono.app.data.CountdownConfig
+import com.krono.app.feature.countdown.CountdownConfig
 import com.krono.app.core.service.MainService
 import com.krono.app.core.ui.theme.KronoIcons
 import com.krono.app.core.ui.theme.KronoTokens
-import com.krono.app.viewmodel.CountdownViewModel
+import com.krono.app.feature.countdown.CountdownViewModel
 import androidx.compose.ui.graphics.Color
 
 @OptIn(ExperimentalMaterial3Api::class)

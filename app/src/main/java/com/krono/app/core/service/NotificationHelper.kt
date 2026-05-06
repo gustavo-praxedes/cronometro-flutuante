@@ -7,12 +7,12 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationCompat
 import com.krono.app.*
-import com.krono.app.data.CountdownState
+import com.krono.app.feature.countdown.CountdownState
 import com.krono.app.feature.stopwatch.StopwatchState
 import com.krono.app.core.data.toFormattedTime
 import com.krono.app.receiver.NotificationActionReceiver
 import com.krono.app.ui.MainActivity
-import com.krono.app.viewmodel.CountdownViewModel
+import com.krono.app.feature.countdown.CountdownViewModel
 
 class NotificationHelper(private val context: Context) {
 

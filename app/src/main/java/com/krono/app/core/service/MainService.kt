@@ -23,8 +23,10 @@ import com.krono.app.util.PermissionUtils
 import com.krono.app.core.tool.ToolRegistry
 import com.krono.app.core.tool.ToolViewModel
 import com.krono.app.core.tool.KronoTool
-import com.krono.app.viewmodel.CountdownViewModel
+import com.krono.app.feature.countdown.CountdownViewModel
+import com.krono.app.feature.countdown.CountdownManager
 import com.krono.app.feature.stopwatch.StopwatchViewModel
+import com.krono.app.feature.stopwatch.StopwatchTool
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
@@ -75,7 +77,15 @@ class MainService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStateRe
         wakeLockManager    = WakeLockManager(this)
         
         val app = application as KronoApp
+
+        if (activeTool == null) {
+            activeTool = ToolRegistry.getTool("stopwatch")
+                ?: StopwatchTool(dataStore, app.StopwatchViewModel)
+        }
+
         overlayManager = OverlayManager(this, windowManager, dataStore, { activeViewModel?.toolState }, serviceScope, this, this, this)
+
+        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_START)
 
         countdownManager = CountdownManager(
             context = this,
@@ -107,7 +117,7 @@ class MainService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStateRe
             }
             ACTION_RESET -> handleReset()
             ACTION_STOP_SERVICE -> closeAndStop()
-            ACTION_SHOW_OVERLAY -> if (checkPermissions()) overlayManager.showOverlayIfHidden()
+            ACTION_SHOW_OVERLAY -> showOverlay()
             ACTION_HIDE_OVERLAY -> hideOverlay()
             ACTION_START_FOCUS -> if (checkPermissions()) {
                 if (!overlayManager.overlayVisible) showOverlay()
@@ -160,22 +170,29 @@ class MainService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStateRe
     }
 
     private fun showOverlay() {
-        serviceScope.launch {
-            currentConfig = dataStore.configFlow.first()
-            overlayManager.showOverlay(
-                currentConfig = currentConfig,
-                onStart = { 
-                    if (checkPermissions()) {
-                        activeViewModel?.start()
-                        feedbackManager.triggerFeedback(currentConfig)
-                    }
-                },
-                onPause = { handlePause(); feedbackManager.triggerFeedback(currentConfig) },
-                onReset = { handleReset() },
-                onClose = { hideOverlay() },
-                onSettings = { KronoNavigator.openSettings(this@MainService) },
-                onFocusModeStarted = { KronoNavigator.startFocusMode(this@MainService) }
-            )
+        serviceScope.launch(Dispatchers.Main.immediate) {
+            runCatching {
+                if (activeTool == null) {
+                    activeTool = ToolRegistry.getTool("stopwatch")
+                        ?: StopwatchTool(dataStore, (application as KronoApp).StopwatchViewModel)
+                }
+
+                currentConfig = dataStore.configFlow.first()
+                overlayManager.showOverlay(
+                    currentConfig = currentConfig,
+                    onStart = { 
+                        if (checkPermissions()) {
+                            activeViewModel?.start()
+                            feedbackManager.triggerFeedback(currentConfig)
+                        }
+                    },
+                    onPause = { handlePause(); feedbackManager.triggerFeedback(currentConfig) },
+                    onReset = { handleReset() },
+                    onClose = { hideOverlay() },
+                    onSettings = { KronoNavigator.openSettings(this@MainService) },
+                    onFocusModeStarted = { KronoNavigator.startFocusMode(this@MainService) }
+                )
+            }
         }
     }
 

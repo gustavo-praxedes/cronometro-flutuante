@@ -79,43 +79,43 @@ class OverlayManager(
             setContent {
                 val config by dataStore.configFlow.collectAsState(initial = OverlayConfig())
                 val toolStateFlow = activeToolState()
-                val state by (toolStateFlow?.collectAsState() ?: mutableStateOf(null))
+                val rawState = toolStateFlow?.collectAsState()?.value
+                val swState = (rawState as? com.krono.app.feature.stopwatch.StopwatchState)
+                    ?: com.krono.app.feature.stopwatch.StopwatchState()
 
                 KronoTheme(selectedTheme = config.selectedTheme) {
-                    (state as? com.krono.app.feature.stopwatch.StopwatchState)?.let { swState ->
-                        StopwatchOverlay(
-                            state = swState,
-                            config = config,
-                            onStart = onStart,
-                            onPause = onPause,
-                            onReset = onReset,
-                            onDrag = { dx, dy -> handleDrag(dx, dy) },
-                            onDragEnd = { saveOverlayPosition() },
-                            onClose = onClose,
-                            onSettings = onSettings,
-                            onToggleFocus = {
-                                serviceScope.launch {
-                                    dataStore.updateConfig(config.copy(focusModeEnabled = !config.focusModeEnabled))
-                                }
-                            },
-                            onToggleKeepScreenOn = {
-                                serviceScope.launch {
-                                    dataStore.updateConfig(config.copy(keepScreenOn = !config.keepScreenOn))
-                                }
-                            },
-                            onToggleAutoLaunch = {
-                                serviceScope.launch {
-                                    dataStore.updateConfig(config.copy(autoLaunch = !config.autoLaunch))
-                                }
-                            },
-                            onToggleBeep = {
-                                serviceScope.launch {
-                                    dataStore.updateConfig(config.copy(isBeepEnabled = !config.isBeepEnabled))
-                                }
-                            },
-                            onMenuVisibilityChange = { menuOpen -> setOverlayFocusable(menuOpen) }
-                        )
-                    }
+                    StopwatchOverlay(
+                        state = swState,
+                        config = config,
+                        onStart = onStart,
+                        onPause = onPause,
+                        onReset = onReset,
+                        onDrag = { dx, dy -> handleDrag(dx, dy) },
+                        onDragEnd = { saveOverlayPosition() },
+                        onClose = onClose,
+                        onSettings = onSettings,
+                        onToggleFocus = {
+                            serviceScope.launch {
+                                dataStore.updateConfig(config.copy(focusModeEnabled = !config.focusModeEnabled))
+                            }
+                        },
+                        onToggleKeepScreenOn = {
+                            serviceScope.launch {
+                                dataStore.updateConfig(config.copy(keepScreenOn = !config.keepScreenOn))
+                            }
+                        },
+                        onToggleAutoLaunch = {
+                            serviceScope.launch {
+                                dataStore.updateConfig(config.copy(autoLaunch = !config.autoLaunch))
+                            }
+                        },
+                        onToggleBeep = {
+                            serviceScope.launch {
+                                dataStore.updateConfig(config.copy(isBeepEnabled = !config.isBeepEnabled))
+                            }
+                        },
+                        onMenuVisibilityChange = { menuOpen -> setOverlayFocusable(menuOpen) }
+                    )
                 }
             }
         }

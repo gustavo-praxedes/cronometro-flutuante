@@ -10,7 +10,7 @@ import com.krono.app.ACTION_SHOW_OVERLAY
 import com.krono.app.ACTION_STOP_SERVICE
 import com.krono.app.core.service.MainService
 import com.krono.app.ACTION_HIDE_OVERLAY
-import com.krono.app.viewmodel.CountdownViewModel
+import com.krono.app.feature.countdown.CountdownViewModel
 
 class NotificationActionReceiver : BroadcastReceiver() {
 
