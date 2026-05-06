@@ -32,4 +32,5 @@ keystore.properties
 .agents
 .claude
 .opencode
+.gemini
 skills-lock.json
