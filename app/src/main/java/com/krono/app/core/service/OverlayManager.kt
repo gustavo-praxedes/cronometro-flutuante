@@ -17,7 +17,7 @@ import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.krono.app.core.data.OverlayConfig
 import com.krono.app.core.data.OverlayDataStore
-import com.krono.app.ui.FloatingTimerUi
+import com.krono.app.feature.stopwatch.StopwatchOverlay
 import com.krono.app.core.ui.theme.KronoTheme
 import com.krono.app.feature.stopwatch.StopwatchViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -81,8 +81,8 @@ class OverlayManager(
                 val StopwatchState by viewModel.StopwatchState.collectAsState()
 
                 KronoTheme(selectedTheme = config.selectedTheme) {
-                    FloatingTimerUi(
-                        StopwatchState = StopwatchState,
+                    StopwatchOverlay(
+                        state = StopwatchState,
                         config = config,
                         onStart = onStart,
                         onPause = onPause,

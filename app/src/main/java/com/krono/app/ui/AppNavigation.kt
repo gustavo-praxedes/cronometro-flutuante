@@ -8,12 +8,11 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-// --- Imports de Ícones e Vetores (Unificados) ---
 import com.krono.app.core.ui.theme.KronoIcons
 import com.krono.app.core.ui.theme.KronoTokens
+import com.krono.app.feature.stopwatch.StopwatchScreen
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
-// ------------------------------------------------
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -40,30 +39,25 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
-
 object AppRoutes {
     const val TIMER     = "timer"
     const val SETTINGS  = "settings"
     const val COUNTDOWN = "countdown"
 }
 
-// ── Bottom bar items ───────────────────────────────────────────────────────
-
 private data class BottomTab(
     val route     : String,
     val label     : String,
-    val iconRes   : Int?,            // drawable resource (material symbols)
+    val iconRes   : Int?,
     val iconVector: ImageVector? = null
 )
 
-// Usa ImageVector para Timer (disponível no M3);
-// HourglassBottom e BrandingWatermark precisam de drawable ou são passados via iconRes.
 private val BOTTOM_TABS = listOf(
     BottomTab(
         route       = AppRoutes.TIMER,
         label       = "Cronômetro",
         iconRes     = null,
-        iconVector  = KronoIcons.Feature.Timer          // Material Timer icon
+        iconVector  = KronoIcons.Feature.Timer
     ),
     BottomTab(
         route       = AppRoutes.COUNTDOWN,
@@ -118,11 +112,9 @@ fun AppNavigation(
         if (cfg.autoLaunch && !isTaskRoot) onTryStartService()
     }
 
-    // Rota atual para highlight da bottom bar
     val currentRoute by navController.currentBackStackEntryAsState()
     val currentDest  = currentRoute?.destination?.route
 
-    // Bottom bar visível apenas nas rotas de nível raiz (não em SETTINGS)
     val showBottomBar = currentDest == AppRoutes.TIMER || currentDest == AppRoutes.COUNTDOWN
 
     Scaffold(
@@ -151,8 +143,8 @@ fun AppNavigation(
             modifier         = Modifier.padding(innerPadding)
         ) {
             composable(AppRoutes.TIMER) {
-                TimerScreen(
-                    StopwatchState     = StopwatchState,
+                StopwatchScreen(
+                    state          = StopwatchState,
                     selectedFont   = config.selectedFont,
                     onStart        = { StopwatchViewModel.start() },
                     onPause        = { StopwatchViewModel.pause() },
@@ -203,7 +195,6 @@ fun AppNavigation(
     }
 }
 
-// ── Bottom Bar Component ───────────────────────────────────────────────────
 @Composable
 private fun KronoBottomBar(
     tabs         : List<BottomTab>,

@@ -1,52 +1,35 @@
-package com.krono.app.ui
+package com.krono.app.feature.stopwatch
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.*
 import androidx.compose.animation.core.*
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.shrinkVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import com.krono.app.core.ui.theme.KronoIcons
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.krono.app.R
 import com.krono.app.core.data.OverlayConfig
-import com.krono.app.feature.stopwatch.StopwatchState
-import com.krono.app.core.data.toFormattedTime
-import com.krono.app.core.ui.components.KronoTimerDisplay
 import com.krono.app.core.ui.components.KronoControlButtons
+import com.krono.app.core.ui.components.KronoTimerDisplay
 import com.krono.app.core.ui.components.AnimatedIconButton
+import com.krono.app.core.ui.theme.KronoIcons
 import com.krono.app.core.ui.theme.KronoTokens
-import com.krono.app.core.ui.theme.timerFontFamily
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-
-
 @Composable
-fun FloatingTimerUi(
-    StopwatchState            : StopwatchState,
+fun StopwatchOverlay(
+    state                 : StopwatchState,
     config                : OverlayConfig,
     onStart               : () -> Unit,
     onPause               : () -> Unit,
@@ -61,20 +44,18 @@ fun FloatingTimerUi(
     onToggleBeep          : () -> Unit,
     onMenuVisibilityChange: (Boolean) -> Unit
 ) {
-    val isRunning = StopwatchState.isRunning
+    val isRunning = state.isRunning
     val scale     = config.scale
 
-    // ── Animação de Entrada Premium (Escala + Alpha estável) ──────────
     val entranceScale = remember { Animatable(0.88f) }
     val entranceAlpha = remember { Animatable(0f) }
 
     LaunchedEffect(Unit) {
-        // Disparamos ambas em paralelo para um efeito fluido
         launch {
             entranceScale.animateTo(
                 targetValue = 1f,
                 animationSpec = spring(
-                    dampingRatio = 0.40f, // Mantém o overshoot elegante
+                    dampingRatio = 0.40f,
                     stiffness = Spring.StiffnessLow
                 )
             )
@@ -87,24 +68,18 @@ fun FloatingTimerUi(
         }
     }
 
-    // ── Escalonamento Dinâmico de Tokens ─────────────────────
     val currentScale  = entranceScale.value
     val cornerRadius  = (config.cornerRadius * scale * currentScale).coerceAtMost(KronoTokens.Overlay.maxCornerRadiusFloat).dp
     val bgColor       = Color(config.backgroundColor).copy(alpha = config.bgOpacity)
     val txtColor      = Color(config.textColor).copy(alpha = config.textOpacity)
     val shape         = RoundedCornerShape(cornerRadius)
 
-    val timeFontSize  = (KronoTokens.Overlay.timerFontSize.value * scale * currentScale).sp
-    val iconSizeDp    = (KronoTokens.Overlay.iconSize.value * scale * currentScale).dp
-    val btnSize       = (KronoTokens.Overlay.buttonSize.value * scale * currentScale).dp
-    val quickIconSize = (KronoTokens.Overlay.quickIconSize.value * scale * currentScale).dp
-    val quickBtnSize  = (KronoTokens.Overlay.quickBtnSize.value * scale * currentScale).dp
-
     val paddingH      = (KronoTokens.Overlay.paddingH.value * scale * currentScale).dp
     val paddingV      = (KronoTokens.Overlay.paddingV.value * scale * currentScale).dp
-    val btnTopPadding = (KronoTokens.Overlay.btnTopPadding.value * scale * currentScale).dp
     val menuPaddingV  = (KronoTokens.Overlay.menuPaddingV.value * scale * currentScale).dp
     val minColWidth   = (KronoTokens.Overlay.minWidth.value * scale * currentScale).dp
+    val quickIconSize = (KronoTokens.Overlay.quickIconSize.value * scale * currentScale).dp
+    val quickBtnSize  = (KronoTokens.Overlay.quickBtnSize.value * scale * currentScale).dp
 
     val currentOnStart              by rememberUpdatedState(onStart)
     val currentOnPause              by rememberUpdatedState(onPause)
@@ -150,9 +125,8 @@ fun FloatingTimerUi(
                 scaleY = finalScale
                 alpha = entranceAlpha.value
                 this.shape = shape
-                clip = true // Ativamos o clip aqui para garantir cantos perfeitos na animação
+                clip = true
             }
-            // Aplicamos o background e border usando o mesmo shape para evitar aliasing (bordas pretas)
             .background(bgColor, shape)
             .border(
                 width = 0.86.dp,
@@ -183,7 +157,7 @@ fun FloatingTimerUi(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 KronoTimerDisplay(
-                    elapsedMs = StopwatchState.elapsedMs,
+                    elapsedMs = state.elapsedMs,
                     showHours = config.showHours,
                     showSeconds = config.showSeconds,
                     selectedFont = config.selectedFont,
@@ -192,11 +166,10 @@ fun FloatingTimerUi(
                     textColor = txtColor
                 )
 
-
                 val MainButtonRow = @Composable {
                     KronoControlButtons(
                         isRunning = currentIsRunning,
-                        isAtLimit = StopwatchState.isAtLimit,
+                        isAtLimit = state.isAtLimit,
                         scale = scale,
                         currentScale = currentScale,
                         textColor = txtColor,
@@ -229,7 +202,6 @@ fun FloatingTimerUi(
                     }
                 }
 
-                // ── Menu de Configurações Rápidas ────────────────────
                 AnimatedVisibility(
                     visible = menuVisible,
                     modifier = Modifier.fillMaxWidth(),

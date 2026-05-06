@@ -1,27 +1,27 @@
-package com.krono.app.ui
+package com.krono.app.feature.stopwatch
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import com.krono.app.core.ui.theme.KronoIcons
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color // Importado para usar Color.White ou Transparent
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.krono.app.feature.stopwatch.StopwatchState
-import com.krono.app.core.data.toFormattedTime
+import com.krono.app.core.ui.theme.KronoIcons
+import com.krono.app.core.ui.theme.KronoTheme
 import com.krono.app.core.ui.theme.timerFontFamily
+import com.krono.app.core.data.toFormattedTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TimerScreen(
-    StopwatchState    : StopwatchState,
+fun StopwatchScreen(
+    state         : StopwatchState,
     selectedFont  : String = "SYSTEM_DEFAULT",
     onStart       : () -> Unit,
     onPause       : () -> Unit,
@@ -29,13 +29,12 @@ fun TimerScreen(
     onOpenOverlay : () -> Unit,
     onOpenSettings: () -> Unit
 ) {
-    val isRunning = StopwatchState.isRunning
+    val isRunning = state.isRunning
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = { },
-                // Ajuste para branco ou transparente para sumir com a divisória
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                     containerColor = Color.Transparent,
                     scrolledContainerColor = Color.Transparent
@@ -69,7 +68,7 @@ fun TimerScreen(
             ) {
                 val fontSize = (maxWidth.value * 0.18f).coerceIn(32f, 76f)
                 Text(
-                    text       = StopwatchState.elapsedMs.toFormattedTime(showHours = true, showSeconds = true),
+                    text       = state.elapsedMs.toFormattedTime(showHours = true, showSeconds = true),
                     fontSize   = fontSize.sp,
                     fontWeight = FontWeight.Bold,
                     fontFamily = timerFontFamily(selectedFont),
@@ -99,7 +98,7 @@ fun TimerScreen(
 
                 FilledIconButton(
                     onClick  = { if (isRunning) onPause() else onStart() },
-                    enabled  = !StopwatchState.isAtLimit,
+                    enabled  = !state.isAtLimit,
                     shape    = CircleShape,
                     modifier = Modifier.size(80.dp),
                     colors   = IconButtonDefaults.filledIconButtonColors(
@@ -120,7 +119,6 @@ fun TimerScreen(
                     }
                 }
 
-                // Substituído: Ícone de Picture-in-Picture (Overlay)
                 FilledTonalIconButton(
                     onClick  = onOpenOverlay,
                     modifier = Modifier.size(56.dp)
