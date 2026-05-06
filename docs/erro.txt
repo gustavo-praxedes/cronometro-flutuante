@@ -1,6 +1,6 @@
-KronoIcons.kt:59:68 Unresolved reference. None of the following candidates is applicable because of a receiver type mismatch:
-val Icons.AutoMirrored.Outlined.ArrowBack: ImageVector
-KronoIcons.kt:60:68 Unresolved reference. None of the following candidates is applicable because of a receiver type mismatch:
-val Icons.AutoMirrored.Outlined.OpenInNew: ImageVector
-KronoIcons.kt:95:68 Unresolved reference. None of the following candidates is applicable because of a receiver type mismatch:
-val Icons.AutoMirrored.Outlined.Article: ImageVector
+AppearancePanel.kt:78:17 Unresolved reference 'Text'.
+AppearancePanel.kt:80:29 Unresolved reference 'MaterialTheme'.
+AppearancePanel.kt:98:17 Unresolved reference 'Text'.
+AppearancePanel.kt:100:29 Unresolved reference 'MaterialTheme'.
+AppearancePanel.kt:127:29 Unresolved reference 'MaterialTheme'.
+AppearancePanel.kt:137:29 Unresolved reference 'MaterialTheme'.
