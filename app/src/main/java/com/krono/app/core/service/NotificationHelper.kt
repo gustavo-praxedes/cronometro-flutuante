@@ -8,7 +8,7 @@ import android.content.Intent
 import androidx.core.app.NotificationCompat
 import com.krono.app.*
 import com.krono.app.data.CountdownState
-import com.krono.app.core.data.TimerState
+import com.krono.app.feature.stopwatch.StopwatchState
 import com.krono.app.core.data.toFormattedTime
 import com.krono.app.receiver.NotificationActionReceiver
 import com.krono.app.ui.MainActivity
@@ -27,7 +27,7 @@ class NotificationHelper(private val context: Context) {
     )
 
     fun buildNotification(
-        timerState: TimerState,
+        StopwatchState: StopwatchState,
         showHours: Boolean,
         showSeconds: Boolean
     ): Notification {
@@ -50,11 +50,11 @@ class NotificationHelper(private val context: Context) {
             .setOnlyAlertOnce(true)
             .setSilent(true)
             .addAction(
-                if (timerState.isRunning) android.R.drawable.ic_media_pause
+                if (StopwatchState.isRunning) android.R.drawable.ic_media_pause
                 else android.R.drawable.ic_media_play,
-                if (timerState.isRunning) context.getString(R.string.action_pause)
+                if (StopwatchState.isRunning) context.getString(R.string.action_pause)
                 else context.getString(R.string.action_play),
-                if (timerState.isRunning) actionIntent(ACTION_PAUSE, 1)
+                if (StopwatchState.isRunning) actionIntent(ACTION_PAUSE, 1)
                 else actionIntent(ACTION_PLAY, 2)
             )
             .addAction(
@@ -68,9 +68,9 @@ class NotificationHelper(private val context: Context) {
                 actionIntent(ACTION_STOP_SERVICE, 4)
             )
 
-        if (timerState.isRunning && timerState.startTime != -1L) {
-            val elapsedSinceStart = System.currentTimeMillis() - timerState.startTime
-            val totalElapsed      = timerState.pauseOffset + elapsedSinceStart
+        if (StopwatchState.isRunning && StopwatchState.startTime != -1L) {
+            val elapsedSinceStart = System.currentTimeMillis() - StopwatchState.startTime
+            val totalElapsed      = StopwatchState.pauseOffset + elapsedSinceStart
             val whenMs            = System.currentTimeMillis() - totalElapsed
 
             builder
@@ -81,7 +81,7 @@ class NotificationHelper(private val context: Context) {
                 .setContentText(context.getString(R.string.notification_text_running))
 
         } else {
-            val frozenTime = timerState.elapsedMs.toFormattedTime(
+            val frozenTime = StopwatchState.elapsedMs.toFormattedTime(
                 showHours   = showHours,
                 showSeconds = showSeconds
             )

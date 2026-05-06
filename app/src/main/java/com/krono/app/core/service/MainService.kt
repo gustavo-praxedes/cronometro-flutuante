@@ -21,7 +21,7 @@ import com.krono.app.core.data.TimerPreferences
 import com.krono.app.util.KronoNavigator
 import com.krono.app.util.PermissionUtils
 import com.krono.app.viewmodel.CountdownViewModel
-import com.krono.app.viewmodel.TimerViewModel
+import com.krono.app.feature.stopwatch.StopwatchViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
@@ -55,7 +55,7 @@ class MainService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStateRe
     private lateinit var wakeLockManager: WakeLockManager
     private lateinit var countdownManager: CountdownManager
 
-    private val viewModel: TimerViewModel get() = (application as KronoApp).timerViewModel
+    private val viewModel: StopwatchViewModel get() = (application as KronoApp).StopwatchViewModel
     private var notificationJob: Job? = null
     private var currentConfig: OverlayConfig = OverlayConfig()
     private var observersStarted = false
@@ -221,7 +221,7 @@ class MainService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStateRe
 
     @SuppressLint("InlinedApi")
     private fun startForegroundWithNotification() {
-        val notification = notificationHelper.buildNotification(viewModel.timerState.value, currentConfig.showHours, currentConfig.showSeconds)
+        val notification = notificationHelper.buildNotification(viewModel.StopwatchState.value, currentConfig.showHours, currentConfig.showSeconds)
         val type = if (Build.VERSION.SDK_INT >= 34) android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE else 0
         
         if (type != 0) startForeground(NOTIFICATION_ID, notification, type)
@@ -231,8 +231,8 @@ class MainService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStateRe
     private fun startNotificationUpdater() {
         notificationJob?.cancel()
         notificationJob = serviceScope.launch {
-            var lastState = viewModel.timerState.value
-            viewModel.timerState.collectLatest { state ->
+            var lastState = viewModel.StopwatchState.value
+            viewModel.StopwatchState.collectLatest { state ->
                 val isReset = !state.isRunning && state.elapsedMs == 0L
                 if (state.isRunning != lastState.isRunning || state.isAtLimit != lastState.isAtLimit || isReset) {
                     val n = notificationHelper.buildNotification(state, currentConfig.showHours, currentConfig.showSeconds)
@@ -252,7 +252,7 @@ class MainService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStateRe
                 
                 if (!config.focusModeEnabled) {
                     sendBroadcast(Intent(ACTION_FOCUS_DISMISSED).apply { `package` = packageName })
-                } else if (focusTrigger && viewModel.timerState.value.isRunning && overlayManager.overlayVisible) {
+                } else if (focusTrigger && viewModel.StopwatchState.value.isRunning && overlayManager.overlayVisible) {
                     KronoNavigator.startFocusMode(this@MainService)
                 }
             }
@@ -270,8 +270,8 @@ class MainService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStateRe
 
     private fun observeTimerRunning() {
         serviceScope.launch {
-            var wasRunning = viewModel.timerState.value.isRunning
-            viewModel.timerState.collect { state ->
+            var wasRunning = viewModel.StopwatchState.value.isRunning
+            viewModel.StopwatchState.collect { state ->
                 val started = !wasRunning && state.isRunning
                 wasRunning = state.isRunning
                 if (started && currentConfig.focusModeEnabled && overlayManager.overlayVisible) {
@@ -282,12 +282,12 @@ class MainService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStateRe
     }
 
     private fun observeTimerLimit() {
-        serviceScope.launch { viewModel.timerState.collect { if (it.isAtLimit) hideOverlay() } }
+        serviceScope.launch { viewModel.StopwatchState.collect { if (it.isAtLimit) hideOverlay() } }
     }
 
     override fun onDestroy() {
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-        if (viewModel.timerState.value.isRunning) viewModel.pause()
+        if (viewModel.StopwatchState.value.isRunning) viewModel.pause()
         timerPrefs.setServiceActive(false)
         wakeLockManager.release()
         overlayManager.removeOverlay()

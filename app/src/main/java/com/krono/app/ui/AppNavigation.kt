@@ -35,7 +35,7 @@ import com.krono.app.R
 import com.krono.app.core.data.OverlayConfig
 import com.krono.app.core.data.OverlayDataStore
 import com.krono.app.util.UpdateInfo
-import com.krono.app.viewmodel.TimerViewModel
+import com.krono.app.feature.stopwatch.StopwatchViewModel
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -76,7 +76,7 @@ private val BOTTOM_TABS = listOf(
 @Composable
 fun AppNavigation(
     dataStore                 : OverlayDataStore,
-    timerViewModel            : TimerViewModel,
+    StopwatchViewModel            : StopwatchViewModel,
     pendingUpdateInfo         : UpdateInfo?,
     navigationEvents          : SharedFlow<String>,
     permissionsDialogEvents   : SharedFlow<Unit>,
@@ -93,7 +93,7 @@ fun AppNavigation(
     isServiceRunning          : () -> Boolean
 ) {
     val navController = rememberNavController()
-    val timerState    by timerViewModel.timerState.collectAsState()
+    val StopwatchState    by StopwatchViewModel.StopwatchState.collectAsState()
     val context       = LocalContext.current
     val scope         = rememberCoroutineScope()
     val config        by dataStore.configFlow.collectAsState(initial = OverlayConfig())
@@ -152,11 +152,11 @@ fun AppNavigation(
         ) {
             composable(AppRoutes.TIMER) {
                 TimerScreen(
-                    timerState     = timerState,
+                    StopwatchState     = StopwatchState,
                     selectedFont   = config.selectedFont,
-                    onStart        = { timerViewModel.start() },
-                    onPause        = { timerViewModel.pause() },
-                    onReset        = { timerViewModel.reset() },
+                    onStart        = { StopwatchViewModel.start() },
+                    onPause        = { StopwatchViewModel.pause() },
+                    onReset        = { StopwatchViewModel.reset() },
                     onOpenOverlay  = onTryStartService,
                     onOpenSettings = { navController.navigate(AppRoutes.SETTINGS) }
                 )

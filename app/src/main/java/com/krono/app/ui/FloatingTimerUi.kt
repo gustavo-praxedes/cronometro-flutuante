@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.krono.app.R
 import com.krono.app.core.data.OverlayConfig
-import com.krono.app.core.data.TimerState
+import com.krono.app.feature.stopwatch.StopwatchState
 import com.krono.app.core.data.toFormattedTime
 import com.krono.app.core.ui.components.KronoTimerDisplay
 import com.krono.app.core.ui.components.KronoControlButtons
@@ -46,7 +46,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun FloatingTimerUi(
-    timerState            : TimerState,
+    StopwatchState            : StopwatchState,
     config                : OverlayConfig,
     onStart               : () -> Unit,
     onPause               : () -> Unit,
@@ -61,7 +61,7 @@ fun FloatingTimerUi(
     onToggleBeep          : () -> Unit,
     onMenuVisibilityChange: (Boolean) -> Unit
 ) {
-    val isRunning = timerState.isRunning
+    val isRunning = StopwatchState.isRunning
     val scale     = config.scale
 
     // ── Animação de Entrada Premium (Escala + Alpha estável) ──────────
@@ -183,7 +183,7 @@ fun FloatingTimerUi(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 KronoTimerDisplay(
-                    elapsedMs = timerState.elapsedMs,
+                    elapsedMs = StopwatchState.elapsedMs,
                     showHours = config.showHours,
                     showSeconds = config.showSeconds,
                     selectedFont = config.selectedFont,
@@ -196,7 +196,7 @@ fun FloatingTimerUi(
                 val MainButtonRow = @Composable {
                     KronoControlButtons(
                         isRunning = currentIsRunning,
-                        isAtLimit = timerState.isAtLimit,
+                        isAtLimit = StopwatchState.isAtLimit,
                         scale = scale,
                         currentScale = currentScale,
                         textColor = txtColor,

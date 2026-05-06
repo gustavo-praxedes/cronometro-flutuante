@@ -8,7 +8,7 @@ import android.os.Build
 import com.google.firebase.FirebaseApp
 import com.krono.app.data.CountdownDataStore
 import com.krono.app.viewmodel.CountdownViewModel
-import com.krono.app.viewmodel.TimerViewModel
+import com.krono.app.feature.stopwatch.StopwatchViewModel
 
 // Constantes globais do App
 const val NOTIFICATION_ID         = 1
@@ -25,8 +25,8 @@ const val EXTRA_SHOW_DONATION     = "extra_show_donation"
 class KronoApp : Application() {
 
     // Singleton do ViewModel passando a referência da application
-    val timerViewModel: TimerViewModel by lazy {
-        TimerViewModel(this)
+    val StopwatchViewModel: StopwatchViewModel by lazy {
+        StopwatchViewModel(this)
     }
 
     val countdownViewModel: CountdownViewModel by lazy {

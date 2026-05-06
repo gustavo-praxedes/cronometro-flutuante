@@ -14,14 +14,14 @@ import androidx.compose.ui.graphics.Color // Importado para usar Color.White ou 
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.krono.app.core.data.TimerState
+import com.krono.app.feature.stopwatch.StopwatchState
 import com.krono.app.core.data.toFormattedTime
 import com.krono.app.core.ui.theme.timerFontFamily
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimerScreen(
-    timerState    : TimerState,
+    StopwatchState    : StopwatchState,
     selectedFont  : String = "SYSTEM_DEFAULT",
     onStart       : () -> Unit,
     onPause       : () -> Unit,
@@ -29,7 +29,7 @@ fun TimerScreen(
     onOpenOverlay : () -> Unit,
     onOpenSettings: () -> Unit
 ) {
-    val isRunning = timerState.isRunning
+    val isRunning = StopwatchState.isRunning
 
     Scaffold(
         topBar = {
@@ -69,7 +69,7 @@ fun TimerScreen(
             ) {
                 val fontSize = (maxWidth.value * 0.18f).coerceIn(32f, 76f)
                 Text(
-                    text       = timerState.elapsedMs.toFormattedTime(showHours = true, showSeconds = true),
+                    text       = StopwatchState.elapsedMs.toFormattedTime(showHours = true, showSeconds = true),
                     fontSize   = fontSize.sp,
                     fontWeight = FontWeight.Bold,
                     fontFamily = timerFontFamily(selectedFont),
@@ -99,7 +99,7 @@ fun TimerScreen(
 
                 FilledIconButton(
                     onClick  = { if (isRunning) onPause() else onStart() },
-                    enabled  = !timerState.isAtLimit,
+                    enabled  = !StopwatchState.isAtLimit,
                     shape    = CircleShape,
                     modifier = Modifier.size(80.dp),
                     colors   = IconButtonDefaults.filledIconButtonColors(

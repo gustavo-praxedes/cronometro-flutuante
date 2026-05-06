@@ -23,7 +23,7 @@ import com.krono.app.core.data.OverlayDataStore
 import com.krono.app.core.service.MainService
 import com.krono.app.core.ui.theme.KronoTheme
 import com.krono.app.util.UpdateInfo
-import com.krono.app.viewmodel.TimerViewModel
+import com.krono.app.feature.stopwatch.StopwatchViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
@@ -36,8 +36,8 @@ class MainActivity : ComponentActivity() {
     private val permissionsRefreshTrigger     = MutableStateFlow(0)
 
     private lateinit var dataStore: OverlayDataStore
-    private val timerViewModel: TimerViewModel
-        get() = (application as KronoApp).timerViewModel
+    private val StopwatchViewModel: StopwatchViewModel
+        get() = (application as KronoApp).StopwatchViewModel
 
     private val pendingUpdateInfo = MutableStateFlow<UpdateInfo?>(null)
 
@@ -96,7 +96,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     AppNavigation(
                         dataStore                 = dataStore,
-                        timerViewModel            = timerViewModel,
+                        StopwatchViewModel            = StopwatchViewModel,
                         pendingUpdateInfo         = pendingUpdateInfo.collectAsState().value,
                         navigationEvents          = navigationEvents,
                         permissionsDialogEvents   = permissionsDialogEvents,

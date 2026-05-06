@@ -3,6 +3,7 @@ package com.krono.app.core.data
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.krono.app.feature.stopwatch.StopwatchState
 
 // ============================================================
 // TimerPreferences.kt
@@ -28,14 +29,14 @@ class TimerPreferences(context: Context) {
         const val KEY_SERVICE_ACTIVE = "service_active"
     }
 
-    fun loadState(): TimerState = TimerState(
+    fun loadState(): StopwatchState = StopwatchState(
         startTime   = prefs.getLong(KEY_START_TIME,   -1L),
         pauseOffset = prefs.getLong(KEY_PAUSE_OFFSET, 0L),
         isRunning   = prefs.getBoolean(KEY_IS_RUNNING,  false),
         isAtLimit   = prefs.getBoolean(KEY_IS_AT_LIMIT, false)
     )
 
-    fun saveState(state: TimerState) {
+    fun saveState(state: StopwatchState) {
         prefs.edit {
             putLong(KEY_START_TIME,   state.startTime)
             putLong(KEY_PAUSE_OFFSET, state.pauseOffset)
@@ -45,7 +46,7 @@ class TimerPreferences(context: Context) {
     }
 
     // commit = true: escrita imediata no disco (processo prestes a encerrar)
-    fun saveStateSync(state: TimerState) {
+    fun saveStateSync(state: StopwatchState) {
         prefs.edit(commit = true) {
             putLong(KEY_START_TIME,   state.startTime)
             putLong(KEY_PAUSE_OFFSET, state.pauseOffset)

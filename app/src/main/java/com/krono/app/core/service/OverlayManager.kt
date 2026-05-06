@@ -19,7 +19,7 @@ import com.krono.app.core.data.OverlayConfig
 import com.krono.app.core.data.OverlayDataStore
 import com.krono.app.ui.FloatingTimerUi
 import com.krono.app.core.ui.theme.KronoTheme
-import com.krono.app.viewmodel.TimerViewModel
+import com.krono.app.feature.stopwatch.StopwatchViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -27,7 +27,7 @@ class OverlayManager(
     private val context: Context,
     private val windowManager: WindowManager,
     private val dataStore: OverlayDataStore,
-    private val viewModel: TimerViewModel,
+    private val viewModel: StopwatchViewModel,
     private val serviceScope: CoroutineScope,
     private val lifecycleOwner: LifecycleOwner,
     private val viewModelStoreOwner: ViewModelStoreOwner,
@@ -78,11 +78,11 @@ class OverlayManager(
         val view = ComposeView(context).apply {
             setContent {
                 val config by dataStore.configFlow.collectAsState(initial = OverlayConfig())
-                val timerState by viewModel.timerState.collectAsState()
+                val StopwatchState by viewModel.StopwatchState.collectAsState()
 
                 KronoTheme(selectedTheme = config.selectedTheme) {
                     FloatingTimerUi(
-                        timerState = timerState,
+                        StopwatchState = StopwatchState,
                         config = config,
                         onStart = onStart,
                         onPause = onPause,
