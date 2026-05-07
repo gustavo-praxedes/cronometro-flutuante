@@ -10,7 +10,7 @@ import com.krono.app.*
 import com.krono.app.feature.countdown.CountdownState
 import com.krono.app.feature.stopwatch.StopwatchState
 import com.krono.app.core.data.toFormattedTime
-import com.krono.app.receiver.NotificationActionReceiver
+import com.krono.app.core.receiver.NotificationActionReceiver
 import com.krono.app.ui.MainActivity
 import com.krono.app.feature.countdown.CountdownViewModel
 
