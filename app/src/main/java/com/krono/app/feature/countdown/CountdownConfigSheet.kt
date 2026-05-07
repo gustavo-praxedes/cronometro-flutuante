@@ -39,7 +39,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import com.krono.app.feature.stopwatch.TimeLimitField
-import com.krono.app.ui.ColorPickerDialog
+import com.krono.app.core.ui.dialogs.ColorPickerDialog
 import com.krono.app.feature.countdown.CountdownConfig
 import com.krono.app.core.ui.theme.KronoTokens
 

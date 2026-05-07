@@ -18,7 +18,7 @@ import com.krono.app.BuildConfig
 import com.krono.app.R
 import com.krono.app.core.ui.theme.KronoIcons
 import com.krono.app.core.ui.theme.KronoTokens
-import com.krono.app.ui.BugReportDialog
+import com.krono.app.core.ui.dialogs.BugReportDialog
 import com.krono.app.core.util.UpdateInfo
 
 private const val GITHUB_URL = "https://github.com/gustavo-praxedes/krono"

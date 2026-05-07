@@ -1,4 +1,4 @@
-package com.krono.app.ui
+package com.krono.app.core.ui.dialogs
 
 import android.os.Build
 import androidx.compose.animation.AnimatedVisibility

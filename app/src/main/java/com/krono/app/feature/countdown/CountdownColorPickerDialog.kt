@@ -43,7 +43,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 
 import androidx.compose.material3.IconButton
-import com.krono.app.ui.ColorPickerDialog
+import com.krono.app.core.ui.dialogs.ColorPickerDialog
 import com.krono.app.core.ui.theme.adaptiveDialogWidth
 import androidx.compose.foundation.layout.wrapContentHeight
 

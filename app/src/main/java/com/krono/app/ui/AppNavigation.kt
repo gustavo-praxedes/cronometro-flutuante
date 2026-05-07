@@ -10,6 +10,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import com.krono.app.core.ui.theme.KronoIcons
 import com.krono.app.core.ui.theme.KronoTokens
+import com.krono.app.core.ui.dialogs.PermissionsDialog
 import com.krono.app.feature.stopwatch.StopwatchViewModel
 import com.krono.app.feature.stopwatch.StopwatchScreen
 import androidx.compose.ui.graphics.vector.ImageVector

@@ -19,7 +19,7 @@ import com.krono.app.core.data.OverlayDataStore
 import com.krono.app.core.ui.theme.KronoThemeOption
 import com.krono.app.core.ui.theme.KronoTokens
 import com.krono.app.core.ui.theme.overlayColorsForTheme
-import com.krono.app.ui.ColorPickerDialog
+import com.krono.app.core.ui.dialogs.ColorPickerDialog
 import com.krono.app.core.ui.components.FontSelector
 import com.krono.app.core.ui.components.ThemeSelector
 import kotlinx.coroutines.launch
