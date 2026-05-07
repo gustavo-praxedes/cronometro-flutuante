@@ -13,6 +13,7 @@
 - fix: Bug introduzido na refatoração corrigido
 
 # 🔧 Manutenção
+- remove empty packages after reorganization
 - refactor: move activities and app shell to app
 - refactor: move settings to core/ui/settings
 - refactor: move generic dialogs to core/ui/dialogs
