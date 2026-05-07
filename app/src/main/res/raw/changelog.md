@@ -13,6 +13,7 @@
 - fix: Bug introduzido na refatoração corrigido
 
 # 🔧 Manutenção
+- ui: improve settings menu panel visual hierarchy
 - remove empty packages after reorganization
 - refactor: move activities and app shell to app
 - refactor: move settings to core/ui/settings

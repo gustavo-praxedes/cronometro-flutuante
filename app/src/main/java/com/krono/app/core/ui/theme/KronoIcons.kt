@@ -28,6 +28,7 @@ import androidx.compose.material.icons.rounded.HourglassBottom
 import androidx.compose.material.icons.rounded.HourglassTop
 import androidx.compose.material.icons.rounded.HourglassEmpty
 import androidx.compose.material.icons.rounded.Info
+import androidx.compose.material.icons.rounded.KeyboardArrowRight
 import androidx.compose.material.icons.rounded.LightMode
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material.icons.rounded.MoreHoriz
@@ -60,6 +61,7 @@ object KronoIcons {
         val OpenExternal: ImageVector = Icons.AutoMirrored.Rounded.OpenInNew
         val Close: ImageVector        = Icons.Rounded.Close
         val Menu: ImageVector         = Icons.Rounded.Menu
+        val ChevronRight: ImageVector = Icons.Rounded.KeyboardArrowRight
     }
 
     // ── Ações ───────────────────────────────────────────────

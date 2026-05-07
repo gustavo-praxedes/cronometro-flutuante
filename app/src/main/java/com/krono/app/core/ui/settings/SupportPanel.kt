@@ -20,6 +20,7 @@ import androidx.compose.ui.text.withStyle
 import com.krono.app.core.data.formatLifetimeDetailed
 import com.krono.app.core.ui.theme.KronoIcons
 import com.krono.app.core.ui.theme.KronoTokens
+import androidx.compose.material3.Surface
 
 private const val KOFI_URL = "https://ko-fi.com/gustavopraxedes"
 

@@ -27,22 +27,29 @@ fun FontSelector(
     ) {
         Text(
             text     = "Fonte",
-            style    = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.weight(1f)
+            style    = MaterialTheme.typography.bodyMedium,
+            color    = MaterialTheme.colorScheme.onSurface
         )
 
         ExposedDropdownMenuBox(
             expanded         = expanded,
             onExpandedChange = { expanded = !expanded },
-            modifier         = Modifier.width(200.dp)
+            modifier         = Modifier.fillMaxWidth()
         ) {
             OutlinedTextField(
                 value         = current.label,
                 onValueChange = {},
                 readOnly      = true,
+                label         = { Text("Fonte") },
                 trailingIcon  = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                shape         = KronoTokens.Shape.badge,
-                modifier      = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable),
+                shape         = KronoTokens.Shape.input,
+                colors        = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                ),
+                modifier      = Modifier
+                    .menuAnchor(MenuAnchorType.PrimaryNotEditable)
+                    .fillMaxWidth(),
                 textStyle     = MaterialTheme.typography.bodyMedium,
                 singleLine    = true
             )

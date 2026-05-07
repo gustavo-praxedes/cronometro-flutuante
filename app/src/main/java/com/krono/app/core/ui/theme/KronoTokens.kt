@@ -41,6 +41,7 @@ object KronoTokens {
 
     // ── Espaçamentos ─────────────────────────────────────────
     object Spacing {
+        val none = 0.dp
         val xs   = 4.dp
         val sm   = 8.dp
         val md   = 12.dp
@@ -83,6 +84,8 @@ object KronoTokens {
         val button        = 22.dp
         val close         = 32.dp
         val cardAction    = 24.dp
+        val rowIcon       = 20.dp
+        val rowTrailing   = 20.dp
     }
 
     // ── Elevação e Sombras ───────────────────────────────────

@@ -49,4 +49,8 @@
     <string name="settings_support">Apoio</string>
     <string name="settings_changelog">Histórico de Alterações</string>
     <string name="settings_updates">Atualizações</string>
+    <string name="settings_group_theme">Tema</string>
+    <string name="settings_group_colors">Cores</string>
+    <string name="settings_group_general">Geral</string>
+    <string name="settings_group_time_limit">Limite de Tempo</string>
 </resources>

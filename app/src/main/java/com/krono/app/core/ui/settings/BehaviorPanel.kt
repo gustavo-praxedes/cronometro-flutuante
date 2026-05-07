@@ -30,86 +30,100 @@ fun BehaviorPanel(
         modifier = modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = KronoTokens.Spacing.xxl),
-        verticalArrangement = Arrangement.spacedBy(KronoTokens.Spacing.xs + 2.dp)
+            .padding(horizontal = KronoTokens.Spacing.lg),
+        verticalArrangement = Arrangement.spacedBy(KronoTokens.Spacing.lg)
     ) {
-        Spacer(modifier = Modifier.height(KronoTokens.Spacing.lg))
+        SettingsGroup(title = stringResource(R.string.settings_group_general)) {
+            ToggleRow(
+                label = stringResource(R.string.label_auto_launch),
+                checked = config.autoLaunch,
+                onChange = {
+                    scope.launch { dataStore.updateConfig(config.copy(autoLaunch = it)) }
+                }
+            )
 
-        ToggleRow(
-            label = stringResource(R.string.label_auto_launch),
-            checked = config.autoLaunch,
-            onChange = {
-                scope.launch { dataStore.updateConfig(config.copy(autoLaunch = it)) }
-            }
-        )
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
 
-        ToggleRow(
-            label = stringResource(R.string.label_show_hours),
-            checked = config.showHours,
-            onChange = {
-                if (!it && !config.showSeconds) return@ToggleRow
-                scope.launch { dataStore.updateConfig(config.copy(showHours = it)) }
-            }
-        )
+            ToggleRow(
+                label = stringResource(R.string.label_show_hours),
+                checked = config.showHours,
+                onChange = {
+                    if (!it && !config.showSeconds) return@ToggleRow
+                    scope.launch { dataStore.updateConfig(config.copy(showHours = it)) }
+                }
+            )
 
-        ToggleRow(
-            label = stringResource(R.string.label_show_seconds),
-            checked = config.showSeconds,
-            onChange = {
-                if (!it && !config.showHours) return@ToggleRow
-                scope.launch { dataStore.updateConfig(config.copy(showSeconds = it)) }
-            }
-        )
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
 
-        ToggleRow(
-            label = stringResource(R.string.label_show_buttons),
-            checked = config.showButtons,
-            onChange = {
-                scope.launch { dataStore.updateConfig(config.copy(showButtons = it)) }
-            }
-        )
+            ToggleRow(
+                label = stringResource(R.string.label_show_seconds),
+                checked = config.showSeconds,
+                onChange = {
+                    if (!it && !config.showHours) return@ToggleRow
+                    scope.launch { dataStore.updateConfig(config.copy(showSeconds = it)) }
+                }
+            )
 
-        ToggleRow(
-            label = stringResource(R.string.label_wake_lock),
-            checked = config.keepScreenOn,
-            onChange = {
-                scope.launch { dataStore.updateConfig(config.copy(keepScreenOn = it)) }
-            }
-        )
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
 
-        ToggleRow(
-            label = stringResource(R.string.label_focus_mode),
-            checked = config.focusModeEnabled,
-            onChange = { isEnabled ->
-                scope.launch { dataStore.updateConfig(config.copy(focusModeEnabled = isEnabled)) }
-                if (isEnabled && isServiceRunning()) onStartFocusMode()
-            }
-        )
+            ToggleRow(
+                label = stringResource(R.string.label_show_buttons),
+                checked = config.showButtons,
+                onChange = {
+                    scope.launch { dataStore.updateConfig(config.copy(showButtons = it)) }
+                }
+            )
 
-        ToggleRow(
-            label = stringResource(R.string.label_beep_enabled),
-            checked = config.isBeepEnabled,
-            onChange = {
-                scope.launch { dataStore.updateConfig(config.copy(isBeepEnabled = it)) }
-            }
-        )
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
 
-        ToggleRow(
-            label = stringResource(R.string.label_vibration_enabled),
-            checked = config.isVibrationEnabled,
-            onChange = {
-                scope.launch { dataStore.updateConfig(config.copy(isVibrationEnabled = it)) }
-            }
-        )
+            ToggleRow(
+                label = stringResource(R.string.label_wake_lock),
+                checked = config.keepScreenOn,
+                onChange = {
+                    scope.launch { dataStore.updateConfig(config.copy(keepScreenOn = it)) }
+                }
+            )
 
-        Spacer(modifier = Modifier.height(KronoTokens.Spacing.lg))
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
 
-        TimeLimitField(
-            timeLimitSeconds = config.timeLimitSeconds,
-            onConfirm = { seconds ->
-                scope.launch { dataStore.updateConfig(config.copy(timeLimitSeconds = seconds)) }
-            }
-        )
+            ToggleRow(
+                label = stringResource(R.string.label_focus_mode),
+                checked = config.focusModeEnabled,
+                onChange = { isEnabled ->
+                    scope.launch { dataStore.updateConfig(config.copy(focusModeEnabled = isEnabled)) }
+                    if (isEnabled && isServiceRunning()) onStartFocusMode()
+                }
+            )
+
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
+
+            ToggleRow(
+                label = stringResource(R.string.label_beep_enabled),
+                checked = config.isBeepEnabled,
+                onChange = {
+                    scope.launch { dataStore.updateConfig(config.copy(isBeepEnabled = it)) }
+                }
+            )
+
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
+
+            ToggleRow(
+                label = stringResource(R.string.label_vibration_enabled),
+                checked = config.isVibrationEnabled,
+                onChange = {
+                    scope.launch { dataStore.updateConfig(config.copy(isVibrationEnabled = it)) }
+                }
+            )
+        }
+
+        SettingsGroup(title = stringResource(R.string.settings_group_time_limit)) {
+            TimeLimitField(
+                timeLimitSeconds = config.timeLimitSeconds,
+                onConfirm = { seconds ->
+                    scope.launch { dataStore.updateConfig(config.copy(timeLimitSeconds = seconds)) }
+                }
+            )
+        }
 
         Spacer(modifier = Modifier.height(KronoTokens.Spacing.xxl))
     }

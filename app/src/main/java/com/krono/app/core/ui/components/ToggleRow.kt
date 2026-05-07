@@ -1,5 +1,6 @@
 package com.krono.app.core.ui.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -12,20 +13,29 @@ import com.krono.app.core.ui.theme.KronoTokens
 fun ToggleRow(
     label   : String,
     checked : Boolean,
-    onChange: (Boolean) -> Unit
+    onChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Row(
-        modifier              = Modifier
+        modifier              = modifier
             .fillMaxWidth()
-            .padding(vertical = KronoTokens.Spacing.xs + 2.dp),
+            .clickable { onChange(!checked) }
+            .padding(
+                horizontal = KronoTokens.Spacing.lg,
+                vertical = KronoTokens.Spacing.md
+            ),
         verticalAlignment     = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
             text     = label,
-            style    = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.weight(1f)
+            style    = MaterialTheme.typography.bodyMedium,
+            color    = MaterialTheme.colorScheme.onSurface
         )
-        Switch(checked = checked, onCheckedChange = onChange)
+
+        Switch(
+            checked = checked,
+            onCheckedChange = onChange
+        )
     }
 }

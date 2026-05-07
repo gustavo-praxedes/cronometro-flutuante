@@ -30,90 +30,90 @@ fun SettingsPanelHost(
     modifier: Modifier = Modifier
 ) {
     when (destination) {
-        SettingsDestination.Appearance -> {
-            AppearancePanel(
-                dataStore = dataStore,
-                modifier = modifier
-            )
-        }
-
-        SettingsDestination.Behavior -> {
-            BehaviorPanel(
-                dataStore = dataStore,
-                isServiceRunning = isServiceRunning,
-                onStartFocusMode = onStartFocusMode,
-                modifier = modifier
-            )
-        }
-
-        SettingsDestination.Overlay -> {
-            OverlayPanel(
-                dataStore = dataStore,
-                modifier = modifier
-            )
-        }
-
-        SettingsDestination.About -> {
-            AboutPanel(
-                onSupportClick = onSupportClick,
-                onShowChangelog = onShowChangelog,
-                modifier = modifier
-            )
-        }
-
-        SettingsDestination.Support -> {
-            SupportPanel(
-                totalLifetimeMs = totalLifetimeMs,
-                onDonate = onSupportClick,
-                modifier = modifier
-            )
-        }
-
-        SettingsDestination.Changelog -> {
-            val updateInfo = pendingUpdateInfo ?: UpdateInfo(
-                tagName = "",
-                changelog = "",
-                releaseUrl = "",
-                downloadUrl = null
-            )
-            ChangelogPanel(
-                updateInfo = updateInfo,
-                onUpdateAvailable = onUpdateAvailable,
-                modifier = modifier
-            )
-        }
-
-        SettingsDestination.Updates -> {
-            if (pendingUpdateInfo != null) {
-                UpdatesPanel(
-                    updateInfo = pendingUpdateInfo,
-                    modifier = modifier
+            SettingsDestination.Appearance -> {
+                AppearancePanel(
+                    dataStore = dataStore,
+                    modifier = Modifier.fillMaxWidth()
                 )
-            } else {
-                Box(
-                    modifier = modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "Nenhuma atualização disponível",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+            }
+
+            SettingsDestination.Behavior -> {
+                BehaviorPanel(
+                    dataStore = dataStore,
+                    isServiceRunning = isServiceRunning,
+                    onStartFocusMode = onStartFocusMode,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+            SettingsDestination.Overlay -> {
+                OverlayPanel(
+                    dataStore = dataStore,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+            SettingsDestination.About -> {
+                AboutPanel(
+                    onSupportClick = onSupportClick,
+                    onShowChangelog = onShowChangelog,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+            SettingsDestination.Support -> {
+                SupportPanel(
+                    totalLifetimeMs = totalLifetimeMs,
+                    onDonate = onSupportClick,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+            SettingsDestination.Changelog -> {
+                val updateInfo = pendingUpdateInfo ?: UpdateInfo(
+                    tagName = "",
+                    changelog = "",
+                    releaseUrl = "",
+                    downloadUrl = null
+                )
+                ChangelogPanel(
+                    updateInfo = updateInfo,
+                    onUpdateAvailable = onUpdateAvailable,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+            SettingsDestination.Updates -> {
+                if (pendingUpdateInfo != null) {
+                    UpdatesPanel(
+                        updateInfo = pendingUpdateInfo,
+                        modifier = Modifier.fillMaxWidth()
                     )
+                } else {
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "Nenhuma atualização disponível",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 }
             }
-        }
 
-        SettingsDestination.Stopwatch -> {
-            ToolSettingsPlaceholder(
-                toolName = "Cronômetro",
-                modifier = modifier
-            )
-        }
+            SettingsDestination.Stopwatch -> {
+                ToolSettingsPlaceholder(
+                    toolName = "Cronômetro",
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
 
-        SettingsDestination.Countdown -> {
+            SettingsDestination.Countdown -> {
             ToolSettingsPlaceholder(
                 toolName = "Cronômetro Regressivo",
-                modifier = modifier
+                modifier = Modifier.fillMaxWidth()
             )
         }
     }
