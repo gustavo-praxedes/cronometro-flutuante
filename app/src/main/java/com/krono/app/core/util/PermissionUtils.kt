@@ -1,4 +1,4 @@
-package com.krono.app.util
+package com.krono.app.core.util
 
 import android.content.Context
 import android.content.pm.PackageManager

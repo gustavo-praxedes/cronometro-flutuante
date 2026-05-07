@@ -17,9 +17,9 @@ import androidx.compose.ui.unit.dp
 import com.krono.app.core.ui.theme.KronoIcons
 import com.krono.app.core.ui.theme.KronoTokens
 import com.krono.app.core.ui.components.SkeletonLoader
-import com.krono.app.util.ApkInstaller
-import com.krono.app.util.DownloadStatus
-import com.krono.app.util.UpdateInfo
+import com.krono.app.core.util.ApkInstaller
+import com.krono.app.core.util.DownloadStatus
+import com.krono.app.core.util.UpdateInfo
 
 @Composable
 fun UpdatesPanel(

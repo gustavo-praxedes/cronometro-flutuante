@@ -10,7 +10,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.krono.app.core.data.OverlayConfig
 import com.krono.app.core.data.OverlayDataStore
-import com.krono.app.util.UpdateInfo
+import com.krono.app.core.util.UpdateInfo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 

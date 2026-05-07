@@ -18,8 +18,8 @@ import com.krono.app.NOTIFICATION_ID
 import com.krono.app.core.data.OverlayConfig
 import com.krono.app.core.data.OverlayDataStore
 import com.krono.app.core.data.TimerPreferences
-import com.krono.app.util.KronoNavigator
-import com.krono.app.util.PermissionUtils
+import com.krono.app.core.util.KronoNavigator
+import com.krono.app.core.util.PermissionUtils
 import com.krono.app.core.tool.ToolRegistry
 import com.krono.app.core.tool.ToolViewModel
 import com.krono.app.core.tool.KronoTool

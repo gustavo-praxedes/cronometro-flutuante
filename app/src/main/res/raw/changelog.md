@@ -13,6 +13,7 @@
 - fix: Bug introduzido na refatoração corrigido
 
 # 🔧 Manutenção
+- refactor: move receiver to core/receiver
 - Limpeza de arquivos obsoletos
 - chore: add settings strings and icons
 - refactor: decouple MainService from StopwatchViewModel via ToolRegistry

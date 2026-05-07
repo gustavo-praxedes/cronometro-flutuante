@@ -17,7 +17,7 @@ import com.krono.app.core.data.OverlayConfig
 import com.krono.app.core.data.OverlayDataStore
 import com.krono.app.core.service.MainService
 import com.krono.app.core.ui.theme.KronoTheme
-import com.krono.app.util.UpdateInfo
+import com.krono.app.core.util.UpdateInfo
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking

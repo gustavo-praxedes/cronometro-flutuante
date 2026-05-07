@@ -6,4 +6,7 @@
 1. Thinking (apenas se solicitado)
 2. Introduções, conclusões e resumo do trabalho
 
+# LOCAIS
+1. JAVA em C:\Program Files\Android\Android Studio\jbr
+
 

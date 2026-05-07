@@ -21,9 +21,9 @@ import com.krono.app.BuildConfig
 import com.krono.app.core.ui.theme.KronoIcons
 import com.krono.app.core.ui.theme.KronoTokens
 import com.krono.app.core.ui.components.SkeletonLoader
-import com.krono.app.util.UpdateInfo
-import com.krono.app.util.UpdateResult
-import com.krono.app.util.checkForUpdate
+import com.krono.app.core.util.UpdateInfo
+import com.krono.app.core.util.UpdateResult
+import com.krono.app.core.util.checkForUpdate
 import kotlinx.coroutines.launch
 
 enum class ItemType(val icon: ImageVector, val iconTint: Color) {

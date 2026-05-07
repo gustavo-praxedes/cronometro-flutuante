@@ -1,4 +1,4 @@
-package com.krono.app.util
+package com.krono.app.core.util
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
