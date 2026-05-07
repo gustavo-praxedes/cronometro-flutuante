@@ -1,4 +1,4 @@
-package com.krono.app.ui.settings
+package com.krono.app.core.ui.settings
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*

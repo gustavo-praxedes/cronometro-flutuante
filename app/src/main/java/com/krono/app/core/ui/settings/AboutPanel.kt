@@ -1,4 +1,4 @@
-package com.krono.app.ui.settings
+package com.krono.app.core.ui.settings
 
 import android.content.Intent
 import android.net.Uri

@@ -1,4 +1,4 @@
-package com.krono.app.ui.settings
+package com.krono.app.core.ui.settings
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween

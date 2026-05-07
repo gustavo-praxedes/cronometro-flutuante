@@ -1,4 +1,4 @@
-package com.krono.app.ui.settings
+package com.krono.app.core.ui.settings
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
@@ -22,7 +22,6 @@ import com.krono.app.core.data.OverlayDataStore
 import com.krono.app.core.ui.theme.KronoIcons
 import com.krono.app.core.ui.theme.KronoTokens
 import com.krono.app.core.util.UpdateInfo
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
