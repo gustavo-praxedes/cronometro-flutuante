@@ -121,25 +121,8 @@ class TransparentProxyActivity : ComponentActivity() {
                             onRequestInstall          = { installLauncher.launch(Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:$packageName"))) },
                             onDismiss                 = { finish() }
                         )
-                        TYPE_UPDATE -> updateData?.let {
-                            UpdateDialog(updateInfo = it, onDismiss = { finish() })
-                        } ?: finish()
-                        
-                        TYPE_DONATION -> DonationDialog(
-                            totalLifetimeMs = config.totalLifetimeMs,
-                            onDismiss = { 
-                                scope.launch { 
-                                    dataStore.resetDonationCycle()
-                                    finish() 
-                                } 
-                            },
-                            onDonate = { 
-                                scope.launch { 
-                                    dataStore.resetDonationCycle()
-                                    finish() 
-                                } 
-                            }
-                        )
+                        TYPE_UPDATE -> finish()
+                        TYPE_DONATION -> finish()
                         else -> finish()
                     }
                 }

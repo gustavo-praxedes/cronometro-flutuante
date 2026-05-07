@@ -1,4 +1,5 @@
 # ✨ Novidades
+- feat: settings two-panel navigation
 - feat: add SettingsPanelHost dispatcher
 - feat: add SettingsMenuPanel
 - feat: integrate About, Support, Changelog, Updates as settings panels

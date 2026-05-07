@@ -3,11 +3,9 @@
 ## Regras Gerais
 
 - Manter aspecto visual consistente com o restante do app
-- Substituir todos os valores hardcoded por `KronoTokens`, `KronoType`, `KronoTheme`, `KronoIcons`
-- Usar linguagem imperativa e commits pequenos
-- Aguardar verificação e aprovação do dev antes de cada commit
+- Nunca valores hardcoded. Adicionar em `KronoTokens`, `KronoType`, `KronoTheme`, `KronoIcons` etc
 - Cada passo termina com checklist de verificação
-- Pré-requisito: PLANO_MESTRE.md concluído (core/tool e feature/stopwatch prontos)
+- Aguardar verificação e aprovação do dev antes de sugerir commit msg
 
 ---
 
@@ -82,9 +80,9 @@ core/data/
   - Singleton via `companion object`
   - Registrar `TypeConverter` de `PomodoroPreset`
   - `RoomDatabase.Callback` para inserir presets padrão no primeiro launch:
-    - Clássico: Foco 25min / Pausa 5min / 4 repetições / `isDefault = true`
-    - Curto: Foco 15min / Pausa 3min / 4 repetições / `isDefault = true`
-    - Longo: Foco 50min / Pausa 10min / 4 repetições / `isDefault = true`
+    - Clássico: Foco 25min / Pausa curta 5min / 4 repetições de foco até pausa longa / Pausa longa 15min / `isDefault = true`
+    - Curto: Foco 15min / Pausa curta 5min / 4 repetições de foco até pausa longa / Pausa longa 15min / `isDefault = true`
+    - Longo: Foco 50min / Pausa curta 10min / 4 repetições de foco até pausa longa / Pausa longa 15min / `isDefault = true`
 
 **Verificar antes do commit:**
 - [ ] Compilar sem erros
@@ -101,7 +99,6 @@ core/data/
   - Chaves de som: `soundFocusUri`, `soundBreakUri`, `soundCompleteUri`
   - Chaves de feedback: `ticTacEnabled`
   - Chave de ciclos: `cyclesDoneToday`
-  - Todos os defaults conforme `PomodoroSpecs.md`
 
 **Verificar antes do commit:**
 - [ ] Compilar sem erros

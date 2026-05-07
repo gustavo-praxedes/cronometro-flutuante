@@ -1,0 +1,14 @@
+ToggleRow.kt:19:60 Unresolved reference 'dp'.
+TransparentProxyActivity.kt:125:29 Unresolved reference 'UpdateDialog'.
+TransparentProxyActivity.kt:128:42 Unresolved reference 'DonationDialog'.
+AppearancePanel.kt:23:25 Unresolved reference 'FontSelector'.
+AppearancePanel.kt:24:25 Unresolved reference 'ThemeSelector'.
+AppearancePanel.kt:49:9 Unresolved reference 'ThemeSelector'.
+AppearancePanel.kt:51:26 Cannot infer type for this parameter. Specify it explicitly.
+AppearancePanel.kt:67:9 Unresolved reference 'FontSelector'.
+AppearancePanel.kt:69:26 Cannot infer type for this parameter. Specify it explicitly.
+OverlayPanel.kt:15:25 Unresolved reference 'AppearanceSlider'.
+OverlayPanel.kt:36:9 Unresolved reference 'AppearanceSlider'.
+OverlayPanel.kt:44:75 Unresolved reference 'it'.
+OverlayPanel.kt:50:9 Unresolved reference 'AppearanceSlider'.
+OverlayPanel.kt:58:82 Unresolved reference 'it'.

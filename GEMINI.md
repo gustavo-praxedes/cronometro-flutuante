@@ -1,7 +1,9 @@
-# Nunca:
-1. Thinking/chain-of-thought (apenas se solicitado).
-2. Introduções e conclusões corteses.
-3. Resumo do que foi feito. 
-
 # Sempre:
-1. Use /agents/skills/caveman-pro/skill.md Modo Ultra
+1. Use /agents/skills/caveman-pro/skill.md Ultra
+2. Fale e pense em pt-br
+
+# Nunca:
+1. Thinking (apenas se solicitado)
+2. Introduções, conclusões e resumo do trabalho
+
+

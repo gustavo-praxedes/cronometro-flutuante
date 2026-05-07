@@ -16,7 +16,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.krono.app.core.ui.theme.KronoIcons
 import com.krono.app.core.ui.theme.KronoTokens
-import com.krono.app.ui.SkeletonLoader
+import com.krono.app.core.ui.components.SkeletonLoader
 import com.krono.app.util.ApkInstaller
 import com.krono.app.util.DownloadStatus
 import com.krono.app.util.UpdateInfo

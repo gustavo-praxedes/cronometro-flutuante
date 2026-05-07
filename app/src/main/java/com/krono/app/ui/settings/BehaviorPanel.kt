@@ -12,8 +12,8 @@ import com.krono.app.R
 import com.krono.app.core.data.OverlayConfig
 import com.krono.app.core.data.OverlayDataStore
 import com.krono.app.core.ui.theme.KronoTokens
-import com.krono.app.ui.ToggleRow
-import com.krono.app.ui.TimeLimitField
+import com.krono.app.core.ui.components.ToggleRow
+import com.krono.app.feature.stopwatch.TimeLimitField
 import kotlinx.coroutines.launch
 
 @Composable

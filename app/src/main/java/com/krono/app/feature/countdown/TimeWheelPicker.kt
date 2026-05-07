@@ -1,4 +1,4 @@
-package com.krono.app.ui
+package com.krono.app.feature.countdown
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -51,7 +51,6 @@ fun TimeWheelPicker(
             .padding(vertical = KronoTokens.Spacing.sm),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Labels Row (Separated from wheels to ensure highlight alignment)
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -70,7 +69,6 @@ fun TimeWheelPicker(
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.Center
         ) {
-            // Spatial Depth: Central glass bar with weightless glow
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -152,7 +150,6 @@ private fun WheelColumn(
         contentAlignment = Alignment.Center,
         modifier = Modifier.width(KronoTokens.Wheel.columnWidth)
     ) {
-        // Individual column depth shadow
         Box(
             modifier = Modifier
                 .width(KronoTokens.Wheel.columnFocusWidth)

@@ -12,7 +12,7 @@ import com.krono.app.R
 import com.krono.app.core.data.OverlayConfig
 import com.krono.app.core.data.OverlayDataStore
 import com.krono.app.core.ui.theme.KronoTokens
-import com.krono.app.ui.AppearanceSlider
+import com.krono.app.core.ui.components.AppearanceSlider
 import kotlinx.coroutines.launch
 import java.util.Locale
 

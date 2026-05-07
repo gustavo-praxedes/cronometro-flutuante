@@ -23,6 +23,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.krono.app.BuildConfig
 import com.krono.app.core.ui.theme.KronoTokens
+import com.krono.app.core.ui.components.SkeletonLoader
 import com.krono.app.core.ui.theme.adaptiveDialogWidth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay

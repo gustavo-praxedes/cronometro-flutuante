@@ -13,8 +13,7 @@ import androidx.compose.ui.unit.dp
 import com.krono.app.R
 import com.krono.app.core.data.OverlayConfig
 import com.krono.app.core.data.OverlayDataStore
-import com.krono.app.ui.ToggleRow
-import com.krono.app.ui.TimeLimitField
+import com.krono.app.core.ui.components.ToggleRow
 import kotlinx.coroutines.launch
 
 @Composable

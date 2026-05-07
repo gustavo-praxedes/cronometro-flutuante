@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import com.krono.app.BuildConfig
 import com.krono.app.core.ui.theme.KronoIcons
 import com.krono.app.core.ui.theme.KronoTokens
-import com.krono.app.ui.SkeletonLoader
+import com.krono.app.core.ui.components.SkeletonLoader
 import com.krono.app.util.UpdateInfo
 import com.krono.app.util.UpdateResult
 import com.krono.app.util.checkForUpdate

@@ -1,4 +1,4 @@
-package com.krono.app.ui
+package com.krono.app.core.ui.components
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
@@ -18,9 +18,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.krono.app.core.ui.theme.KronoTokens
 
-/**
- * Skeleton loader shimmer effect components
- */
 object SkeletonLoader {
 
     @Composable
