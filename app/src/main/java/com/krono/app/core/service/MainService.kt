@@ -80,7 +80,7 @@ class MainService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStateRe
 
         if (activeTool == null) {
             activeTool = ToolRegistry.getTool("stopwatch")
-                ?: StopwatchTool(dataStore, app.StopwatchViewModel)
+                ?: StopwatchTool(dataStore, app.stopwatchViewModel)
         }
 
         overlayManager = OverlayManager(this, windowManager, dataStore, { activeViewModel?.toolState }, serviceScope, this, this, this)
@@ -174,7 +174,7 @@ class MainService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStateRe
             runCatching {
                 if (activeTool == null) {
                     activeTool = ToolRegistry.getTool("stopwatch")
-                        ?: StopwatchTool(dataStore, (application as KronoApp).StopwatchViewModel)
+                        ?: StopwatchTool(dataStore, (application as KronoApp).stopwatchViewModel)
                 }
 
                 currentConfig = dataStore.configFlow.first()

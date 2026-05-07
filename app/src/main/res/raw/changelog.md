@@ -13,6 +13,7 @@
 - fix: Bug introduzido na refatoração corrigido
 
 # 🔧 Manutenção
+- refactor: move settings to core/ui/settings
 - refactor: move generic dialogs to core/ui/dialogs
 - refactor: move util to core/util
 - refactor: move receiver to core/receiver

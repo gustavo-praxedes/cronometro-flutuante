@@ -1,4 +1,4 @@
-package com.krono.app.ui
+package com.krono.app
 
 import android.content.Intent
 import android.net.Uri
@@ -15,9 +15,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.lifecycleScope
-import com.krono.app.ACTION_RESET
-import com.krono.app.ACTION_SHOW_OVERLAY
-import com.krono.app.KronoApp
 import com.krono.app.core.data.OverlayConfig
 import com.krono.app.core.data.OverlayDataStore
 import com.krono.app.core.service.MainService
@@ -36,8 +33,8 @@ class MainActivity : ComponentActivity() {
     private val permissionsRefreshTrigger     = MutableStateFlow(0)
 
     private lateinit var dataStore: OverlayDataStore
-    private val StopwatchViewModel: StopwatchViewModel
-        get() = (application as KronoApp).StopwatchViewModel
+    private val stopwatchViewModel: StopwatchViewModel
+        get() = (application as KronoApp).stopwatchViewModel
 
     private val pendingUpdateInfo = MutableStateFlow<UpdateInfo?>(null)
 
@@ -96,7 +93,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     AppNavigation(
                         dataStore                 = dataStore,
-                        StopwatchViewModel            = StopwatchViewModel,
+                        stopwatchViewModel            = stopwatchViewModel,
                         pendingUpdateInfo         = pendingUpdateInfo.collectAsState().value,
                         navigationEvents          = navigationEvents,
                         permissionsDialogEvents   = permissionsDialogEvents,
@@ -129,7 +126,7 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch {
             val config = dataStore.configFlow.first()
             val intent = Intent(this@MainActivity, MainService::class.java).apply {
-                action = if (config.focusModeEnabled) com.krono.app.ACTION_START_FOCUS else ACTION_SHOW_OVERLAY
+                action = if (config.focusModeEnabled) ACTION_START_FOCUS else ACTION_SHOW_OVERLAY
             }
             startForegroundService(intent)
             android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
@@ -157,7 +154,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun startFocusMode() {
-        startForegroundService(Intent(this, MainService::class.java).apply { action = com.krono.app.ACTION_START_FOCUS })
+        startForegroundService(Intent(this, MainService::class.java).apply { action = ACTION_START_FOCUS })
     }
 
     private fun showOverlay() {

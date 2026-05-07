@@ -5,7 +5,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.provider.Settings
 import androidx.core.content.ContextCompat
-import com.krono.app.ui.TransparentProxyActivity
+import com.krono.app.TransparentProxyActivity
 
 object PermissionUtils {
 

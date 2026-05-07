@@ -11,7 +11,7 @@ import com.krono.app.feature.countdown.CountdownState
 import com.krono.app.feature.stopwatch.StopwatchState
 import com.krono.app.core.data.toFormattedTime
 import com.krono.app.core.receiver.NotificationActionReceiver
-import com.krono.app.ui.MainActivity
+import com.krono.app.MainActivity
 import com.krono.app.feature.countdown.CountdownViewModel
 
 class NotificationHelper(private val context: Context) {

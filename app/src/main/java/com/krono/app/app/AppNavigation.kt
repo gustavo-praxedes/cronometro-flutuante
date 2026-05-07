@@ -1,4 +1,4 @@
-package com.krono.app.ui
+package com.krono.app
 
 import android.os.Build
 import android.provider.Settings
@@ -31,8 +31,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.krono.app.KronoApp
-import com.krono.app.R
 import com.krono.app.core.data.OverlayConfig
 import com.krono.app.core.data.OverlayDataStore
 import com.krono.app.core.util.UpdateInfo
@@ -73,7 +71,7 @@ private val BOTTOM_TABS = listOf(
 @Composable
 fun AppNavigation(
     dataStore                 : OverlayDataStore,
-    StopwatchViewModel            : StopwatchViewModel,
+    stopwatchViewModel            : StopwatchViewModel,
     pendingUpdateInfo         : UpdateInfo?,
     navigationEvents          : SharedFlow<String>,
     permissionsDialogEvents   : SharedFlow<Unit>,
@@ -90,7 +88,7 @@ fun AppNavigation(
     isServiceRunning          : () -> Boolean
 ) {
     val navController = rememberNavController()
-    val StopwatchState    by StopwatchViewModel.StopwatchState.collectAsState()
+    val stopwatchState    by stopwatchViewModel.StopwatchState.collectAsState()
     val context       = LocalContext.current
     val scope         = rememberCoroutineScope()
     val config        by dataStore.configFlow.collectAsState(initial = OverlayConfig())
@@ -147,11 +145,11 @@ fun AppNavigation(
         ) {
             composable(AppRoutes.TIMER) {
                 StopwatchScreen(
-                    state          = StopwatchState,
+                    state          = stopwatchState,
                     selectedFont   = config.selectedFont,
-                    onStart        = { StopwatchViewModel.start() },
-                    onPause        = { StopwatchViewModel.pause() },
-                    onReset        = { StopwatchViewModel.reset() },
+                    onStart        = { stopwatchViewModel.start() },
+                    onPause        = { stopwatchViewModel.pause() },
+                    onReset        = { stopwatchViewModel.reset() },
                     onOpenOverlay  = onTryStartService,
                     onOpenSettings = { navController.navigate(AppRoutes.SETTINGS) }
                 )

@@ -2,9 +2,9 @@ package com.krono.app.core.util
 
 import android.content.Context
 import android.content.Intent
-import com.krono.app.ui.MainActivity
-import com.krono.app.ui.TransparentProxyActivity
-import com.krono.app.ui.FocusActivity
+import com.krono.app.MainActivity
+import com.krono.app.TransparentProxyActivity
+import com.krono.app.FocusActivity
 
 /**
  * Centraliza toda a navegação disparada pelo serviço ou receivers.

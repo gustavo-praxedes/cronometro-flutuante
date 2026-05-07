@@ -16,7 +16,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:name="com.krono.app.KronoApp"
+        android:name=".KronoApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -26,14 +26,14 @@
 
         <!-- MainActivity: Telas de Cronômetro e Configurações (Interna) -->
         <activity
-            android:name=".ui.MainActivity"
+            android:name=".MainActivity"
             android:exported="false"
             android:label="@string/app_name"
             android:windowSoftInputMode="adjustResize" />
 
         <!-- FocusActivity: Modo de foco em tela cheia -->
         <activity
-            android:name=".ui.FocusActivity"
+            android:name=".FocusActivity"
             android:exported="false"
             android:theme="@style/Theme.Krono.Focus"
             android:taskAffinity="com.krono.app.focus"
@@ -72,7 +72,7 @@
 
         <!-- TransparentProxyActivity: Ponto de entrada unificado e Hospedeiro de Diálogos -->
         <activity
-            android:name=".ui.TransparentProxyActivity"
+            android:name=".TransparentProxyActivity"
             android:exported="true"
             android:theme="@style/Theme.Krono.Translucent"
             android:excludeFromRecents="true"

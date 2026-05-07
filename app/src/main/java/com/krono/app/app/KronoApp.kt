@@ -14,7 +14,6 @@ import com.krono.app.feature.stopwatch.StopwatchTool
 import com.krono.app.core.tool.ToolRegistry
 import com.krono.app.core.data.OverlayDataStore
 
-// Constantes globais do App
 const val NOTIFICATION_ID         = 1
 const val CHANNEL_ID              = "timer_channel"
 const val ACTION_PLAY             = "com.krono.app.ACTION_PLAY"
@@ -28,8 +27,7 @@ const val EXTRA_SHOW_DONATION     = "extra_show_donation"
 
 class KronoApp : Application() {
 
-    // Singleton do ViewModel passando a referência da application
-    val StopwatchViewModel: StopwatchViewModel by lazy {
+    val stopwatchViewModel: StopwatchViewModel by lazy {
         StopwatchViewModel(this)
     }
 
@@ -40,18 +38,15 @@ class KronoApp : Application() {
     override fun onCreate() {
         super.onCreate()
         
-        // 1. Inicializa o Firebase
         try {
             FirebaseApp.initializeApp(this)
         } catch (e: Exception) {
             e.printStackTrace()
         }
 
-        // 2. Cria o canal de notificação
         createNotificationChannel()
 
-        // 3. Registra as ferramentas
-        ToolRegistry.register(StopwatchTool(OverlayDataStore(this), StopwatchViewModel))
+        ToolRegistry.register(StopwatchTool(OverlayDataStore(this), stopwatchViewModel))
         ToolRegistry.register(CountdownTool(countdownViewModel))
     }
 
