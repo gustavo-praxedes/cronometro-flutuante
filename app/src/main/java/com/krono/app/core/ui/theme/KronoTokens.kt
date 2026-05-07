@@ -160,6 +160,7 @@ object KronoTokens {
         val inlineSpinner  = 18.dp
         val buttonSpinner  = 20.dp
         val listItemHeight = 48.dp
+        val rowMin         = 56.dp
         val colorSwatch    = 36.dp
         val colorPreview   = 120.dp
         val colorInputWidth = 180.dp
