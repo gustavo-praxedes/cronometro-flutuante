@@ -23,7 +23,8 @@ object KronoTokens {
         val dialog         = RoundedCornerShape(24.dp)
         val button         = RoundedCornerShape(16.dp)
         val buttonSmall    = RoundedCornerShape(12.dp)
-        val card           = RoundedCornerShape(20.dp)
+        val card           = RoundedCornerShape(16.dp)
+        val iconBox         = RoundedCornerShape(10.dp)
         val input          = RoundedCornerShape(12.dp)
         val badge          = RoundedCornerShape(6.dp)
         val progressBar    = RoundedCornerShape(50)
@@ -59,6 +60,14 @@ object KronoTokens {
         val sectionGap      = 20.dp
         val cardPaddingH    = 18.dp
         val cardPaddingV    = 14.dp
+
+        val rowInner        = 12.dp
+    }
+
+    // ── Tamanhos de Componentes Genéricos ───────────────────────
+    object Size {
+        val iconBox         = 40.dp
+        val iconInner       = 22.dp
     }
 
     // ── Tipografia (Valores Base) ──────────────────────────

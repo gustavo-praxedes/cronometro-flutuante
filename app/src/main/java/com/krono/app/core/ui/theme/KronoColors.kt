@@ -19,6 +19,8 @@ val DarkModernColors = darkColorScheme(
     surfaceVariant   = Color(0xFF313244),
     onSurfaceVariant = Color(0xFF9399B2),
     outline          = Color(0xFF45475A),
+    secondaryContainer = Color(0xFF4A4A6A),
+    onSecondaryContainer = Color(0xFFE8E8F8),
 )
 
 // ── Solarized Dark ───────────────────────────────────────────
@@ -34,10 +36,12 @@ val SolarizedDarkColors = darkColorScheme(
     onSurface        = Color(0xFF93A1A1),
     surfaceVariant   = Color(0xFF073642),
     onSurfaceVariant = Color(0xFF657B83),
-    outline          = Color(0xFF586E75),
+outline          = Color(0xFF586E75),
+    secondaryContainer = Color(0xFF0A3A4A),
+    onSecondaryContainer = Color(0xFFB8E8E8),
 )
 
-// ── Midnight Slate ─────────────────────────────────────────
+    // ── Midnight Slate ─────────────────────────────────────────
 val MidnightSlateColors = darkColorScheme(
     primary          = Color(0xFF818CF8),
     onPrimary        = Color(0xFF1E293B),
@@ -50,10 +54,12 @@ val MidnightSlateColors = darkColorScheme(
     onSurface        = Color(0xFFE2E8F0),
     surfaceVariant   = Color(0xFF334155),
     onSurfaceVariant = Color(0xFF94A3B8),
-    outline          = Color(0xFF475569),
+outline          = Color(0xFF475569),
+    secondaryContainer = Color(0xFF1E3A5F),
+    onSecondaryContainer = Color(0xFFD8E8FF),
 )
 
-// ── Ruby Night ─────────────────────────────────────────
+    // ── Ruby Night ─────────────────────────────────────────
 val RubyNightColors = darkColorScheme(
     primary          = Color(0xFFEF4444),
     onPrimary        = Color(0xFF1A1614),
@@ -66,10 +72,12 @@ val RubyNightColors = darkColorScheme(
     onSurface        = Color(0xFFE7D9CC),
     surfaceVariant   = Color(0xFF3D3028),
     onSurfaceVariant = Color(0xFFB8956E),
-    outline          = Color(0xFF5D463A),
+outline          = Color(0xFF5D463A),
+    secondaryContainer = Color(0xFF4A3530),
+    onSecondaryContainer = Color(0xFFFFF0E8),
 )
 
-// ── Forest Deep ─────────────────────────────────────────
+    // ── Forest Deep ─────────────────────────────────────────
 val ForestDeepColors = darkColorScheme(
     primary          = Color(0xFF4ADE80),
     onPrimary        = Color(0xFF0F1F18),
@@ -82,10 +90,12 @@ val ForestDeepColors = darkColorScheme(
     onSurface        = Color(0xFFC5E8CF),
     surfaceVariant   = Color(0xFF233D2E),
     onSurfaceVariant = Color(0xFF8FBC8F),
-    outline          = Color(0xFF3A5A42),
+outline          = Color(0xFF3A5A42),
+    secondaryContainer = Color(0xFF1A3A28),
+    onSecondaryContainer = Color(0xFFD0F8E0),
 )
 
-// ── Light Modern ─────────────────────────────────────────────
+    // ── Light Modern ─────────────────────────────────────────────
 val LightModernColors = lightColorScheme(
     primary          = Color(0xFF6B7FD4),
     onPrimary        = Color(0xFFFFFFFF),
@@ -98,10 +108,12 @@ val LightModernColors = lightColorScheme(
     onSurface        = Color(0xFF1C1B1F),
     surfaceVariant   = Color(0xFFE7E0EC),
     onSurfaceVariant = Color(0xFF49454F),
-    outline          = Color(0xFFCAC4D0),
+outline          = Color(0xFFCAC4D0),
+    secondaryContainer = Color(0xFFE8E0F0),
+    onSecondaryContainer = Color(0xFF2A2840),
 )
 
-// ── Solarized Light ──────────────────────────────────────────
+    // ── Solarized Light ──────────────────────────────────────────
 val SolarizedLightColors = lightColorScheme(
     primary          = Color(0xFF2075C7),
     onPrimary        = Color(0xFFFFFFFF),
@@ -114,10 +126,12 @@ val SolarizedLightColors = lightColorScheme(
     onSurface        = Color(0xFF586E75),
     surfaceVariant   = Color(0xFFE8E2CF),
     onSurfaceVariant = Color(0xFF839496),
-    outline          = Color(0xFFB09F7D),
+outline          = Color(0xFFB09F7D),
+    secondaryContainer = Color(0xFFD4E4D4),
+    onSecondaryContainer = Color(0xFF203030),
 )
 
-// ── Porcelain ─────────────────────────────────────────
+    // ── Porcelain ─────────────────────────────────────────
 val PorcelainColors = lightColorScheme(
     primary          = Color(0xFF6366F1),
     onPrimary        = Color(0xFFFFFFFF),
@@ -130,10 +144,12 @@ val PorcelainColors = lightColorScheme(
     onSurface        = Color(0xFF1E293B),
     surfaceVariant   = Color(0xFFF1F5F9),
     onSurfaceVariant = Color(0xFF64748B),
-    outline          = Color(0xFFE2E8F0),
+outline          = Color(0xFFE2E8F0),
+    secondaryContainer = Color(0xFFE8E8F0),
+    onSecondaryContainer = Color(0xFF303040),
 )
 
-// ── Amber Glow ─────────────────────────────────────────
+    // ── Amber Glow ─────────────────────────────────────────
 val AmberGlowColors = lightColorScheme(
     primary          = Color(0xFFD97706),
     onPrimary        = Color(0xFFFFFFFF),
@@ -146,10 +162,12 @@ val AmberGlowColors = lightColorScheme(
     onSurface        = Color(0xFF78350F),
     surfaceVariant   = Color(0xFFFEF3C7),
     onSurfaceVariant = Color(0xFFB45309),
-    outline          = Color(0xFFFDBA74),
+outline          = Color(0xFFFDBA74),
+    secondaryContainer = Color(0xFFFFF0D0),
+    onSecondaryContainer = Color(0xFF403010),
 )
 
-// ── Arctic ─────────────────────────────────────────
+    // ── Arctic ─────────────────────────────────────────
 val ArcticColors = lightColorScheme(
     primary          = Color(0xFF0284C7),
     onPrimary        = Color(0xFFFFFFFF),
@@ -162,10 +180,12 @@ val ArcticColors = lightColorScheme(
     onSurface        = Color(0xFF0C4A6E),
     surfaceVariant   = Color(0xFFE0F2FE),
     onSurfaceVariant = Color(0xFF0369A1),
-    outline          = Color(0xFF7DD3FC),
+outline          = Color(0xFF7DD3FC),
+    secondaryContainer = Color(0xFFD0F0FF),
+    onSecondaryContainer = Color(0xFF103040),
 )
 
-/**
+    /**
  * Retorna as cores do overlay (background, texto) como ARGB Int
  * para o tema selecionado, respeitando o modo claro/escuro do sistema
  * quando o tema for AUTO.

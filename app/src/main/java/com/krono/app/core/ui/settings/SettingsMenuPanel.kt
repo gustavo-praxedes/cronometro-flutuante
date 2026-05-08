@@ -230,7 +230,7 @@ private fun SettingsSearchBar(
             Box(Modifier.weight(1f)) {
                 if (query.isEmpty()) {
                     Text(
-                        text = "Pesquise configurações...",
+                        text = "Pesquisar...",
                         style = MaterialTheme.typography.bodyMedium,
                         color = hintColor
                     )
