@@ -271,13 +271,13 @@ private fun SettingsSearchBar(
 private fun SectionLabel(titleRes: Int) {
     Text(
         text = stringResource(titleRes).uppercase(),
-        style = MaterialTheme.typography.labelSmall.copy(
+        style = MaterialTheme.typography.labelMedium.copy(
             letterSpacing = 1.2.sp
         ),
         fontWeight = FontWeight.Bold,
         color = MaterialTheme.colorScheme.primary,
         modifier = Modifier.padding(
-            start = KronoTokens.Spacing.xl,
+            start = KronoTokens.Spacing.lg,
             top = KronoTokens.Spacing.md,
             bottom = KronoTokens.Spacing.sm
         )
@@ -323,13 +323,18 @@ private fun SettingsItem(
     onClick: () -> Unit
 ) {
     val bgColor = if (selected)
-        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
+        MaterialTheme.colorScheme.secondaryContainer
     else
         Color.Transparent
+    val textColor = if (selected)
+        MaterialTheme.colorScheme.onSecondaryContainer
+    else
+        MaterialTheme.colorScheme.onSurface
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .clip(KronoTokens.Shape.card)
             .background(bgColor)
             .clickable(onClick = onClick)
             .padding(
@@ -338,19 +343,36 @@ private fun SettingsItem(
             ),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        // Active indicator (left bar)
+        if (selected) {
+            Box(
+                modifier = Modifier
+                    .width(4.dp)
+                    .height(32.dp)
+                    .background(
+                        MaterialTheme.colorScheme.primary,
+                        RoundedCornerShape(2.dp)
+                    )
+            )
+            Spacer(Modifier.width(KronoTokens.Spacing.md))
+        }
+
         // Colored icon container
         Box(
             modifier = Modifier
                 .size(40.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .background(accentColor.copy(alpha = 0.15f)),
+                .clip(KronoTokens.Shape.iconBox)
+                .background(
+                    if (selected) accentColor.copy(alpha = 0.2f)
+                    else accentColor.copy(alpha = 0.1f)
+                ),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
                 modifier = Modifier.size(20.dp),
-                tint = accentColor
+                tint = accentColor.copy(if (selected) 1f else 0.7f)
             )
         }
 
@@ -360,19 +382,19 @@ private fun SettingsItem(
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = title,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodyLarge,
                 fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
-                color = if (selected)
-                    MaterialTheme.colorScheme.onPrimaryContainer
-                else
-                    MaterialTheme.colorScheme.onSurface,
+                color = textColor,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
             Text(
                 text = subtitle,
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = if (selected)
+                    MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f)
+                else
+                    MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -380,7 +402,7 @@ private fun SettingsItem(
 
         Spacer(Modifier.width(KronoTokens.Spacing.sm))
 
-        // Badge or chevron
+        // Badge
         if (showBadge) {
             Badge(
                 containerColor = MaterialTheme.colorScheme.error,
@@ -391,12 +413,13 @@ private fun SettingsItem(
             }
         }
 
+        // Chevron (sempre visível no menu lateral)
         Icon(
             imageVector = KronoIcons.Navigation.ChevronRight,
             contentDescription = null,
             modifier = Modifier.size(KronoTokens.Icon.small),
             tint = if (selected)
-                MaterialTheme.colorScheme.onPrimaryContainer
+                MaterialTheme.colorScheme.onSecondaryContainer
             else
                 MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
         )
