@@ -1,6 +1,7 @@
 package com.krono.app.core.ui.settings
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.ui.zIndex
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -13,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -91,35 +93,11 @@ private fun WideScreenLayout(
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = stringResource(R.string.settings_title),
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = KronoIcons.Navigation.Back,
-                            contentDescription = stringResource(R.string.action_back)
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                )
-            )
-        },
-        containerColor = MaterialTheme.colorScheme.background
-    ) { paddingValues ->
+    Column(
+        modifier = modifier.fillMaxSize()
+    ) {
         Row(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(paddingValues)
+            modifier = Modifier.fillMaxSize()
         ) {
             // Menu rail
             Surface(
@@ -129,12 +107,43 @@ private fun WideScreenLayout(
                 color = MaterialTheme.colorScheme.surface,
                 tonalElevation = 0.dp
             ) {
-                SettingsMenuPanel(
-                    selectedDestination = selectedDestination,
-                    onDestinationSelected = onDestinationSelected,
-                    hasPendingUpdate = updateInfo != null,
-                    modifier = Modifier.fillMaxSize()
-                )
+Column(modifier = Modifier.fillMaxSize()) {
+                // Header fixo no topo
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                start = KronoTokens.Spacing.sm,
+                                end = KronoTokens.Spacing.sm,
+                                top = 48.dp
+                            ),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        IconButton(onClick = onBack) {
+                            Icon(
+                                imageVector = KronoIcons.Navigation.Back,
+                                contentDescription = stringResource(R.string.action_back)
+                            )
+                        }
+                        Text(
+                            text = stringResource(R.string.settings_title),
+                            style = MaterialTheme.typography.titleLarge.copy(
+                                fontSize = KronoTokens.Typography.dialogTitle
+                            ),
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+
+                    // Menu scrollável
+                    SettingsMenuPanel(
+                        selectedDestination = selectedDestination,
+                        onDestinationSelected = onDestinationSelected,
+                        hasPendingUpdate = updateInfo != null,
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                    )
+                }
             }
 
             VerticalDivider(
@@ -150,18 +159,23 @@ private fun WideScreenLayout(
                     .fillMaxHeight()
                     .padding(horizontal = KronoTokens.Spacing.lg)
             ) {
+                // Sticky header - alinhado com Row do painel esquerdo
                 if (selectedDestination != null) {
-                    // Sticky header
-                    Text(
-                        text = stringResource(selectedDestination.titleRes),
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.padding(
-                            top = KronoTokens.Spacing.lg,
-                            bottom = KronoTokens.Spacing.lg
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 48.dp, start = KronoTokens.Spacing.lg),
+                        verticalAlignment = Alignment.Top
+                    ) {
+                        Text(
+                            text = stringResource(selectedDestination.titleRes),
+                            style = MaterialTheme.typography.titleLarge.copy(
+                                fontSize = KronoTokens.Typography.dialogTitle
+                            ),
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
                         )
-                    )
+                    }
                 }
 
                 if (selectedDestination == null) {
@@ -182,12 +196,14 @@ private fun WideScreenLayout(
                             Spacer(modifier = Modifier.height(KronoTokens.Spacing.lg))
                             Text(
                                 text = stringResource(R.string.settings_select_category),
-                                style = MaterialTheme.typography.bodyLarge,
+                                style = MaterialTheme.typography.bodyLarge.copy(
+                                    fontSize = KronoTokens.Typography.bodyText
+                                ),
                                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                             )
                         }
                     }
-                } else {
+                } else if (selectedDestination != null) {
                     AnimatedContent(
                         targetState = selectedDestination,
                         transitionSpec = {

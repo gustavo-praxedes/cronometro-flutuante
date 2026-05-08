@@ -10,6 +10,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.krono.app.core.data.OverlayConfig
 import com.krono.app.core.data.OverlayDataStore
+import com.krono.app.core.ui.theme.KronoTokens
 import com.krono.app.core.util.UpdateInfo
 import kotlinx.coroutines.CoroutineScope
 
@@ -92,7 +93,9 @@ fun SettingsPanelHost(
                         Spacer(Modifier.height(8.dp))
                         Text(
                             text = "Você está atualizado",
-                            style = MaterialTheme.typography.bodyLarge,
+                            style = MaterialTheme.typography.bodyLarge.copy(
+                                fontSize = KronoTokens.Typography.bodyText
+                            ),
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
@@ -132,13 +135,17 @@ private fun ToolSettingsPlaceholder(
             Spacer(Modifier.height(16.dp))
             Text(
                 text = toolName,
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontSize = KronoTokens.Typography.buttonLabel
+                ),
                 fontWeight = FontWeight.SemiBold
             )
             Spacer(Modifier.height(4.dp))
             Text(
                 text = "Em desenvolvimento",
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontSize = KronoTokens.Typography.listItem
+                ),
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }

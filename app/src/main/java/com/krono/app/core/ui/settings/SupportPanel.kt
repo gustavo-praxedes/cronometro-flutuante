@@ -111,7 +111,7 @@ fun SupportPanel(
             )
             Spacer(Modifier.width(KronoTokens.Button.iconSpacing))
             Text(
-                text = "Pagar um café ☕",
+                text = "Pagar um café",
                 fontSize = KronoTokens.Typography.buttonLabel,
                 fontWeight = FontWeight.Bold
             )
@@ -121,7 +121,9 @@ fun SupportPanel(
 
         Text(
             text = "Abre o Ko-fi em seu navegador",
-            style = MaterialTheme.typography.bodySmall,
+            style = MaterialTheme.typography.bodySmall.copy(
+                fontSize = KronoTokens.Typography.statusLabel
+            ),
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 

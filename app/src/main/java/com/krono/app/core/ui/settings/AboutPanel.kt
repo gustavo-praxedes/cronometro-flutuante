@@ -84,7 +84,9 @@ fun AboutPanel(
                 Spacer(Modifier.height(KronoTokens.Spacing.xs))
                 Text(
                     text = "Versão ${BuildConfig.VERSION_NAME}",
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        fontSize = KronoTokens.Typography.statusLabel
+                    ),
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -207,7 +209,9 @@ private fun AboutActionRow(
             )
             Text(
                 text = subtitle,
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.bodySmall.copy(
+                    fontSize = KronoTokens.Typography.statusLabel
+                ),
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }

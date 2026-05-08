@@ -35,7 +35,7 @@ Implementar o host de conteúdo que renderiza as configurações selecionadas. O
 - [ ] **Sincronização**:
     - O título deve ser atualizado automaticamente com base no `SettingsDestination` selecionado no menu lateral.
 
-**Msg Sugerida:** `ui: add dynamic sticky header to content panel`
+**Msg Sugerida:** ``
 
 ---
 

@@ -89,7 +89,9 @@ fun UpdatesPanel(
         ) {
             Text(
                 text = "Nova Versão",
-                style = MaterialTheme.typography.labelMedium,
+                style = MaterialTheme.typography.labelMedium.copy(
+                    fontSize = KronoTokens.Typography.statusLabel
+                ),
                 color = MaterialTheme.colorScheme.onErrorContainer,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(
@@ -136,7 +138,9 @@ fun UpdatesPanel(
                     Spacer(Modifier.width(KronoTokens.Spacing.sm))
                     Text(
                         text = "Download iniciado em segundo plano",
-                        style = MaterialTheme.typography.bodySmall,
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            fontSize = KronoTokens.Typography.statusLabel
+                        ),
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                 }
@@ -158,12 +162,16 @@ fun UpdatesPanel(
                 ) {
                     Text(
                         text = "Baixando atualização...",
-                        style = MaterialTheme.typography.labelSmall,
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            fontSize = KronoTokens.Typography.statusLabel
+                        ),
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
                         text = "${(progress * 100).toInt()}%",
-                        style = MaterialTheme.typography.labelSmall,
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            fontSize = KronoTokens.Typography.statusLabel
+                        ),
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Bold
                     )
@@ -184,7 +192,9 @@ fun UpdatesPanel(
             Text(
                 text  = "Falha no download. Tente novamente.",
                 color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.labelSmall,
+                style = MaterialTheme.typography.labelSmall.copy(
+                    fontSize = KronoTokens.Typography.statusLabel
+                ),
                 modifier = Modifier.padding(bottom = KronoTokens.Spacing.sm)
             )
         }
@@ -216,7 +226,9 @@ fun UpdatesPanel(
                         Spacer(Modifier.width(KronoTokens.Spacing.sm))
                         Text(
                             text = item.text,
-                            style = MaterialTheme.typography.bodySmall,
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                fontSize = KronoTokens.Typography.statusLabel
+                            ),
                             modifier = Modifier.weight(1f)
                         )
                     }

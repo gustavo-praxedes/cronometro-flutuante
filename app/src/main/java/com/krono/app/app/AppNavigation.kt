@@ -138,10 +138,12 @@ fun AppNavigation(
         }
     ) { innerPadding ->
 
+        val isSettingsRoute = currentDest == AppRoutes.SETTINGS
+
         NavHost(
             navController    = navController,
             startDestination = if (startInSettings) AppRoutes.SETTINGS else AppRoutes.TIMER,
-            modifier         = Modifier.padding(innerPadding)
+            modifier         = if (showBottomBar) Modifier.padding(innerPadding) else Modifier
         ) {
             composable(AppRoutes.TIMER) {
                 StopwatchScreen(

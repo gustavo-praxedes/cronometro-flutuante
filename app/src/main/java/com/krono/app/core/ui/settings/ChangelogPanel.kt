@@ -122,7 +122,9 @@ fun ChangelogPanel(
         ) {
             Text(
                 text = "v${updateInfo.tagName}",
-                style = MaterialTheme.typography.labelMedium,
+                style = MaterialTheme.typography.labelMedium.copy(
+                    fontSize = KronoTokens.Typography.statusLabel
+                ),
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(

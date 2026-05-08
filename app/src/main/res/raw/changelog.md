@@ -13,6 +13,7 @@
 - fix: Bug introduzido na refatoração corrigido
 
 # 🔧 Manutenção
+- ui: add dynamic sticky header to content panel
 - changelog: update entries for settings refinements
 - style: refine navigation icons and touch feedback
 - ui: implement modern KronoDialog with scrim and click-outside dismiss

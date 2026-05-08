@@ -22,6 +22,7 @@ fun SettingsGroup(
         Text(
             text = title.uppercase(),
             style = MaterialTheme.typography.labelSmall.copy(
+                fontSize = KronoTokens.Typography.statusLabel,
                 letterSpacing = 1.2.sp
             ),
             fontWeight = FontWeight.Bold,

@@ -172,7 +172,9 @@ private fun ColorSwatchItem(
     ) {
         Text(
             text = label,
-            style = MaterialTheme.typography.labelSmall,
+            style = MaterialTheme.typography.labelSmall.copy(
+                fontSize = KronoTokens.Typography.statusLabel
+            ),
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Spacer(Modifier.height(KronoTokens.Spacing.sm))
@@ -190,7 +192,9 @@ private fun ColorSwatchItem(
         Spacer(Modifier.height(KronoTokens.Spacing.xs))
         Text(
             text = hexText,
-            style = MaterialTheme.typography.labelSmall,
+            style = MaterialTheme.typography.labelSmall.copy(
+                fontSize = KronoTokens.Typography.statusLabel
+            ),
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         TextButton(
@@ -199,7 +203,9 @@ private fun ColorSwatchItem(
         ) {
             Text(
                 text = "Editar",
-                style = MaterialTheme.typography.labelSmall
+                style = MaterialTheme.typography.labelSmall.copy(
+                    fontSize = KronoTokens.Typography.statusLabel
+                )
             )
         }
     }

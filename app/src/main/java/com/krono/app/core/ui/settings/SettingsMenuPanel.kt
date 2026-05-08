@@ -102,7 +102,7 @@ fun SettingsMenuPanel(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
     ) {
-        Spacer(Modifier.height(KronoTokens.Spacing.lg))
+        Spacer(Modifier.height(KronoTokens.Spacing.xxl))
 
         // ── Search Bar ────────────────────────────────────────
         SettingsSearchBar(
@@ -113,7 +113,7 @@ fun SettingsMenuPanel(
                 .padding(horizontal = KronoTokens.Spacing.lg)
         )
 
-        Spacer(Modifier.height(KronoTokens.Spacing.lg))
+        Spacer(Modifier.height(KronoTokens.Spacing.xl))
 
         if (filteredDestinations != null) {
             // ── Search Results ────────────────────────────────
@@ -134,7 +134,9 @@ fun SettingsMenuPanel(
                         Spacer(Modifier.height(KronoTokens.Spacing.sm))
                         Text(
                             text = "Nenhum resultado",
-                            style = MaterialTheme.typography.bodyMedium,
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                fontSize = KronoTokens.Typography.listItem
+                            ),
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
@@ -231,7 +233,9 @@ private fun SettingsSearchBar(
                 if (query.isEmpty()) {
                     Text(
                         text = "Pesquisar...",
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            fontSize = KronoTokens.Typography.listItem
+                        ),
                         color = hintColor
                     )
                 }
@@ -239,7 +243,10 @@ private fun SettingsSearchBar(
                     value = query,
                     onValueChange = onQueryChange,
                     singleLine = true,
-                    textStyle = MaterialTheme.typography.bodyMedium.copy(color = textColor),
+                    textStyle = MaterialTheme.typography.bodyMedium.copy(
+                                fontSize = KronoTokens.Typography.listItem,
+                                color = textColor
+                            ),
                     cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -272,6 +279,7 @@ private fun SectionLabel(titleRes: Int) {
     Text(
         text = stringResource(titleRes).uppercase(),
         style = MaterialTheme.typography.labelMedium.copy(
+            fontSize = KronoTokens.Typography.statusLabel,
             letterSpacing = 1.2.sp
         ),
         fontWeight = FontWeight.Bold,
@@ -382,7 +390,9 @@ private fun SettingsItem(
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = title,
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontSize = KronoTokens.Typography.bodyText
+                ),
                 fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
                 color = textColor,
                 maxLines = 1,
@@ -390,7 +400,9 @@ private fun SettingsItem(
             )
             Text(
                 text = subtitle,
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.bodySmall.copy(
+                    fontSize = KronoTokens.Typography.statusLabel
+                ),
                 color = if (selected)
                     MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f)
                 else
@@ -409,7 +421,7 @@ private fun SettingsItem(
                 contentColor = MaterialTheme.colorScheme.onError,
                 modifier = Modifier.padding(end = KronoTokens.Spacing.xs)
             ) {
-                Text("!", style = MaterialTheme.typography.labelSmall)
+                Text("!", style = MaterialTheme.typography.labelSmall.copy(fontSize = KronoTokens.Typography.statusLabel))
             }
         }
 
