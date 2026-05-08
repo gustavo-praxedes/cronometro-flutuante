@@ -14,7 +14,6 @@ import com.krono.app.core.ui.theme.KronoTokens
 import com.krono.app.core.ui.components.AppearanceSlider
 import kotlinx.coroutines.launch
 import java.util.Locale
-import androidx.compose.ui.unit.dp
 
 @Composable
 fun OverlayPanel(

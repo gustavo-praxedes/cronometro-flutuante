@@ -7,60 +7,50 @@ import com.krono.app.core.ui.theme.KronoIcons
 
 sealed class SettingsDestination(
     @StringRes val titleRes: Int,
-    val icon: ImageVector,
-    val subtitle: String
+    val icon: ImageVector
 ) {
     data object Appearance : SettingsDestination(
         titleRes = R.string.settings_appearance,
-        icon = KronoIcons.Settings.Appearance,
-        subtitle = "Temas, cores e fontes"
+        icon = KronoIcons.Settings.Appearance
     )
 
     data object Behavior : SettingsDestination(
         titleRes = R.string.settings_behavior,
-        icon = KronoIcons.Settings.Behavior,
-        subtitle = "Auto-início, botões e limites"
+        icon = KronoIcons.Settings.Behavior
     )
 
     data object Overlay : SettingsDestination(
         titleRes = R.string.settings_overlay,
-        icon = KronoIcons.Settings.Overlay,
-        subtitle = "Escala, raio e posição"
+        icon = KronoIcons.Settings.Overlay
     )
 
     data object Stopwatch : SettingsDestination(
         titleRes = R.string.settings_stopwatch,
-        icon = KronoIcons.Feature.Timer,
-        subtitle = "Configurações do cronômetro"
+        icon = KronoIcons.Feature.Timer
     )
 
     data object Countdown : SettingsDestination(
         titleRes = R.string.settings_countdown,
-        icon = KronoIcons.Feature.Countdown,
-        subtitle = "Configurações da contagem regressiva"
+        icon = KronoIcons.Feature.Countdown
     )
 
     data object About : SettingsDestination(
         titleRes = R.string.settings_about,
-        icon = KronoIcons.Settings.Info,
-        subtitle = "Informações e links do projeto"
+        icon = KronoIcons.Settings.Info
     )
 
     data object Support : SettingsDestination(
         titleRes = R.string.settings_support,
-        icon = KronoIcons.Settings.Heart,
-        subtitle = "Apoie o desenvolvimento"
+        icon = KronoIcons.Settings.Heart
     )
 
     data object Changelog : SettingsDestination(
         titleRes = R.string.settings_changelog,
-        icon = KronoIcons.Settings.History,
-        subtitle = "Novidades desta versão"
+        icon = KronoIcons.Settings.History
     )
 
     data object Updates : SettingsDestination(
         titleRes = R.string.settings_updates,
-        icon = KronoIcons.Settings.Update,
-        subtitle = "Verificar atualizações disponíveis"
+        icon = KronoIcons.Settings.Update
     )
 }

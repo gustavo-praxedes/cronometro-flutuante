@@ -13,6 +13,7 @@
 - fix: Bug introduzido na refatoração corrigido
 
 # 🔧 Manutenção
+- add import
 - ui: improve informational settings panels visual
 - ui: improve settings menu panel visual hierarchy
 - remove empty packages after reorganization

@@ -33,8 +33,6 @@ fun BehaviorPanel(
             .padding(horizontal = KronoTokens.Spacing.lg),
         verticalArrangement = Arrangement.spacedBy(KronoTokens.Spacing.lg)
     ) {
-        Spacer(Modifier.height(KronoTokens.Spacing.sm))
-
         SettingsGroup(title = stringResource(R.string.settings_group_general)) {
             ToggleRow(
                 label = stringResource(R.string.label_auto_launch),
@@ -44,7 +42,7 @@ fun BehaviorPanel(
                 }
             )
 
-            GroupDivider()
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
 
             ToggleRow(
                 label = stringResource(R.string.label_show_hours),
@@ -55,7 +53,7 @@ fun BehaviorPanel(
                 }
             )
 
-            GroupDivider()
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
 
             ToggleRow(
                 label = stringResource(R.string.label_show_seconds),
@@ -66,7 +64,7 @@ fun BehaviorPanel(
                 }
             )
 
-            GroupDivider()
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
 
             ToggleRow(
                 label = stringResource(R.string.label_show_buttons),
@@ -76,7 +74,7 @@ fun BehaviorPanel(
                 }
             )
 
-            GroupDivider()
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
 
             ToggleRow(
                 label = stringResource(R.string.label_wake_lock),
@@ -86,7 +84,7 @@ fun BehaviorPanel(
                 }
             )
 
-            GroupDivider()
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
 
             ToggleRow(
                 label = stringResource(R.string.label_focus_mode),
@@ -97,7 +95,7 @@ fun BehaviorPanel(
                 }
             )
 
-            GroupDivider()
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
 
             ToggleRow(
                 label = stringResource(R.string.label_beep_enabled),
@@ -107,7 +105,7 @@ fun BehaviorPanel(
                 }
             )
 
-            GroupDivider()
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
 
             ToggleRow(
                 label = stringResource(R.string.label_vibration_enabled),
@@ -127,14 +125,6 @@ fun BehaviorPanel(
             )
         }
 
-        Spacer(Modifier.height(KronoTokens.Spacing.xxl))
+        Spacer(modifier = Modifier.height(KronoTokens.Spacing.xxl))
     }
-}
-
-@Composable
-private fun GroupDivider() {
-    HorizontalDivider(
-        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f),
-        thickness = 0.5.dp
-    )
 }

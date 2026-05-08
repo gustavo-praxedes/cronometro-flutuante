@@ -4,16 +4,13 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.PlatformTextStyle
@@ -30,12 +27,12 @@ import com.krono.app.core.util.checkForUpdate
 import kotlinx.coroutines.launch
 
 enum class ItemType(val icon: ImageVector, val iconTint: Color) {
-    FEAT (KronoIcons.Action.Sparkle, Color(0xFF10B981)),
-    FIX  (KronoIcons.Status.Bug,     Color(0xFFEF4444)),
-    PERF (KronoIcons.Status.Speed,   Color(0xFFF59E0B)),
-    DOCS (KronoIcons.Status.Doc,     Color(0xFF8B5CF6)),
-    CHORE(KronoIcons.Status.Build,   Color(0xFF6B7280)),
-    OTHER(KronoIcons.Action.Check,   Color(0xFF3B82F6))
+    FEAT (KronoIcons.Action.Sparkle,          Color(0xFF10B981)),
+    FIX  (KronoIcons.Status.Bug,              Color(0xFFEF4444)),
+    PERF (KronoIcons.Status.Speed,            Color(0xFFF59E0B)),
+    DOCS (KronoIcons.Status.Doc,              Color(0xFF8B5CF6)),
+    CHORE(KronoIcons.Status.Build,            Color(0xFF6B7280)),
+    OTHER(KronoIcons.Action.Check,            Color(0xFF3B82F6))
 }
 
 data class ChangelogItem(val text: String, val type: ItemType)
@@ -43,7 +40,7 @@ data class ChangelogItem(val text: String, val type: ItemType)
 fun parseChangelog(changelog: String): List<ChangelogItem> {
     if (changelog.isBlank()) {
         return listOf(ChangelogItem(
-            text = "Versão inicial do Krono! Explore os recursos e comece a medir seu tempo.",
+            text = "Esta é a versão inicial do Krono! Explore os recursos e comece a medir seu tempo com precisão.",
             type = ItemType.FEAT
         ))
     }
@@ -69,6 +66,7 @@ fun parseChangelog(changelog: String): List<ChangelogItem> {
         if (trimmed.startsWith("-") || trimmed.startsWith("*") || trimmed.startsWith("•")) {
             val content = trimmed.substring(1).trim()
                 .replace(Regex("\\[.*?\\]\\(.*?\\)"), "")
+
             if (content.isBlank() || content.contains("Comparação completa", true)) return@forEach
 
             val itemType = when {
@@ -109,59 +107,72 @@ fun ChangelogPanel(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = KronoTokens.Spacing.lg),
+            .padding(horizontal = KronoTokens.Spacing.xxl),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(Modifier.height(KronoTokens.Spacing.lg))
-
-        // Version badge
-        Surface(
-            shape = RoundedCornerShape(50),
-            color = MaterialTheme.colorScheme.primaryContainer,
-            modifier = Modifier.wrapContentSize()
-        ) {
-            Text(
-                text = "v${updateInfo.tagName}",
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(
-                    horizontal = KronoTokens.Spacing.md,
-                    vertical = KronoTokens.Spacing.xs
-                )
-            )
-        }
-
-        Spacer(Modifier.height(KronoTokens.Spacing.sm))
+        Spacer(Modifier.height(KronoTokens.Spacing.xl))
 
         Text(
-            text = "Novidades da Versão",
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center
+            text       = "Novidades da Versão ${updateInfo.tagName}",
+            style      = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.SemiBold,
+            fontSize   = KronoTokens.Typography.dialogTitle,
+            textAlign  = TextAlign.Center,
+            modifier   = Modifier.padding(horizontal = KronoTokens.Spacing.dialogPadding)
         )
 
-        Spacer(Modifier.height(KronoTokens.Spacing.lg))
+        Spacer(Modifier.height(KronoTokens.Spacing.sectionGap))
 
-        // Changelog list
         LazyColumn(
-            modifier = Modifier
+            modifier            = Modifier
                 .weight(1f)
                 .fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(KronoTokens.Spacing.sm),
+            verticalArrangement = Arrangement.spacedBy(KronoTokens.Spacing.listItemGap),
             horizontalAlignment = Alignment.Start
         ) {
             items(changelogItems) { item ->
-                ChangelogItemRow(item = item)
+                Row(
+                    modifier          = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.Top
+                ) {
+                    Icon(
+                        imageVector        = item.type.icon,
+                        contentDescription = null,
+                        tint               = item.type.iconTint,
+                        modifier           = Modifier
+                            .size(KronoTokens.Icon.listItem)
+                            .padding(top = KronoTokens.Spacing.xs)
+                    )
+
+                    Spacer(Modifier.width(KronoTokens.Spacing.listIconGap))
+
+                    Text(
+                        text     = item.text,
+                        style    = MaterialTheme.typography.bodyMedium.copy(
+                            platformStyle = PlatformTextStyle(includeFontPadding = false)
+                        ),
+                        modifier = Modifier.weight(1f)
+                    )
+                }
             }
         }
 
-        Spacer(Modifier.height(KronoTokens.Spacing.lg))
+        Spacer(Modifier.height(KronoTokens.Spacing.sectionGap))
 
         AnimatedVisibility(
             visible = !checking,
-            enter = fadeIn(animationSpec = tween(KronoTokens.Animation.fadeDurationMs)),
-            exit  = fadeOut(animationSpec = tween(KronoTokens.Animation.fadeDurationMs))
+            enter   = fadeIn(
+                animationSpec = tween(
+                    durationMillis = KronoTokens.Animation.fadeDurationMs,
+                    easing = KronoTokens.Motion.easingNormal
+                )
+            ),
+            exit    = fadeOut(
+                animationSpec = tween(
+                    durationMillis = KronoTokens.Animation.fadeDurationMs,
+                    easing = KronoTokens.Motion.easingNormal
+                )
+            )
         ) {
             val result     = lastResult
             val isUpToDate = result is UpdateResult.UpToDate ||
@@ -169,21 +180,19 @@ fun ChangelogPanel(
                             result.info.tagName == BuildConfig.VERSION_NAME)
 
             if (isUpToDate) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
-                        imageVector = KronoIcons.Action.Check,
+                        imageVector        = KronoIcons.Action.Check,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(KronoTokens.Icon.status)
+                        tint               = MaterialTheme.colorScheme.primary,
+                        modifier           = Modifier.size(KronoTokens.Icon.status)
                     )
                     Spacer(Modifier.width(KronoTokens.Spacing.sm))
                     Text(
-                        text = "Você está atualizado",
-                        style = MaterialTheme.typography.bodyMedium,
+                        text  = "Atualizado",
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            platformStyle = PlatformTextStyle(includeFontPadding = false)
+                        ),
                         color = MaterialTheme.colorScheme.primary
                     )
                 }
@@ -205,21 +214,21 @@ fun ChangelogPanel(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(KronoTokens.Button.height),
-                    shape = KronoTokens.Shape.button,
+                    shape  = KronoTokens.Shape.button,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
+                        contentColor   = MaterialTheme.colorScheme.onPrimary
                     )
                 ) {
                     Icon(
-                        imageVector = KronoIcons.Action.Reset,
+                        imageVector        = KronoIcons.Action.Reset,
                         contentDescription = null,
-                        modifier = Modifier.size(KronoTokens.Icon.button)
+                        modifier           = Modifier.size(KronoTokens.Icon.button)
                     )
                     Spacer(Modifier.width(KronoTokens.Button.iconSpacing))
                     Text(
-                        text = "Verificar Atualizações",
-                        fontSize = KronoTokens.Typography.buttonLabel,
+                        text       = "Verificar Atualizações",
+                        fontSize   = KronoTokens.Typography.buttonLabel,
                         fontWeight = FontWeight.Bold
                     )
                 }
@@ -228,57 +237,23 @@ fun ChangelogPanel(
 
         if (checking) {
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier              = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment     = Alignment.CenterVertically
             ) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(KronoTokens.Component.inlineSpinner),
-                    strokeWidth = KronoTokens.Stroke.circularIndicator
+                SkeletonLoader.SkeletonText(
+                    modifier = Modifier
+                        .width(60.dp)
+                        .height(KronoTokens.Component.inlineSpinner)
                 )
                 Spacer(Modifier.width(KronoTokens.Spacing.md))
                 Text(
-                    text = "Verificando...",
+                    text  = "Verificando...",
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
         }
 
         Spacer(Modifier.height(KronoTokens.Spacing.xxl))
-    }
-}
-
-@Composable
-private fun ChangelogItemRow(item: ChangelogItem) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.Top
-    ) {
-        Box(
-            modifier = Modifier
-                .size(28.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(item.type.iconTint.copy(alpha = 0.12f)),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = item.type.icon,
-                contentDescription = null,
-                tint = item.type.iconTint,
-                modifier = Modifier.size(14.dp)
-            )
-        }
-
-        Spacer(Modifier.width(KronoTokens.Spacing.md))
-
-        Text(
-            text = item.text,
-            style = MaterialTheme.typography.bodyMedium.copy(
-                platformStyle = PlatformTextStyle(includeFontPadding = false)
-            ),
-            modifier = Modifier
-                .weight(1f)
-                .padding(top = 4.dp)
-        )
     }
 }

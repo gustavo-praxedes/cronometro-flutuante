@@ -10,7 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.krono.app.core.ui.theme.KronoTokens
 
 @Composable
@@ -20,11 +19,9 @@ fun SettingsGroup(
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
-            text = title.uppercase(),
-            style = MaterialTheme.typography.labelSmall.copy(
-                letterSpacing = 1.2.sp
-            ),
-            fontWeight = FontWeight.Bold,
+            text = title,
+            style = MaterialTheme.typography.labelSmall,
+            fontWeight = FontWeight.SemiBold,
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.padding(
                 start = KronoTokens.Spacing.xs,
@@ -35,9 +32,8 @@ fun SettingsGroup(
         Surface(
             modifier = Modifier.fillMaxWidth(),
             shape = KronoTokens.Shape.card,
-            color = MaterialTheme.colorScheme.surface,
-            tonalElevation = 1.dp,
-            shadowElevation = 0.dp
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+            tonalElevation = 1.dp
         ) {
             Column(
                 modifier = Modifier.padding(KronoTokens.Spacing.none)

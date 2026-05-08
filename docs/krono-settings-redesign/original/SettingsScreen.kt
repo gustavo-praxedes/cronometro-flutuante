@@ -8,6 +8,8 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -36,8 +38,10 @@ fun SettingsScreen(
 ) {
     val config      = dataStore.configFlow.collectAsState(initial = OverlayConfig()).value
     val scope       = rememberCoroutineScope()
+    val systemIsDark = androidx.compose.foundation.isSystemInDarkTheme()
 
     var selectedDestination by remember { mutableStateOf<SettingsDestination?>(null) }
+    var changelogInfo by remember { mutableStateOf<UpdateInfo?>(null) }
     var updateInfo by remember { mutableStateOf<UpdateInfo?>(pendingUpdateInfo) }
 
     val configuration = LocalConfiguration.current
@@ -92,7 +96,7 @@ private fun WideScreenLayout(
 ) {
     Scaffold(
         topBar = {
-            TopAppBar(
+            CenterAlignedTopAppBar(
                 title = {
                     Text(
                         text = stringResource(R.string.settings_title),
@@ -107,42 +111,31 @@ private fun WideScreenLayout(
                             contentDescription = stringResource(R.string.action_back)
                         )
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                )
+                }
             )
-        },
-        containerColor = MaterialTheme.colorScheme.background
+        }
     ) { paddingValues ->
         Row(
             modifier = modifier
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            // Menu rail
-            Surface(
+            SettingsMenuPanel(
+                selectedDestination = selectedDestination,
+                onDestinationSelected = onDestinationSelected,
+                hasPendingUpdate = updateInfo != null,
                 modifier = Modifier
                     .weight(0.35f)
-                    .fillMaxHeight(),
-                color = MaterialTheme.colorScheme.surface,
-                tonalElevation = 0.dp
-            ) {
-                SettingsMenuPanel(
-                    selectedDestination = selectedDestination,
-                    onDestinationSelected = onDestinationSelected,
-                    hasPendingUpdate = updateInfo != null,
-                    modifier = Modifier.fillMaxSize()
-                )
-            }
-
-            VerticalDivider(
-                modifier = Modifier.fillMaxHeight(),
-                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),
-                thickness = 0.5.dp
+                    .fillMaxHeight()
             )
 
-            // Detail panel
+            HorizontalDivider(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .width(1.dp),
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+            )
+
             val targetDestination = selectedDestination ?: SettingsDestination.Appearance
 
             AnimatedContent(
@@ -150,12 +143,12 @@ private fun WideScreenLayout(
                 transitionSpec = {
                     (slideInHorizontally(
                         animationSpec = tween(KronoTokens.Animation.slideDurationMs),
-                        initialOffsetX = { it / 2 }
+                        initialOffsetX = { it }
                     ) + fadeIn(animationSpec = tween(KronoTokens.Animation.fadeDurationMs)))
                         .togetherWith(
                             slideOutHorizontally(
                                 animationSpec = tween(KronoTokens.Animation.slideDurationMs),
-                                targetOffsetX = { -it / 2 }
+                                targetOffsetX = { -it }
                             ) + fadeOut(animationSpec = tween(KronoTokens.Animation.fadeDurationMs))
                         )
                 },
@@ -174,8 +167,8 @@ private fun WideScreenLayout(
                     isServiceRunning = isServiceRunning,
                     onStartFocusMode = onStartFocusMode,
                     onSupportClick = { onDestinationSelected(SettingsDestination.Support) },
-                    onShowChangelog = { onDestinationSelected(SettingsDestination.Changelog) },
-                    onUpdateAvailable = { onDestinationSelected(SettingsDestination.Updates) },
+                    onShowChangelog = { info -> onDestinationSelected(SettingsDestination.Changelog) },
+                    onUpdateAvailable = { info -> onDestinationSelected(SettingsDestination.Updates) },
                     modifier = Modifier.fillMaxSize()
                 )
             }
@@ -199,7 +192,7 @@ private fun NarrowScreenLayout(
 ) {
     Scaffold(
         topBar = {
-            TopAppBar(
+            CenterAlignedTopAppBar(
                 title = {
                     Text(
                         text = if (selectedDestination != null)
@@ -222,46 +215,29 @@ private fun NarrowScreenLayout(
                     ) {
                         Icon(
                             imageVector = if (selectedDestination != null)
-                                KronoIcons.Navigation.Back
+                                KronoIcons.Navigation.Close
                             else
                                 KronoIcons.Navigation.Back,
                             contentDescription = stringResource(R.string.action_back)
                         )
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                )
+                }
             )
-        },
-        containerColor = MaterialTheme.colorScheme.background
+        }
     ) { paddingValues ->
         AnimatedContent(
             targetState = selectedDestination,
             transitionSpec = {
-                if (targetState != null) {
-                    (slideInHorizontally(
-                        animationSpec = tween(KronoTokens.Animation.slideDurationMs),
-                        initialOffsetX = { it }
-                    ) + fadeIn(animationSpec = tween(KronoTokens.Animation.fadeDurationMs)))
-                        .togetherWith(
-                            slideOutHorizontally(
-                                animationSpec = tween(KronoTokens.Animation.slideDurationMs),
-                                targetOffsetX = { -it }
-                            ) + fadeOut(animationSpec = tween(KronoTokens.Animation.fadeDurationMs))
-                        )
-                } else {
-                    (slideInHorizontally(
-                        animationSpec = tween(KronoTokens.Animation.slideDurationMs),
-                        initialOffsetX = { -it }
-                    ) + fadeIn(animationSpec = tween(KronoTokens.Animation.fadeDurationMs)))
-                        .togetherWith(
-                            slideOutHorizontally(
-                                animationSpec = tween(KronoTokens.Animation.slideDurationMs),
-                                targetOffsetX = { it }
-                            ) + fadeOut(animationSpec = tween(KronoTokens.Animation.fadeDurationMs))
-                        )
-                }
+                (slideInHorizontally(
+                    animationSpec = tween(KronoTokens.Animation.slideDurationMs),
+                    initialOffsetX = { it }
+                ) + fadeIn(animationSpec = tween(KronoTokens.Animation.fadeDurationMs)))
+                    .togetherWith(
+                        slideOutHorizontally(
+                            animationSpec = tween(KronoTokens.Animation.slideDurationMs),
+                            targetOffsetX = { -it }
+                        ) + fadeOut(animationSpec = tween(KronoTokens.Animation.fadeDurationMs))
+                    )
             },
             label = "menu-panel-transition",
             modifier = modifier
@@ -279,8 +255,8 @@ private fun NarrowScreenLayout(
                     isServiceRunning = isServiceRunning,
                     onStartFocusMode = onStartFocusMode,
                     onSupportClick = { onDestinationSelected(SettingsDestination.Support) },
-                    onShowChangelog = { onDestinationSelected(SettingsDestination.Changelog) },
-                    onUpdateAvailable = { onDestinationSelected(SettingsDestination.Updates) },
+                    onShowChangelog = { info -> onDestinationSelected(SettingsDestination.Changelog) },
+                    onUpdateAvailable = { info -> onDestinationSelected(SettingsDestination.Updates) },
                     modifier = Modifier.fillMaxSize()
                 )
             } else {
