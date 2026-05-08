@@ -10,6 +10,7 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
@@ -143,41 +144,83 @@ private fun WideScreenLayout(
             )
 
             // Detail panel
-            val targetDestination = selectedDestination ?: SettingsDestination.Appearance
-
-            AnimatedContent(
-                targetState = targetDestination,
-                transitionSpec = {
-                    (slideInHorizontally(
-                        animationSpec = tween(KronoTokens.Animation.slideDurationMs),
-                        initialOffsetX = { it / 2 }
-                    ) + fadeIn(animationSpec = tween(KronoTokens.Animation.fadeDurationMs)))
-                        .togetherWith(
-                            slideOutHorizontally(
-                                animationSpec = tween(KronoTokens.Animation.slideDurationMs),
-                                targetOffsetX = { -it / 2 }
-                            ) + fadeOut(animationSpec = tween(KronoTokens.Animation.fadeDurationMs))
-                        )
-                },
-                label = "panel-transition",
+            Column(
                 modifier = Modifier
                     .weight(0.65f)
                     .fillMaxHeight()
-            ) { destination ->
-                SettingsPanelHost(
-                    destination = destination,
-                    config = config,
-                    dataStore = dataStore,
-                    scope = scope,
-                    totalLifetimeMs = 0L,
-                    pendingUpdateInfo = updateInfo,
-                    isServiceRunning = isServiceRunning,
-                    onStartFocusMode = onStartFocusMode,
-                    onSupportClick = { onDestinationSelected(SettingsDestination.Support) },
-                    onShowChangelog = { onDestinationSelected(SettingsDestination.Changelog) },
-                    onUpdateAvailable = { onDestinationSelected(SettingsDestination.Updates) },
-                    modifier = Modifier.fillMaxSize()
-                )
+                    .padding(horizontal = KronoTokens.Spacing.lg)
+            ) {
+                if (selectedDestination != null) {
+                    // Sticky header
+                    Text(
+                        text = stringResource(selectedDestination.titleRes),
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.padding(
+                            top = KronoTokens.Spacing.lg,
+                            bottom = KronoTokens.Spacing.lg
+                        )
+                    )
+                }
+
+                if (selectedDestination == null) {
+                    // Empty state
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Icon(
+                                imageVector = KronoIcons.Action.Settings,
+                                contentDescription = null,
+                                modifier = Modifier.size(80.dp),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
+                            )
+                            Spacer(modifier = Modifier.height(KronoTokens.Spacing.lg))
+                            Text(
+                                text = stringResource(R.string.settings_select_category),
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                            )
+                        }
+                    }
+                } else {
+                    AnimatedContent(
+                        targetState = selectedDestination,
+                        transitionSpec = {
+                            (slideInHorizontally(
+                                animationSpec = tween(KronoTokens.Animation.slideDurationMs),
+                                initialOffsetX = { it / 2 }
+                            ) + fadeIn(animationSpec = tween(KronoTokens.Animation.fadeDurationMs)))
+                                .togetherWith(
+                                    slideOutHorizontally(
+                                        animationSpec = tween(KronoTokens.Animation.slideDurationMs),
+                                        targetOffsetX = { -it / 2 }
+                                    ) + fadeOut(animationSpec = tween(KronoTokens.Animation.fadeDurationMs))
+                                )
+                        },
+                        label = "panel-transition",
+                        modifier = Modifier.fillMaxSize()
+                    ) { destination ->
+                        SettingsPanelHost(
+                            destination = destination,
+                            config = config,
+                            dataStore = dataStore,
+                            scope = scope,
+                            totalLifetimeMs = 0L,
+                            pendingUpdateInfo = updateInfo,
+                            isServiceRunning = isServiceRunning,
+                            onStartFocusMode = onStartFocusMode,
+                            onSupportClick = { onDestinationSelected(SettingsDestination.Support) },
+                            onShowChangelog = { onDestinationSelected(SettingsDestination.Changelog) },
+                            onUpdateAvailable = { onDestinationSelected(SettingsDestination.Updates) },
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
+                }
             }
         }
     }

@@ -47,6 +47,9 @@ import androidx.compose.material.icons.rounded.Speed
 import androidx.compose.material.icons.rounded.TrackChanges
 import androidx.compose.material.icons.rounded.Update
 import androidx.compose.material.icons.rounded.VolumeUp
+import androidx.compose.material.icons.rounded.ConfirmationNumber
+import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material.icons.rounded.SearchOff
 import androidx.compose.ui.graphics.vector.ImageVector
 
 /**
@@ -83,6 +86,8 @@ object KronoIcons {
         val Focus: ImageVector        = Icons.Rounded.TrackChanges
         val Download: ImageVector     = Icons.Rounded.Download
         val Notification: ImageVector = Icons.Rounded.Notifications
+        val Search: ImageVector       = Icons.Rounded.Search
+        val SearchOff: ImageVector    = Icons.Rounded.SearchOff
     }
 
     // ── Status e Info ───────────────────────────────────────
@@ -119,6 +124,7 @@ object KronoIcons {
         val History: ImageVector     = Icons.Outlined.History
         val Update: ImageVector      = Icons.Outlined.SystemUpdate
         val Info: ImageVector         = Icons.Outlined.Info
+        val TicketGate: ImageVector  = Icons.Rounded.ConfirmationNumber
     }
 }
 

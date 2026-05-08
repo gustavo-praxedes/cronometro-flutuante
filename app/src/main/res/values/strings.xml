@@ -37,6 +37,7 @@
     <string name="label_time_limit">Limite de Tempo</string>
 
     <!-- Settings Menu -->
+    <string name="settings_select_category">Selecione uma categoria para configurar</string>
     <string name="settings_appearance">Aparência</string>
     <string name="settings_behavior">Comportamento</string>
     <string name="settings_overlay">Sobreposição</string>

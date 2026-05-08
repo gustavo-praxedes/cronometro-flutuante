@@ -126,7 +126,7 @@ fun SettingsMenuPanel(
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Icon(
-                            imageVector = KronoIcons.Status.Empty,
+                            imageVector = KronoIcons.Action.SearchOff,
                             contentDescription = null,
                             modifier = Modifier.size(KronoTokens.StateIcon.emptyMedium),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
@@ -221,7 +221,7 @@ private fun SettingsSearchBar(
             horizontalArrangement = Arrangement.spacedBy(KronoTokens.Spacing.sm)
         ) {
             Icon(
-                imageVector = KronoIcons.Action.Settings, // reuse magnifier-like icon
+                imageVector = KronoIcons.Action.Search,
                 contentDescription = null,
                 modifier = Modifier.size(18.dp),
                 tint = hintColor
