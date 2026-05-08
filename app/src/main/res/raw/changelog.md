@@ -13,6 +13,8 @@
 - fix: Bug introduzido na refatoração corrigido
 
 # 🔧 Manutenção
+- style: refine navigation icons and touch feedback
+- ui: implement modern KronoDialog with scrim and click-outside dismiss
 - aprimoramento de settings
 - add import
 - ui: improve informational settings panels visual
