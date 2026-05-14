@@ -37,18 +37,18 @@ private fun SettingsDestination.accentColor(): Color = when (this) {
     SettingsDestination.About       -> Color(0xFF3B82F6)
     SettingsDestination.Support     -> Color(0xFFEF4444)
     SettingsDestination.Changelog   -> Color(0xFFF97316)
-    SettingsDestination.Updates     -> Color(0xFF22C55E)
+    SettingsDestination.BugReport   -> Color(0xFFE11D48)
 }
 
 // ── Section data ──────────────────────────────────────────────
 private data class MenuSection(
-    val titleRes: Int,
+    val title: String,
     val destinations: List<SettingsDestination>
 )
 
 private val menuSections = listOf(
     MenuSection(
-        titleRes = R.string.settings_section_general,
+        title = "Funções Gerais",
         destinations = listOf(
             SettingsDestination.Appearance,
             SettingsDestination.Behavior,
@@ -56,19 +56,19 @@ private val menuSections = listOf(
         )
     ),
     MenuSection(
-        titleRes = R.string.settings_section_tools,
+        title = "Ferramentas",
         destinations = listOf(
             SettingsDestination.Stopwatch,
             SettingsDestination.Countdown
         )
     ),
     MenuSection(
-        titleRes = R.string.settings_section_info,
+        title = "Projeto",
         destinations = listOf(
             SettingsDestination.About,
             SettingsDestination.Support,
             SettingsDestination.Changelog,
-            SettingsDestination.Updates
+            SettingsDestination.BugReport
         )
     )
 )
@@ -92,8 +92,7 @@ fun SettingsMenuPanel(
         if (searchQuery.isBlank()) null
         else allDestinations.filter { dest ->
             val title = titleMap[dest] ?: ""
-            title.contains(searchQuery, ignoreCase = true) ||
-                dest.subtitle.contains(searchQuery, ignoreCase = true)
+            title.contains(searchQuery, ignoreCase = true)
         }
     }
 
@@ -150,11 +149,11 @@ fun SettingsMenuPanel(
                     filteredDestinations.forEachIndexed { index, dest ->
                         SettingsItem(
                             title = titleMap[dest] ?: "",
-                            subtitle = dest.subtitle,
+                            subtitle = null,
                             icon = dest.icon,
                             accentColor = dest.accentColor(),
                             selected = selectedDestination == dest,
-                            showBadge = dest is SettingsDestination.Updates && hasPendingUpdate,
+                            showBadge = dest is SettingsDestination.Changelog && hasPendingUpdate,
                             onClick = { onDestinationSelected(dest) }
                         )
                         if (index < filteredDestinations.lastIndex) {
@@ -166,7 +165,7 @@ fun SettingsMenuPanel(
         } else {
             // ── All Sections ──────────────────────────────────
             menuSections.forEach { section ->
-                SectionLabel(titleRes = section.titleRes)
+                SectionLabel(title = section.title)
 
                 SectionCard(
                     modifier = Modifier
@@ -176,11 +175,11 @@ fun SettingsMenuPanel(
                     section.destinations.forEachIndexed { index, dest ->
                         SettingsItem(
                             title = titleMap[dest] ?: "",
-                            subtitle = dest.subtitle,
+                            subtitle = null,
                             icon = dest.icon,
                             accentColor = dest.accentColor(),
                             selected = selectedDestination == dest,
-                            showBadge = dest is SettingsDestination.Updates && hasPendingUpdate,
+                            showBadge = dest is SettingsDestination.Changelog && hasPendingUpdate,
                             onClick = { onDestinationSelected(dest) }
                         )
                         if (index < section.destinations.lastIndex) {
@@ -232,7 +231,7 @@ private fun SettingsSearchBar(
             Box(Modifier.weight(1f)) {
                 if (query.isEmpty()) {
                     Text(
-                        text = "Pesquisar...",
+                        text = "Pesquise configurações...",
                         style = MaterialTheme.typography.bodyMedium.copy(
                             fontSize = KronoTokens.Typography.listItem
                         ),
@@ -275,9 +274,9 @@ private fun SettingsSearchBar(
 
 // ── Section Label ─────────────────────────────────────────────
 @Composable
-private fun SectionLabel(titleRes: Int) {
+private fun SectionLabel(title: String) {
     Text(
-        text = stringResource(titleRes).uppercase(),
+        text = title.uppercase(),
         style = MaterialTheme.typography.labelMedium.copy(
             fontSize = KronoTokens.Typography.statusLabel,
             letterSpacing = 1.2.sp
@@ -323,7 +322,7 @@ private fun ItemDivider() {
 @Composable
 private fun SettingsItem(
     title: String,
-    subtitle: String,
+    subtitle: String?,
     icon: ImageVector,
     accentColor: Color,
     selected: Boolean,
@@ -331,7 +330,7 @@ private fun SettingsItem(
     onClick: () -> Unit
 ) {
     val bgColor = if (selected)
-        MaterialTheme.colorScheme.secondaryContainer
+        MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.75f)
     else
         Color.Transparent
     val textColor = if (selected)
@@ -351,20 +350,6 @@ private fun SettingsItem(
             ),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Active indicator (left bar)
-        if (selected) {
-            Box(
-                modifier = Modifier
-                    .width(4.dp)
-                    .height(32.dp)
-                    .background(
-                        MaterialTheme.colorScheme.primary,
-                        RoundedCornerShape(2.dp)
-                    )
-            )
-            Spacer(Modifier.width(KronoTokens.Spacing.md))
-        }
-
         // Colored icon container
         Box(
             modifier = Modifier
@@ -380,7 +365,7 @@ private fun SettingsItem(
                 imageVector = icon,
                 contentDescription = null,
                 modifier = Modifier.size(20.dp),
-                tint = accentColor.copy(if (selected) 1f else 0.7f)
+                tint = accentColor.copy(if (selected) 0.9f else 0.75f)
             )
         }
 
@@ -393,23 +378,25 @@ private fun SettingsItem(
                 style = MaterialTheme.typography.bodyLarge.copy(
                     fontSize = KronoTokens.Typography.bodyText
                 ),
-                fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
+                fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Medium,
                 color = textColor,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
-            Text(
-                text = subtitle,
-                style = MaterialTheme.typography.bodySmall.copy(
-                    fontSize = KronoTokens.Typography.statusLabel
-                ),
-                color = if (selected)
-                    MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f)
-                else
-                    MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
+            if (!subtitle.isNullOrBlank()) {
+                Text(
+                    text = subtitle,
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        fontSize = KronoTokens.Typography.statusLabel
+                    ),
+                    color = if (selected)
+                        MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f)
+                    else
+                        MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
         }
 
         Spacer(Modifier.width(KronoTokens.Spacing.sm))

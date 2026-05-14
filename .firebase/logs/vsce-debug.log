@@ -674,3 +674,5 @@ Generated sources: esm\package.json [17B] package.json [615B] README.md [41108B]
  {"metadata":{"emulator":{"name":"dataconnect"},"message":"I0508 08:10:15.843554   12524 dev.go:104] Listening on address (HTTP + gRPC): 127.0.0.1:50001\n"}}
 [debug] [2026-05-08T11:10:16.003Z] I0508 08:10:16.002629   12524 engine.go:209] [projects/emulator/locations/emulator/services/krono 48e6] ExecuteGraphqlRead query IntrospectionQuery: succeeded. 
  {"metadata":{"emulator":{"name":"dataconnect"},"message":"I0508 08:10:16.002629   12524 engine.go:209] [projects/emulator/locations/emulator/services/krono 48e6] ExecuteGraphqlRead query IntrospectionQuery: succeeded. \n"}}
+[info] [Firebase Plugin] Stopping SQL Connect toolkit
+[warn] !  SQL Connect Emulator has exited upon receiving signal: SIGINT 

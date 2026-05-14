@@ -42,6 +42,7 @@ import androidx.compose.material.icons.rounded.RadioButtonUnchecked
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Replay
 import androidx.compose.material.icons.rounded.Settings
+import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material.icons.rounded.Timer
 import androidx.compose.material.icons.rounded.Speed
 import androidx.compose.material.icons.rounded.TrackChanges
@@ -88,6 +89,7 @@ object KronoIcons {
         val Notification: ImageVector = Icons.Rounded.Notifications
         val Search: ImageVector       = Icons.Rounded.Search
         val SearchOff: ImageVector    = Icons.Rounded.SearchOff
+        val Share: ImageVector        = Icons.Rounded.Share
     }
 
     // ── Status e Info ───────────────────────────────────────

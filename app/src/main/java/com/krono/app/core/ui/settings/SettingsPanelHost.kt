@@ -1,13 +1,13 @@
 package com.krono.app.core.ui.settings
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.krono.app.core.data.OverlayConfig
 import com.krono.app.core.data.OverlayDataStore
 import com.krono.app.core.ui.theme.KronoTokens
@@ -30,122 +30,44 @@ fun SettingsPanelHost(
     modifier: Modifier = Modifier
 ) {
     when (destination) {
-        SettingsDestination.Appearance -> AppearancePanel(
-            dataStore = dataStore,
-            modifier = modifier
-        )
-
+        SettingsDestination.Appearance -> AppearancePanel(dataStore = dataStore, modifier = modifier)
         SettingsDestination.Behavior -> BehaviorPanel(
             dataStore = dataStore,
             isServiceRunning = isServiceRunning,
             onStartFocusMode = onStartFocusMode,
             modifier = modifier
         )
-
-        SettingsDestination.Overlay -> OverlayPanel(
-            dataStore = dataStore,
-            modifier = modifier
-        )
-
-        SettingsDestination.About -> AboutPanel(
-            onSupportClick = onSupportClick,
-            onShowChangelog = onShowChangelog,
-            modifier = modifier
-        )
-
+        SettingsDestination.Overlay -> OverlayPanel(dataStore = dataStore, modifier = modifier)
+        SettingsDestination.About -> AboutPanel(modifier = modifier)
         SettingsDestination.Support -> SupportPanel(
             totalLifetimeMs = totalLifetimeMs,
             onDonate = onSupportClick,
             modifier = modifier
         )
-
         SettingsDestination.Changelog -> {
             val updateInfo = pendingUpdateInfo ?: UpdateInfo(
-                tagName = "",
-                changelog = "",
+                tagName = "vAtual",
+                changelog = "Versão atual instalada. Sem atualização pendente.",
                 releaseUrl = "",
                 downloadUrl = null
             )
-            ChangelogPanel(
-                updateInfo = updateInfo,
-                onUpdateAvailable = onUpdateAvailable,
-                modifier = modifier
-            )
+            UpdatesPanel(updateInfo = updateInfo, modifier = modifier)
         }
-
-        SettingsDestination.Updates -> {
-            if (pendingUpdateInfo != null) {
-                UpdatesPanel(
-                    updateInfo = pendingUpdateInfo,
-                    modifier = modifier
-                )
-            } else {
-                Box(
-                    modifier = modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(
-                            text = "✓",
-                            style = MaterialTheme.typography.headlineLarge,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                        Spacer(Modifier.height(8.dp))
-                        Text(
-                            text = "Você está atualizado",
-                            style = MaterialTheme.typography.bodyLarge.copy(
-                                fontSize = KronoTokens.Typography.bodyText
-                            ),
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-            }
-        }
-
-        SettingsDestination.Stopwatch -> ToolSettingsPlaceholder(
-            toolName = "Cronômetro",
-            modifier = modifier
-        )
-
-        SettingsDestination.Countdown -> ToolSettingsPlaceholder(
-            toolName = "Contagem Regressiva",
-            modifier = modifier
-        )
+        SettingsDestination.BugReport -> BugReportPanel(modifier = modifier)
+        SettingsDestination.Stopwatch -> ToolSettingsPlaceholder("Cronômetro", modifier)
+        SettingsDestination.Countdown -> ToolSettingsPlaceholder("Contagem Regressiva", modifier)
     }
 }
 
 @Composable
-private fun ToolSettingsPlaceholder(
-    toolName: String,
-    modifier: Modifier = Modifier
-) {
-    Box(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text(
-                text = "🛠",
-                style = MaterialTheme.typography.headlineLarge
-            )
-            Spacer(Modifier.height(16.dp))
-            Text(
-                text = toolName,
-                style = MaterialTheme.typography.titleMedium.copy(
-                    fontSize = KronoTokens.Typography.buttonLabel
-                ),
-                fontWeight = FontWeight.SemiBold
-            )
+private fun ToolSettingsPlaceholder(toolName: String, modifier: Modifier = Modifier) {
+    Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+            Text(text = toolName, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
             Spacer(Modifier.height(4.dp))
             Text(
                 text = "Em desenvolvimento",
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    fontSize = KronoTokens.Typography.listItem
-                ),
+                style = MaterialTheme.typography.bodyMedium.copy(fontSize = KronoTokens.Typography.listItem),
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }

@@ -9,7 +9,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -21,37 +21,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.krono.app.BuildConfig
-import com.krono.app.R
 import com.krono.app.core.ui.theme.KronoIcons
 import com.krono.app.core.ui.theme.KronoTokens
-import com.krono.app.core.ui.dialogs.BugReportDialog
-import com.krono.app.core.util.UpdateInfo
 
 private const val GITHUB_URL = "https://github.com/gustavo-praxedes/krono"
+private const val LATEST_APK_URL = "https://github.com/gustavo-praxedes/krono/releases/latest/download/krono.apk"
 
 @Composable
 fun AboutPanel(
-    onSupportClick: () -> Unit,
-    onShowChangelog: (UpdateInfo) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-    var showBugReport by remember { mutableStateOf(false) }
-
-    val localChangelog = remember {
-        try {
-            context.resources.openRawResource(R.raw.changelog).bufferedReader().readText()
-        } catch (_: Exception) { "" }
-    }
-
-    val localUpdateInfo = remember {
-        UpdateInfo(
-            tagName     = BuildConfig.VERSION_NAME,
-            changelog   = localChangelog,
-            releaseUrl  = GITHUB_URL,
-            downloadUrl = null
-        )
-    }
 
     Column(
         modifier = modifier
@@ -62,7 +42,6 @@ fun AboutPanel(
     ) {
         Spacer(Modifier.height(KronoTokens.Spacing.xl))
 
-        // App identity header
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
@@ -76,7 +55,7 @@ fun AboutPanel(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "⏱ Krono",
+                    text = "Krono",
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold,
                     fontSize = KronoTokens.Typography.dialogTitle
@@ -84,9 +63,7 @@ fun AboutPanel(
                 Spacer(Modifier.height(KronoTokens.Spacing.xs))
                 Text(
                     text = "Versão ${BuildConfig.VERSION_NAME}",
-                    style = MaterialTheme.typography.bodySmall.copy(
-                        fontSize = KronoTokens.Typography.statusLabel
-                    ),
+                    style = MaterialTheme.typography.bodySmall.copy(fontSize = KronoTokens.Typography.statusLabel),
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -103,35 +80,13 @@ fun AboutPanel(
 
         Spacer(Modifier.height(KronoTokens.Spacing.xl))
 
-        SettingsGroup(title = "Ações") {
-            AboutActionRow(
-                icon = KronoIcons.Status.Favorite,
-                iconColor = Color(0xFFEF4444),
-                title = "Apoiar o Projeto",
-                subtitle = "Ko-fi · Ajude a manter gratuito",
-                trailing = TrailingType.Chevron,
-                onClick = onSupportClick
-            )
-
-            RowDivider()
-
-            AboutActionRow(
-                icon = KronoIcons.Status.Bug,
-                iconColor = Color(0xFFF59E0B),
-                title = "Relatar Bug",
-                subtitle = "Encontrou algo errado?",
-                trailing = TrailingType.Chevron,
-                onClick = { showBugReport = true }
-            )
-
-            RowDivider()
-
+        SettingsGroup(title = "Projeto") {
             AboutActionRow(
                 icon = KronoIcons.Status.Source,
                 iconColor = Color(0xFF6B7FD4),
                 title = "Código Fonte",
                 subtitle = "GitHub · Contribua com o projeto",
-                trailing = TrailingType.External,
+                trailing = KronoIcons.Navigation.OpenExternal,
                 onClick = {
                     context.startActivity(
                         Intent(Intent.ACTION_VIEW, Uri.parse(GITHUB_URL))
@@ -139,30 +94,30 @@ fun AboutPanel(
                     )
                 }
             )
-        }
 
-        Spacer(Modifier.height(KronoTokens.Spacing.lg))
+            RowDivider()
 
-        SettingsGroup(title = "Informações") {
             AboutActionRow(
-                icon = KronoIcons.Settings.History,
+                icon = KronoIcons.Action.Share,
                 iconColor = Color(0xFF10B981),
-                title = "Novidades da Versão",
-                subtitle = "Ver o que mudou nesta versão",
-                trailing = TrailingType.Chevron,
-                onClick = { onShowChangelog(localUpdateInfo) }
+                title = "Compartilhar o Krono",
+                subtitle = "Envie o link do projeto para outras pessoas",
+                trailing = KronoIcons.Navigation.ChevronRight,
+                onClick = {
+                    val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                        type = "text/plain"
+                        putExtra(Intent.EXTRA_SUBJECT, "Krono")
+                        putExtra(Intent.EXTRA_TEXT, LATEST_APK_URL)
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    }
+                    context.startActivity(Intent.createChooser(shareIntent, "Compartilhar Krono"))
+                }
             )
         }
 
         Spacer(Modifier.height(KronoTokens.Spacing.xxl))
     }
-
-    if (showBugReport) {
-        BugReportDialog(onDismiss = { showBugReport = false })
-    }
 }
-
-private enum class TrailingType { Chevron, External }
 
 @Composable
 private fun AboutActionRow(
@@ -170,17 +125,14 @@ private fun AboutActionRow(
     iconColor: Color,
     title: String,
     subtitle: String,
-    trailing: TrailingType,
+    trailing: ImageVector,
     onClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(
-                horizontal = KronoTokens.Spacing.lg,
-                vertical = KronoTokens.Spacing.md
-            ),
+            .padding(horizontal = KronoTokens.Spacing.lg, vertical = KronoTokens.Spacing.md),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
@@ -190,37 +142,19 @@ private fun AboutActionRow(
                 .background(iconColor.copy(alpha = 0.15f)),
             contentAlignment = Alignment.Center
         ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                modifier = Modifier.size(20.dp),
-                tint = iconColor
-            )
+            Icon(icon, contentDescription = null, modifier = Modifier.size(20.dp), tint = iconColor)
         }
-
         Spacer(Modifier.width(KronoTokens.Spacing.md))
-
         Column(modifier = Modifier.weight(1f)) {
+            Text(title, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
             Text(
-                text = title,
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Normal,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            Text(
-                text = subtitle,
-                style = MaterialTheme.typography.bodySmall.copy(
-                    fontSize = KronoTokens.Typography.statusLabel
-                ),
+                subtitle,
+                style = MaterialTheme.typography.bodySmall.copy(fontSize = KronoTokens.Typography.statusLabel),
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
-
         Icon(
-            imageVector = when (trailing) {
-                TrailingType.Chevron  -> KronoIcons.Navigation.ChevronRight
-                TrailingType.External -> KronoIcons.Navigation.OpenExternal
-            },
+            imageVector = trailing,
             contentDescription = null,
             modifier = Modifier.size(KronoTokens.Icon.small),
             tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)

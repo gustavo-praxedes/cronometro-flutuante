@@ -46,6 +46,12 @@ fun SettingsScreen(
     val configuration = LocalConfiguration.current
     val isWideScreen = configuration.screenWidthDp >= 600
 
+    LaunchedEffect(isWideScreen) {
+        if (isWideScreen && selectedDestination == null) {
+            selectedDestination = SettingsDestination.Appearance
+        }
+    }
+
     LaunchedEffect(pendingUpdateInfo) {
         if (pendingUpdateInfo != null) updateInfo = pendingUpdateInfo
     }
@@ -86,7 +92,7 @@ private fun WideScreenLayout(
     dataStore: OverlayDataStore,
     scope: kotlinx.coroutines.CoroutineScope,
     selectedDestination: SettingsDestination?,
-    onDestinationSelected: (SettingsDestination) -> Unit,
+    onDestinationSelected: (SettingsDestination?) -> Unit,
     updateInfo: UpdateInfo?,
     isServiceRunning: () -> Boolean,
     onStartFocusMode: () -> Unit,
@@ -137,7 +143,7 @@ Column(modifier = Modifier.fillMaxSize()) {
                     // Menu scrollável
                     SettingsMenuPanel(
                         selectedDestination = selectedDestination,
-                        onDestinationSelected = onDestinationSelected,
+                        onDestinationSelected = { onDestinationSelected(it) },
                         hasPendingUpdate = updateInfo != null,
                         modifier = Modifier
                             .weight(1f)
@@ -232,7 +238,7 @@ Column(modifier = Modifier.fillMaxSize()) {
                             onStartFocusMode = onStartFocusMode,
                             onSupportClick = { onDestinationSelected(SettingsDestination.Support) },
                             onShowChangelog = { onDestinationSelected(SettingsDestination.Changelog) },
-                            onUpdateAvailable = { onDestinationSelected(SettingsDestination.Updates) },
+                            onUpdateAvailable = { onDestinationSelected(SettingsDestination.Changelog) },
                             modifier = Modifier.fillMaxSize()
                         )
                     }
@@ -249,7 +255,7 @@ private fun NarrowScreenLayout(
     dataStore: OverlayDataStore,
     scope: kotlinx.coroutines.CoroutineScope,
     selectedDestination: SettingsDestination?,
-    onDestinationSelected: (SettingsDestination) -> Unit,
+    onDestinationSelected: (SettingsDestination?) -> Unit,
     onBack: () -> Unit,
     updateInfo: UpdateInfo?,
     isServiceRunning: () -> Boolean,
@@ -273,7 +279,7 @@ private fun NarrowScreenLayout(
                     IconButton(
                         onClick = {
                             if (selectedDestination != null) {
-                                onDestinationSelected(null as SettingsDestination)
+                                onDestinationSelected(null)
                             } else {
                                 onBack()
                             }
@@ -339,13 +345,13 @@ private fun NarrowScreenLayout(
                     onStartFocusMode = onStartFocusMode,
                     onSupportClick = { onDestinationSelected(SettingsDestination.Support) },
                     onShowChangelog = { onDestinationSelected(SettingsDestination.Changelog) },
-                    onUpdateAvailable = { onDestinationSelected(SettingsDestination.Updates) },
+                    onUpdateAvailable = { onDestinationSelected(SettingsDestination.Changelog) },
                     modifier = Modifier.fillMaxSize()
                 )
             } else {
                 SettingsMenuPanel(
                     selectedDestination = null,
-                    onDestinationSelected = onDestinationSelected,
+                    onDestinationSelected = { onDestinationSelected(it) },
                     hasPendingUpdate = updateInfo != null,
                     modifier = Modifier.fillMaxSize()
                 )

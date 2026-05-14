@@ -12,6 +12,7 @@ import com.krono.app.core.data.OverlayConfig
 import com.krono.app.core.data.OverlayDataStore
 import com.krono.app.core.ui.theme.KronoTokens
 import com.krono.app.core.ui.components.AppearanceSlider
+import com.krono.app.core.ui.components.ToggleRow
 import kotlinx.coroutines.launch
 import java.util.Locale
 import androidx.compose.ui.unit.dp
@@ -35,6 +36,50 @@ fun OverlayPanel(
 
         SettingsGroup(title = stringResource(R.string.settings_overlay)) {
             Column(modifier = Modifier.padding(KronoTokens.Spacing.lg)) {
+                ToggleRow(
+                    label = stringResource(R.string.label_show_buttons),
+                    checked = config.showButtons,
+                    onChange = {
+                        scope.launch { dataStore.updateConfig(config.copy(showButtons = it)) }
+                    }
+                )
+
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = KronoTokens.Spacing.md),
+                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f),
+                    thickness = 0.5.dp
+                )
+
+                ToggleRow(
+                    label = stringResource(R.string.label_show_hours),
+                    checked = config.showHours,
+                    onChange = {
+                        if (!it && !config.showSeconds) return@ToggleRow
+                        scope.launch { dataStore.updateConfig(config.copy(showHours = it)) }
+                    }
+                )
+
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = KronoTokens.Spacing.md),
+                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f),
+                    thickness = 0.5.dp
+                )
+
+                ToggleRow(
+                    label = stringResource(R.string.label_show_seconds),
+                    checked = config.showSeconds,
+                    onChange = {
+                        if (!it && !config.showHours) return@ToggleRow
+                        scope.launch { dataStore.updateConfig(config.copy(showSeconds = it)) }
+                    }
+                )
+
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = KronoTokens.Spacing.md),
+                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f),
+                    thickness = 0.5.dp
+                )
+
                 AppearanceSlider(
                     label = stringResource(R.string.label_scale),
                     value = config.scale,

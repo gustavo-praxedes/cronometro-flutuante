@@ -44,40 +44,6 @@ fun BehaviorPanel(
                 }
             )
 
-            GroupDivider()
-
-            ToggleRow(
-                label = stringResource(R.string.label_show_hours),
-                checked = config.showHours,
-                onChange = {
-                    if (!it && !config.showSeconds) return@ToggleRow
-                    scope.launch { dataStore.updateConfig(config.copy(showHours = it)) }
-                }
-            )
-
-            GroupDivider()
-
-            ToggleRow(
-                label = stringResource(R.string.label_show_seconds),
-                checked = config.showSeconds,
-                onChange = {
-                    if (!it && !config.showHours) return@ToggleRow
-                    scope.launch { dataStore.updateConfig(config.copy(showSeconds = it)) }
-                }
-            )
-
-            GroupDivider()
-
-            ToggleRow(
-                label = stringResource(R.string.label_show_buttons),
-                checked = config.showButtons,
-                onChange = {
-                    scope.launch { dataStore.updateConfig(config.copy(showButtons = it)) }
-                }
-            )
-
-            GroupDivider()
-
             ToggleRow(
                 label = stringResource(R.string.label_wake_lock),
                 checked = config.keepScreenOn,
