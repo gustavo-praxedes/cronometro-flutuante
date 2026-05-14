@@ -168,6 +168,15 @@ class CountdownViewModel(
         updateRuntime(id) { it.copy(remainingSeconds = remainingSeconds) }
     }
 
+    fun setRemainingSeconds(id: String, seconds: Long, clearCompleted: Boolean = false) {
+        updateRuntime(id) { state ->
+            state.copy(
+                remainingSeconds = seconds.coerceAtLeast(0L),
+                isCompleted = if (clearCompleted) false else state.isCompleted
+            )
+        }
+    }
+
     // ── Helpers ───────────────────────────────────────────────────────────────
 
     private fun updateRuntime(id: String, transform: (CountdownState) -> CountdownState) {

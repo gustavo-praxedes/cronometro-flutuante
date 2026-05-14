@@ -37,18 +37,21 @@ class CountdownManager(
         val state = vmState(id) ?: return
         if (state.isCompleted) return
 
-        val startRemaining = remainingMap.getOrPut(id) { state.remainingSeconds }
+        remainingMap.putIfAbsent(id, state.remainingSeconds)
 
         activeTimers[id] = scope.launch {
-            var remaining = startRemaining
-            while (remaining > 0) {
+            while (true) {
                 delay(1_000L)
-                remaining--
-                remainingMap[id] = remaining
-                countdownViewModel.onTick(id, remaining)
+                val current = remainingMap[id] ?: (vmState(id)?.remainingSeconds ?: 0L)
+                val next = (current - 1).coerceAtLeast(0L)
+                remainingMap[id] = next
+                countdownViewModel.onTick(id, next)
                 syncOverlay(id)
+                if (next <= 0L) {
+                    complete(id)
+                    break
+                }
             }
-            if (remaining <= 0) complete(id)
         }
     }
 
@@ -68,6 +71,16 @@ class CountdownManager(
         notificationHelper.cancelCountdownNotification(id)
     }
 
+    fun addOneMinute(id: String) {
+        val state = vmState(id) ?: return
+        val base = remainingMap[id] ?: state.remainingSeconds
+        val next = (base + 60L).coerceAtMost(99L * 3600L + 59L * 60L + 59L)
+        remainingMap[id] = next
+        countdownViewModel.setRemainingSeconds(id, next, clearCompleted = true)
+        syncOverlay(id)
+        vmState(id)?.let { if (it.isOverlayVisible) notificationHelper.postCountdownNotification(it) }
+    }
+
     // ── Overlay ────────────────────────────────────────────────────────────
 
     fun showOverlay(id: String) {
@@ -81,6 +94,7 @@ class CountdownManager(
                 onPlay  = { play(id); countdownViewModel.play(context, id) },
                 onPause = { pause(id); countdownViewModel.pause(context, id) },
                 onReset = { reset(id); countdownViewModel.reset(context, id) },
+                onPlusOne = { addOneMinute(id) },
                 onClose = {
                     hideOverlay(id)
                     countdownViewModel.forceHideOverlay(id)

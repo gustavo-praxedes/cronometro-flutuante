@@ -1,4 +1,4 @@
-package com.krono.app.core.ui.components
+﻿package com.krono.app.core.ui.components
 
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
@@ -102,7 +102,7 @@ fun KronoControlButtons(
             onClick = onReset,
             modifier = Modifier.size(btnSize)
         ) {
-            Icon(KronoIcons.Action.Reset, "Reset", tint = textColor, modifier = Modifier.size(iconSizeDp))
+            Icon(KronoIcons.Action.StopFilled, "Reset", tint = textColor, modifier = Modifier.size(iconSizeDp))
         }
 
         AnimatedIconButton(
@@ -120,3 +120,4 @@ fun KronoControlButtons(
         }
     }
 }
+

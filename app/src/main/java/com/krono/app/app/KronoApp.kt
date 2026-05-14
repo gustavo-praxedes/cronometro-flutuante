@@ -11,6 +11,8 @@ import com.krono.app.feature.countdown.CountdownTool
 import com.krono.app.feature.countdown.CountdownViewModel
 import com.krono.app.feature.stopwatch.StopwatchViewModel
 import com.krono.app.feature.stopwatch.StopwatchTool
+import com.krono.app.feature.pomodoro.PomodoroTool
+import com.krono.app.feature.pomodoro.PomodoroViewModel
 import com.krono.app.core.tool.ToolRegistry
 import com.krono.app.core.data.OverlayDataStore
 
@@ -34,6 +36,7 @@ class KronoApp : Application() {
     val countdownViewModel: CountdownViewModel by lazy {
         CountdownViewModel(CountdownDataStore(this))
     }
+    val pomodoroViewModel: PomodoroViewModel by lazy { PomodoroViewModel() }
 
     override fun onCreate() {
         super.onCreate()
@@ -48,6 +51,7 @@ class KronoApp : Application() {
 
         ToolRegistry.register(StopwatchTool(OverlayDataStore(this), stopwatchViewModel))
         ToolRegistry.register(CountdownTool(countdownViewModel))
+        ToolRegistry.register(PomodoroTool(pomodoroViewModel))
     }
 
     private fun createNotificationChannel() {

@@ -16,6 +16,7 @@ import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.krono.app.core.data.OverlayConfig
 import com.krono.app.core.data.OverlayDataStore
+import com.krono.app.feature.pomodoro.PomodoroOverlay
 import com.krono.app.feature.stopwatch.StopwatchOverlay
 import com.krono.app.core.ui.theme.KronoTheme
 import com.krono.app.core.tool.ToolState
@@ -47,6 +48,7 @@ class OverlayManager(
         onStart: () -> Unit,
         onPause: () -> Unit,
         onReset: () -> Unit,
+        onNext: () -> Unit,
         onClose: () -> Unit,
         onSettings: () -> Unit,
         onFocusModeStarted: () -> Unit
@@ -80,42 +82,60 @@ class OverlayManager(
                 val config by dataStore.configFlow.collectAsState(initial = OverlayConfig())
                 val toolStateFlow = activeToolState()
                 val rawState = toolStateFlow?.collectAsState()?.value
-                val swState = (rawState as? com.krono.app.feature.stopwatch.StopwatchState)
-                    ?: com.krono.app.feature.stopwatch.StopwatchState()
 
                 KronoTheme(selectedTheme = config.selectedTheme) {
-                    StopwatchOverlay(
-                        state = swState,
-                        config = config,
-                        onStart = onStart,
-                        onPause = onPause,
-                        onReset = onReset,
-                        onDrag = { dx, dy -> handleDrag(dx, dy) },
-                        onDragEnd = { saveOverlayPosition() },
-                        onClose = onClose,
-                        onSettings = onSettings,
-                        onToggleFocus = {
-                            serviceScope.launch {
-                                dataStore.updateConfig(config.copy(focusModeEnabled = !config.focusModeEnabled))
-                            }
-                        },
-                        onToggleKeepScreenOn = {
-                            serviceScope.launch {
-                                dataStore.updateConfig(config.copy(keepScreenOn = !config.keepScreenOn))
-                            }
-                        },
-                        onToggleAutoLaunch = {
-                            serviceScope.launch {
-                                dataStore.updateConfig(config.copy(autoLaunch = !config.autoLaunch))
-                            }
-                        },
-                        onToggleBeep = {
-                            serviceScope.launch {
-                                dataStore.updateConfig(config.copy(isBeepEnabled = !config.isBeepEnabled))
-                            }
-                        },
-                        onMenuVisibilityChange = { menuOpen -> setOverlayFocusable(menuOpen) }
-                    )
+                    when (config.activeToolId) {
+                        "pomodoro" -> {
+                            val pomodoroState = (rawState as? com.krono.app.feature.pomodoro.PomodoroState)
+                                ?: com.krono.app.feature.pomodoro.PomodoroState()
+                            PomodoroOverlay(
+                                state = pomodoroState,
+                                onPlay = onStart,
+                                onPause = onPause,
+                                onReset = onReset,
+                                onNext = onNext,
+                                onClose = onClose,
+                                onDrag = { dx, dy -> handleDrag(dx, dy) },
+                                onDragEnd = { saveOverlayPosition() }
+                            )
+                        }
+                        else -> {
+                            val swState = (rawState as? com.krono.app.feature.stopwatch.StopwatchState)
+                                ?: com.krono.app.feature.stopwatch.StopwatchState()
+                            StopwatchOverlay(
+                                state = swState,
+                                config = config,
+                                onStart = onStart,
+                                onPause = onPause,
+                                onReset = onReset,
+                                onDrag = { dx, dy -> handleDrag(dx, dy) },
+                                onDragEnd = { saveOverlayPosition() },
+                                onClose = onClose,
+                                onSettings = onSettings,
+                                onToggleFocus = {
+                                    serviceScope.launch {
+                                        dataStore.updateConfig(config.copy(focusModeEnabled = !config.focusModeEnabled))
+                                    }
+                                },
+                                onToggleKeepScreenOn = {
+                                    serviceScope.launch {
+                                        dataStore.updateConfig(config.copy(keepScreenOn = !config.keepScreenOn))
+                                    }
+                                },
+                                onToggleAutoLaunch = {
+                                    serviceScope.launch {
+                                        dataStore.updateConfig(config.copy(autoLaunch = !config.autoLaunch))
+                                    }
+                                },
+                                onToggleBeep = {
+                                    serviceScope.launch {
+                                        dataStore.updateConfig(config.copy(isBeepEnabled = !config.isBeepEnabled))
+                                    }
+                                },
+                                onMenuVisibilityChange = { menuOpen -> setOverlayFocusable(menuOpen) }
+                            )
+                        }
+                    }
                 }
             }
         }

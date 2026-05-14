@@ -1,4 +1,4 @@
-package com.krono.app.core.ui.settings
+﻿package com.krono.app.core.ui.settings
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
@@ -12,6 +12,7 @@ import com.krono.app.core.data.OverlayConfig
 import com.krono.app.core.data.OverlayDataStore
 import com.krono.app.core.ui.theme.KronoTokens
 import com.krono.app.core.util.UpdateInfo
+import com.krono.app.feature.pomodoro.PomodoroSettings
 import kotlinx.coroutines.CoroutineScope
 
 @Composable
@@ -47,15 +48,16 @@ fun SettingsPanelHost(
         SettingsDestination.Changelog -> {
             val updateInfo = pendingUpdateInfo ?: UpdateInfo(
                 tagName = "vAtual",
-                changelog = "Versão atual instalada. Sem atualização pendente.",
+                changelog = "VersÃ£o atual instalada. Sem atualizaÃ§Ã£o pendente.",
                 releaseUrl = "",
                 downloadUrl = null
             )
             UpdatesPanel(updateInfo = updateInfo, modifier = modifier)
         }
         SettingsDestination.BugReport -> BugReportPanel(modifier = modifier)
-        SettingsDestination.Stopwatch -> ToolSettingsPlaceholder("Cronômetro", modifier)
+        SettingsDestination.Stopwatch -> ToolSettingsPlaceholder("CronÃ´metro", modifier)
         SettingsDestination.Countdown -> ToolSettingsPlaceholder("Contagem Regressiva", modifier)
+        SettingsDestination.Pomodoro -> PomodoroSettings()
     }
 }
 
@@ -73,3 +75,5 @@ private fun ToolSettingsPlaceholder(toolName: String, modifier: Modifier = Modif
         }
     }
 }
+
+

@@ -32,6 +32,7 @@ class CountdownOverlayManager(
     private val onPlay: () -> Unit,
     private val onPause: () -> Unit,
     private val onReset: () -> Unit,
+    private val onPlusOne: () -> Unit,
     private val onClose: () -> Unit
 ) : LifecycleOwner, ViewModelStoreOwner, SavedStateRegistryOwner {
 
@@ -200,6 +201,10 @@ class CountdownOverlayManager(
                             onPlay = onPlay,
                             onPause = onPause,
                             onReset = onReset,
+                            onBottomExtraAction = onPlusOne,
+                            bottomExtraIcon = com.krono.app.core.ui.theme.KronoIcons.Action.PlusOne,
+                            bottomExtraDescription = "+1 min",
+                            overlayWidthScale = 0.96f,
                             onClose = onClose,
                             onDrag = { dx, dy -> onDrag(dx, dy) },
                             onDragEnd = { onDragEnd() }

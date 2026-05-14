@@ -34,6 +34,7 @@ private fun SettingsDestination.accentColor(): Color = when (this) {
     SettingsDestination.Overlay     -> Color(0xFF8B5CF6)
     SettingsDestination.Stopwatch   -> Color(0xFF10B981)
     SettingsDestination.Countdown   -> Color(0xFF06B6D4)
+    SettingsDestination.Pomodoro    -> Color(0xFFE11D48)
     SettingsDestination.About       -> Color(0xFF3B82F6)
     SettingsDestination.Support     -> Color(0xFFEF4444)
     SettingsDestination.Changelog   -> Color(0xFFF97316)
@@ -59,7 +60,8 @@ private val menuSections = listOf(
         title = "Ferramentas",
         destinations = listOf(
             SettingsDestination.Stopwatch,
-            SettingsDestination.Countdown
+            SettingsDestination.Countdown,
+            SettingsDestination.Pomodoro
         )
     ),
     MenuSection(

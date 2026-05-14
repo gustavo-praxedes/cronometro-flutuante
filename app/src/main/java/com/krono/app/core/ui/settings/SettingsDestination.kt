@@ -33,6 +33,10 @@ sealed class SettingsDestination(
         titleRes = R.string.settings_countdown,
         icon = KronoIcons.Feature.Countdown
     )
+    data object Pomodoro : SettingsDestination(
+        titleRes = R.string.settings_pomodoro,
+        icon = KronoIcons.Feature.Pomodoro
+    )
 
     data object About : SettingsDestination(
         titleRes = R.string.settings_about,

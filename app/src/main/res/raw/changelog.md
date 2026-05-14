@@ -13,6 +13,7 @@
 - fix: Bug introduzido na refatoração corrigido
 
 # 🔧 Manutenção
+- Ajuste em Settings
 - Ajustes de design na settings
 - ui: add dynamic sticky header to content panel
 - changelog: update entries for settings refinements

@@ -188,6 +188,7 @@ class MainService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStateRe
                     },
                     onPause = { handlePause(); feedbackManager.triggerFeedback(currentConfig) },
                     onReset = { handleReset() },
+                    onNext = { (activeViewModel as? com.krono.app.feature.pomodoro.PomodoroViewModel)?.skipPhase() },
                     onClose = { hideOverlay() },
                     onSettings = { KronoNavigator.openSettings(this@MainService) },
                     onFocusModeStarted = { KronoNavigator.startFocusMode(this@MainService) }

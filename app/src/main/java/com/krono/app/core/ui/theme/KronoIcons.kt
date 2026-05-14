@@ -14,6 +14,7 @@ import androidx.compose.material.icons.outlined.Tune
 import androidx.compose.material.icons.outlined.WebAsset
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.AutoAwesome
+import androidx.compose.material.icons.rounded.AvTimer
 import androidx.compose.material.icons.rounded.BugReport
 import androidx.compose.material.icons.rounded.Build
 import androidx.compose.material.icons.rounded.Check
@@ -22,6 +23,7 @@ import androidx.compose.material.icons.rounded.Code
 import androidx.compose.material.icons.rounded.Coffee
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Download
+import androidx.compose.material.icons.rounded.ExposurePlus1
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.History
 import androidx.compose.material.icons.rounded.HourglassBottom
@@ -43,6 +45,8 @@ import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Replay
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.rounded.Share
+import androidx.compose.material.icons.rounded.SkipNext
+import androidx.compose.material.icons.rounded.Stop
 import androidx.compose.material.icons.rounded.Timer
 import androidx.compose.material.icons.rounded.Speed
 import androidx.compose.material.icons.rounded.TrackChanges
@@ -75,6 +79,8 @@ object KronoIcons {
         val Play: ImageVector         = Icons.Rounded.PlayArrow
         val Pause: ImageVector        = Icons.Rounded.Pause
         val Reset: ImageVector        = Icons.Rounded.Refresh
+        val StopFilled: ImageVector   = Icons.Rounded.Stop
+        val Next: ImageVector         = Icons.Rounded.SkipNext
         val Replay: ImageVector       = Icons.Rounded.Replay
         val More: ImageVector         = Icons.Rounded.MoreVert
         val MoreHoriz: ImageVector    = Icons.Rounded.MoreHoriz
@@ -90,6 +96,7 @@ object KronoIcons {
         val Search: ImageVector       = Icons.Rounded.Search
         val SearchOff: ImageVector    = Icons.Rounded.SearchOff
         val Share: ImageVector        = Icons.Rounded.Share
+        val PlusOne: ImageVector      = Icons.Rounded.ExposurePlus1
     }
 
     // ── Status e Info ───────────────────────────────────────
@@ -112,6 +119,7 @@ object KronoIcons {
     object Feature {
         val Overlay: ImageVector      = Icons.Rounded.PictureInPicture
         val Timer: ImageVector        = Icons.Rounded.Timer
+        val Pomodoro: ImageVector     = Icons.Rounded.AvTimer
         val Hourglass: ImageVector    = Icons.Rounded.HourglassTop
         val HourglassBottom: ImageVector = Icons.Rounded.HourglassBottom
         val Countdown: ImageVector    = Icons.Outlined.HourglassBottom

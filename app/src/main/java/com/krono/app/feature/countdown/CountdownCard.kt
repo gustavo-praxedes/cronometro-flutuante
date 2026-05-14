@@ -1,4 +1,4 @@
-package com.krono.app.feature.countdown
+﻿package com.krono.app.feature.countdown
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.spring
@@ -56,13 +56,13 @@ fun CountdownCard(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(KronoTokens.Spacing.md)
         ) {
-            // ── Row 1: Description + Badge + Menu ─────────────────────────────
+            // â”€â”€ Row 1: Description + Badge + Menu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
             Row(
                 modifier          = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text       = state.config.description.ifBlank { "Sem título" },
+                    text       = state.config.description.ifBlank { "Sem tÃ­tulo" },
                     style      = MaterialTheme.typography.labelLarge,
                     fontWeight = FontWeight.SemiBold,
                     color      = textColor.copy(alpha = KronoTokens.Alpha.medium),
@@ -78,7 +78,7 @@ fun CountdownCard(
                     ) {
                         Icon(
                             imageVector        = KronoIcons.Action.More,
-                            contentDescription = "Opções",
+                            contentDescription = "OpÃ§Ãµes",
                             tint               = textColor.copy(alpha = KronoTokens.Alpha.medium),
                             modifier           = Modifier.size(KronoTokens.Icon.listItem)
                         )
@@ -106,7 +106,7 @@ fun CountdownCard(
                 }
             }
 
-            // ── Row 2: Time Display (LEFT) + Controls (RIGHT) ─────────────────
+            // â”€â”€ Row 2: Time Display (LEFT) + Controls (RIGHT) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
             Row(
                 modifier          = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
@@ -146,7 +146,7 @@ fun CountdownCard(
                         modifier = Modifier.size(KronoTokens.Button.heightSmall)
                     ) {
                         Icon(
-                            imageVector        = KronoIcons.Action.Reset,
+                            imageVector        = KronoIcons.Action.StopFilled,
                             contentDescription = "Reiniciar",
                             tint               = textColor,
                             modifier           = Modifier.size(KronoTokens.Icon.button)
@@ -177,3 +177,4 @@ fun CountdownCard(
 // Extension to help with Sp conversion if needed
 private fun Double.toSp() = (this).toTextUnit()
 private fun Double.toTextUnit() = androidx.compose.ui.unit.TextUnit(this.toFloat(), androidx.compose.ui.unit.TextUnitType.Sp)
+

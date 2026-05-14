@@ -35,6 +35,7 @@ import com.krono.app.core.data.OverlayConfig
 import com.krono.app.core.data.OverlayDataStore
 import com.krono.app.core.util.UpdateInfo
 import com.krono.app.feature.countdown.CountdownScreen
+import com.krono.app.feature.pomodoro.PomodoroScreen
 import com.krono.app.core.ui.settings.SettingsScreen
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.first
@@ -44,6 +45,7 @@ object AppRoutes {
     const val TIMER     = "timer"
     const val SETTINGS  = "settings"
     const val COUNTDOWN = "countdown"
+    const val POMODORO = "pomodoro"
 }
 
 private data class BottomTab(
@@ -65,6 +67,12 @@ private val BOTTOM_TABS = listOf(
         label       = "Timer",
         iconRes     = null,
         iconVector  = KronoIcons.Feature.HourglassBottom
+    ),
+    BottomTab(
+        route       = AppRoutes.POMODORO,
+        label       = "Pomodoro",
+        iconRes     = null,
+        iconVector  = KronoIcons.Feature.Pomodoro
     )
 )
 
@@ -116,7 +124,7 @@ fun AppNavigation(
     val currentRoute by navController.currentBackStackEntryAsState()
     val currentDest  = currentRoute?.destination?.route
 
-    val showBottomBar = currentDest == AppRoutes.TIMER || currentDest == AppRoutes.COUNTDOWN
+    val showBottomBar = currentDest == AppRoutes.TIMER || currentDest == AppRoutes.COUNTDOWN || currentDest == AppRoutes.POMODORO
 
     Scaffold(
         bottomBar = {
@@ -152,7 +160,12 @@ fun AppNavigation(
                     onStart        = { stopwatchViewModel.start() },
                     onPause        = { stopwatchViewModel.pause() },
                     onReset        = { stopwatchViewModel.reset() },
-                    onOpenOverlay  = onTryStartService,
+                    onOpenOverlay  = {
+                        scope.launch {
+                            dataStore.updateConfig(config.copy(activeToolId = "stopwatch"))
+                            onTryStartService()
+                        }
+                    },
                     onOpenSettings = { navController.navigate(AppRoutes.SETTINGS) }
                 )
             }
@@ -180,6 +193,19 @@ fun AppNavigation(
                     onStartFocusMode  = onStartFocusMode,
                     onShowOverlay     = onShowOverlay,
                     onBack            = navigateBack
+                )
+            }
+            composable(AppRoutes.POMODORO) {
+                PomodoroScreen(
+                    viewModel = (context.applicationContext as KronoApp).pomodoroViewModel,
+                    onOpenSettings = { navController.navigate(AppRoutes.SETTINGS) },
+                    selectedFont = config.selectedFont,
+                    onOpenOverlay = {
+                        scope.launch {
+                            dataStore.updateConfig(config.copy(activeToolId = "pomodoro"))
+                            onTryStartService()
+                        }
+                    }
                 )
             }
         }
@@ -242,6 +268,7 @@ private fun KronoBottomBar(
                         val icon = when (tab.route) {
                             AppRoutes.TIMER     -> KronoIcons.Feature.Timer
                             AppRoutes.COUNTDOWN -> KronoIcons.Feature.HourglassBottom
+                            AppRoutes.POMODORO  -> KronoIcons.Feature.Pomodoro
                             else                -> tab.iconVector ?: ImageVector.vectorResource(id = tab.iconRes!!)
                         }
 

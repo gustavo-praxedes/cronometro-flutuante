@@ -43,6 +43,7 @@
     <string name="settings_overlay">Sobreposição</string>
     <string name="settings_stopwatch">Cronômetro</string>
     <string name="settings_countdown">Timer</string>
+    <string name="settings_pomodoro">Pomodoro</string>
     <string name="settings_section_general">GERAL</string>
     <string name="settings_section_tools">FERRAMENTAS</string>
     <string name="settings_section_info">SOBRE</string>
@@ -55,3 +56,5 @@
     <string name="settings_group_general">Geral</string>
     <string name="settings_group_time_limit">Limite de Tempo</string>
 </resources>
+
+
