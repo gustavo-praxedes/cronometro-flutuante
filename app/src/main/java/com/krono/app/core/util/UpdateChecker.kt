@@ -1,4 +1,4 @@
-package com.krono.app.core.util
+﻿package com.krono.app.core.util
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -160,3 +160,4 @@ private fun isNewerVersion(remote: String, local: String): Boolean {
         false
     }
 }
+

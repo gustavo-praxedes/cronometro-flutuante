@@ -1,4 +1,4 @@
-package com.krono.app.core.ui.components
+﻿package com.krono.app.core.ui.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -29,7 +29,7 @@ internal fun AppearanceSlider(
             Text(
                 text       = display,
                 style      = MaterialTheme.typography.bodySmall,
-                fontWeight = FontWeight.Bold,
+                fontWeight = FontWeight.Normal,
                 color      = MaterialTheme.colorScheme.primary
             )
         }

@@ -1,4 +1,4 @@
-package com.krono.app.core.ui.components
+﻿package com.krono.app.core.ui.components
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,10 +30,11 @@ fun KronoTimerDisplay(
         ),
         color = textColor,
         fontSize = timeFontSize,
-        fontWeight = FontWeight.Bold,
+        fontWeight = FontWeight.Normal,
         fontFamily = timerFontFamily(selectedFont),
         maxLines = 1,
         softWrap = false,
         modifier = modifier
     )
 }
+

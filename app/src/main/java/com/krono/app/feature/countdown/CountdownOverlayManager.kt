@@ -1,10 +1,12 @@
-package com.krono.app.feature.countdown
+﻿package com.krono.app.feature.countdown
 
 import android.content.Context
 import android.graphics.PixelFormat
 import android.graphics.Rect
 import android.view.Gravity
 import android.view.WindowManager
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.ComposeView
 import androidx.lifecycle.Lifecycle
@@ -19,8 +21,9 @@ import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.krono.app.feature.countdown.CountdownState
+import com.krono.app.core.data.OverlayConfig
+import com.krono.app.core.data.OverlayDataStore
 import com.krono.app.core.ui.theme.KronoTheme
-import com.krono.app.core.ui.theme.KronoThemeOption
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
@@ -194,7 +197,8 @@ class CountdownOverlayManager(
             setViewTreeSavedStateRegistryOwner(this@CountdownOverlayManager)
 
             setContent {
-                KronoTheme(selectedTheme = KronoThemeOption.AUTO.name) {
+                val overlayConfig by OverlayDataStore(context).configFlow.collectAsState(initial = OverlayConfig())
+                KronoTheme(selectedTheme = overlayConfig.selectedTheme, appFontSize = overlayConfig.appFontSize) {
                     overlayState.value?.let { s ->
                         CountdownOverlayUi(
                             state = s,
@@ -204,6 +208,14 @@ class CountdownOverlayManager(
                             onBottomExtraAction = onPlusOne,
                             bottomExtraIcon = com.krono.app.core.ui.theme.KronoIcons.Action.PlusOne,
                             bottomExtraDescription = "+1 min",
+                            timeFormat = overlayConfig.countdownFormat,
+                            showButtons = overlayConfig.countdownOverlayShowButtons,
+                            showHours = overlayConfig.countdownOverlayShowHours,
+                            showSeconds = overlayConfig.countdownOverlayShowSeconds,
+                            selectedFont = overlayConfig.overlayFontFamily,
+                            overlayScale = overlayConfig.countdownOverlayScale,
+                            overlayCornerRadius = overlayConfig.countdownOverlayCornerRadius,
+                            overlayCustomColor = overlayConfig.countdownOverlayCustomColor,
                             overlayWidthScale = 0.96f,
                             onClose = onClose,
                             onDrag = { dx, dy -> onDrag(dx, dy) },
@@ -238,3 +250,4 @@ class CountdownOverlayManager(
 
     fun getBounds(): Rect = Rect(posX, posY, posX + overlayW, posY + overlayH)
 }
+

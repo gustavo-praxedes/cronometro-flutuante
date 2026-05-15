@@ -1,4 +1,4 @@
-package com.krono.app.feature.stopwatch
+﻿package com.krono.app.feature.stopwatch
 
 import com.krono.app.core.tool.ToolState
 
@@ -12,3 +12,4 @@ data class StopwatchState(
     override val isAtLimit   : Boolean = false,
     override val elapsedMs   : Long    = 0L
 ) : ToolState
+

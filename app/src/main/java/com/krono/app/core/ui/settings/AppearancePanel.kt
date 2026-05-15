@@ -20,8 +20,11 @@ import com.krono.app.core.ui.theme.KronoThemeOption
 import com.krono.app.core.ui.theme.KronoTokens
 import com.krono.app.core.ui.theme.overlayColorsForTheme
 import com.krono.app.core.ui.dialogs.ColorPickerDialog
-import com.krono.app.core.ui.components.FontSelector
+import com.krono.app.core.ui.components.AppearanceSlider
+import com.krono.app.core.ui.components.KronoDropdown
 import com.krono.app.core.ui.components.ThemeSelector
+import com.krono.app.core.ui.components.ToggleRow
+import com.krono.app.core.ui.theme.KronoFontOption
 import kotlinx.coroutines.launch
 
 @Composable
@@ -33,8 +36,7 @@ fun AppearancePanel(
     val scope = rememberCoroutineScope()
     val systemIsDark = isSystemInDarkTheme()
 
-    var showBgPicker by remember { mutableStateOf(false) }
-    var showTextPicker by remember { mutableStateOf(false) }
+    val langPtBr = stringResource(R.string.settings_language_pt_br)
 
     Column(
         modifier = modifier
@@ -69,144 +71,118 @@ fun AppearancePanel(
                 thickness = 0.5.dp
             )
 
-            FontSelector(
-                selectedFont = config.selectedFont,
-                onChange = { font ->
+            val fontOptions = KronoFontOption.entries
+            KronoDropdown(
+                value = config.overlayFontFamily,
+                onValueChange = { value ->
                     scope.launch {
-                        dataStore.updateConfig(config.copy(selectedFont = font))
+                        dataStore.updateConfig(config.copy(overlayFontFamily = value))
                     }
-                }
+                },
+                options = fontOptions.map { it.name },
+                label = stringResource(R.string.settings_overlay_font_label),
+                modifier = Modifier.padding(horizontal = KronoTokens.Spacing.md, vertical = KronoTokens.Spacing.sm),
+                textMapping = { key -> fontOptions.firstOrNull { it.name == key }?.label ?: key }
             )
-        }
 
-        SettingsGroup(title = stringResource(R.string.settings_group_colors)) {
-            // Color swatches row
-            Row(
+            HorizontalDivider(
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f),
+                thickness = 0.5.dp
+            )
+
+            val languageOptions = listOf("pt-BR")
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(
-                        horizontal = KronoTokens.Spacing.lg,
-                        vertical = KronoTokens.Spacing.md
-                    ),
-                horizontalArrangement = Arrangement.spacedBy(KronoTokens.Spacing.lg)
+                    .padding(horizontal = KronoTokens.Spacing.md, vertical = KronoTokens.Spacing.sm),
+                verticalArrangement = Arrangement.spacedBy(KronoTokens.Spacing.sm)
             ) {
-                ColorSwatchItem(
-                    label = stringResource(R.string.label_background_color),
-                    color = Color(config.backgroundColor).copy(alpha = config.bgOpacity),
-                    hexText = "#%06X".format(config.backgroundColor and 0xFFFFFF).uppercase(),
-                    modifier = Modifier.weight(1f),
-                    onClick = { showBgPicker = true }
-                )
-
-                VerticalDivider(
-                    modifier = Modifier.height(56.dp),
-                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f),
-                    thickness = 0.5.dp
-                )
-
-                ColorSwatchItem(
-                    label = stringResource(R.string.label_text_color),
-                    color = Color(config.textColor).copy(alpha = config.textOpacity),
-                    hexText = "#%06X".format(config.textColor and 0xFFFFFF).uppercase(),
-                    modifier = Modifier.weight(1f),
-                    onClick = { showTextPicker = true }
+                KronoDropdown(
+                    value = config.appLanguage,
+                    onValueChange = { locale ->
+                        scope.launch { dataStore.updateConfig(config.copy(appLanguage = locale)) }
+                    },
+                    options = languageOptions,
+                    label = stringResource(R.string.settings_language_label),
+                    textMapping = { tag ->
+                        when (tag) {
+                            "pt-BR" -> langPtBr
+                            else -> tag
+                        }
+                    }
                 )
             }
+            HorizontalDivider(
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f),
+                thickness = 0.5.dp
+            )
+            ToggleRow(
+                label = stringResource(R.string.behavior_play_pause_sound_label),
+                subtitle = stringResource(R.string.behavior_play_pause_sound_subtitle),
+                checked = config.playPauseSoundEnabled,
+                onChange = {
+                    scope.launch { dataStore.updateConfig(config.copy(playPauseSoundEnabled = it)) }
+                }
+            )
+            GroupDivider()
+            ToggleRow(
+                label = stringResource(R.string.behavior_play_pause_vibration_label),
+                subtitle = stringResource(R.string.behavior_play_pause_vibration_subtitle),
+                checked = config.playPauseVibrationEnabled,
+                onChange = {
+                    scope.launch { dataStore.updateConfig(config.copy(playPauseVibrationEnabled = it)) }
+                }
+            )
+            GroupDivider()
+            AppearanceSlider(
+                label = stringResource(R.string.settings_volume_play_pause),
+                value = config.playPauseVolume,
+                minLabel = "0%",
+                maxLabel = "100%",
+                range = 0f..1f,
+                display = "${(config.playPauseVolume * 100).toInt()}%",
+                onChange = { scope.launch { dataStore.updateConfig(config.copy(playPauseVolume = it)) } }
+            )
+            GroupDivider()
+            AppearanceSlider(
+                label = stringResource(R.string.settings_volume_tick),
+                value = config.tickVolume,
+                minLabel = "0%",
+                maxLabel = "100%",
+                range = 0f..1f,
+                display = "${(config.tickVolume * 100).toInt()}%",
+                onChange = { scope.launch { dataStore.updateConfig(config.copy(tickVolume = it)) } }
+            )
+            GroupDivider()
+            AppearanceSlider(
+                label = stringResource(R.string.settings_volume_focus_alert),
+                value = config.focusAlertVolume,
+                minLabel = "0%",
+                maxLabel = "100%",
+                range = 0f..1f,
+                display = "${(config.focusAlertVolume * 100).toInt()}%",
+                onChange = { scope.launch { dataStore.updateConfig(config.copy(focusAlertVolume = it)) } }
+            )
+            GroupDivider()
+            AppearanceSlider(
+                label = stringResource(R.string.settings_volume_break_alert),
+                value = config.breakAlertVolume,
+                minLabel = "0%",
+                maxLabel = "100%",
+                range = 0f..1f,
+                display = "${(config.breakAlertVolume * 100).toInt()}%",
+                onChange = { scope.launch { dataStore.updateConfig(config.copy(breakAlertVolume = it)) } }
+            )
         }
 
         Spacer(Modifier.height(KronoTokens.Spacing.xxl))
     }
-
-    if (showBgPicker) {
-        ColorPickerDialog(
-            title = stringResource(R.string.label_background_color),
-            initialColor = Color(config.backgroundColor),
-            initialOpacity = config.bgOpacity,
-            onPreview = { color, opacity ->
-                scope.launch {
-                    dataStore.updateConfig(config.copy(backgroundColor = color.toArgb(), bgOpacity = opacity))
-                }
-            },
-            onConfirm = { color, opacity ->
-                scope.launch {
-                    dataStore.updateConfig(config.copy(backgroundColor = color.toArgb(), bgOpacity = opacity))
-                }
-                showBgPicker = false
-            },
-            onDismiss = { showBgPicker = false }
-        )
-    }
-
-    if (showTextPicker) {
-        ColorPickerDialog(
-            title = stringResource(R.string.label_text_color),
-            initialColor = Color(config.textColor),
-            initialOpacity = config.textOpacity,
-            onPreview = { color, opacity ->
-                scope.launch {
-                    dataStore.updateConfig(config.copy(textColor = color.toArgb(), textOpacity = opacity))
-                }
-            },
-            onConfirm = { color, opacity ->
-                scope.launch {
-                    dataStore.updateConfig(config.copy(textColor = color.toArgb(), textOpacity = opacity))
-                }
-                showTextPicker = false
-            },
-            onDismiss = { showTextPicker = false }
-        )
-    }
 }
 
 @Composable
-private fun ColorSwatchItem(
-    label: String,
-    color: Color,
-    hexText: String,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
-) {
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelSmall.copy(
-                fontSize = KronoTokens.Typography.statusLabel
-            ),
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Spacer(Modifier.height(KronoTokens.Spacing.sm))
-        Surface(
-            modifier = Modifier
-                .size(KronoTokens.Component.colorSwatch),
-            shape = CircleShape,
-            color = color,
-            border = androidx.compose.foundation.BorderStroke(
-                1.5.dp,
-                MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
-            ),
-            onClick = onClick
-        ) {}
-        Spacer(Modifier.height(KronoTokens.Spacing.xs))
-        Text(
-            text = hexText,
-            style = MaterialTheme.typography.labelSmall.copy(
-                fontSize = KronoTokens.Typography.statusLabel
-            ),
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        TextButton(
-            onClick = onClick,
-            contentPadding = PaddingValues(horizontal = KronoTokens.Spacing.sm, vertical = 2.dp)
-        ) {
-            Text(
-                text = "Editar",
-                style = MaterialTheme.typography.labelSmall.copy(
-                    fontSize = KronoTokens.Typography.statusLabel
-                )
-            )
-        }
-    }
+private fun GroupDivider() {
+    HorizontalDivider(
+        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f),
+        thickness = 0.5.dp
+    )
 }

@@ -1,4 +1,4 @@
-package com.krono.app.core.ui.dialogs
+﻿package com.krono.app.core.ui.dialogs
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -22,6 +22,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.krono.app.BuildConfig
+import com.krono.app.R
+import androidx.compose.ui.res.stringResource
 import com.krono.app.core.ui.theme.KronoTokens
 import com.krono.app.core.ui.components.SkeletonLoader
 import com.krono.app.core.ui.theme.adaptiveDialogWidth
@@ -100,11 +102,11 @@ fun BugReportDialog(onDismiss: () -> Unit) {
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text       = "Relatar Bug",
+                        text       = stringResource(R.string.bug_report_title),
                         style      = MaterialTheme.typography.headlineSmall.copy(
                             platformStyle = PlatformTextStyle(includeFontPadding = false)
                         ),
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.Normal,
                         fontSize   = KronoTokens.Typography.dialogTitle,
                         textAlign  = TextAlign.Center
                     )
@@ -116,7 +118,7 @@ fun BugReportDialog(onDismiss: () -> Unit) {
                     ) {
                         Icon(
                             imageVector        = KronoIcons.Navigation.Close,
-                            contentDescription = "Fechar",
+                            contentDescription = stringResource(R.string.action_close),
                             tint               = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
@@ -125,7 +127,7 @@ fun BugReportDialog(onDismiss: () -> Unit) {
                 Spacer(Modifier.height(KronoTokens.Spacing.sectionGap))
 
                 Text(
-                    text      = "Descreva o problema encontrado. Nome e email são opcionais.",
+                    text      = stringResource(R.string.bug_report_dialog_subtitle),
                     style     = MaterialTheme.typography.bodyMedium,
                     fontSize  = KronoTokens.Typography.bodyText,
                     textAlign = TextAlign.Center,
@@ -138,7 +140,7 @@ fun BugReportDialog(onDismiss: () -> Unit) {
                 OutlinedTextField(
                     value         = name,
                     onValueChange = { if (it.length <= 50) name = it },
-                    label         = { Text("Nome (opcional)") },
+                    label         = { Text(stringResource(R.string.bug_report_name_optional)) },
                     singleLine    = true,
                     shape         = KronoTokens.Shape.input,
                     modifier      = Modifier.fillMaxWidth(),
@@ -160,7 +162,7 @@ fun BugReportDialog(onDismiss: () -> Unit) {
                 OutlinedTextField(
                     value         = email,
                     onValueChange = { if (it.length <= 50) email = it },
-                    label         = { Text("Email (opcional)") },
+                    label         = { Text(stringResource(R.string.bug_report_email_optional)) },
                     singleLine    = true,
                     isError       = emailError,
                     shape         = KronoTokens.Shape.input,
@@ -170,7 +172,7 @@ fun BugReportDialog(onDismiss: () -> Unit) {
                     ),
                     supportingText = {
                         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                            Text(if (emailError) "Email inválido" else "", color = MaterialTheme.colorScheme.error)
+                            Text(if (emailError) stringResource(R.string.bug_report_email_invalid) else "", color = MaterialTheme.colorScheme.error)
                             Text("${email.length}/50")
                         }
                     }
@@ -182,7 +184,7 @@ fun BugReportDialog(onDismiss: () -> Unit) {
                 OutlinedTextField(
                     value         = message,
                     onValueChange = { if (it.length <= 250) message = it },
-                    label         = { Text("Descrição do problema *") },
+                    label         = { Text(stringResource(R.string.bug_report_description_required)) },
                     minLines      = 4,
                     maxLines      = 6,
                     shape         = KronoTokens.Shape.input,
@@ -223,7 +225,7 @@ fun BugReportDialog(onDismiss: () -> Unit) {
                      ) {
                          Icon(KronoIcons.Action.Check, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(KronoTokens.Icon.status))
                          Spacer(Modifier.width(KronoTokens.Spacing.sm))
-                         Text("Relatório enviado. Obrigado!", color = MaterialTheme.colorScheme.primary)
+                         Text(stringResource(R.string.bug_report_dialog_success), color = MaterialTheme.colorScheme.primary)
                      }
                  }
 
@@ -243,7 +245,7 @@ fun BugReportDialog(onDismiss: () -> Unit) {
                      )
                  ) {
                      Text(
-                         text     = "Falha ao enviar. Verifique sua conexão.",
+                         text     = stringResource(R.string.bug_report_dialog_error),
                          color    = MaterialTheme.colorScheme.error,
                          modifier = Modifier.padding(bottom = KronoTokens.Spacing.sm),
                          style    = MaterialTheme.typography.labelSmall
@@ -278,11 +280,11 @@ fun BugReportDialog(onDismiss: () -> Unit) {
                                  .height(KronoTokens.Component.buttonSpinner)
                          )
                          Spacer(Modifier.width(KronoTokens.Button.iconSpacing))
-                         Text("Enviando...")
+                         Text(stringResource(R.string.bug_report_sending))
                      } else {
                          Icon(KronoIcons.Status.Bug, null, modifier = Modifier.size(KronoTokens.Icon.button))
                          Spacer(Modifier.width(KronoTokens.Button.iconSpacing))
-                         Text("Enviar Relatório", fontWeight = FontWeight.Bold)
+                         Text(stringResource(R.string.bug_report_send_button), fontWeight = FontWeight.Normal)
                      }
                  }
             }
@@ -324,3 +326,5 @@ private suspend fun submitToGoogleForms(
         SubmitState.Error
     }
 }
+
+

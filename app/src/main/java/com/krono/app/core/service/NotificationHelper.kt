@@ -1,4 +1,4 @@
-package com.krono.app.core.service
+﻿package com.krono.app.core.service
 
 import android.app.Notification
 import android.app.NotificationManager
@@ -112,26 +112,26 @@ class NotificationHelper(private val context: Context) {
 
         return NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.mipmap.ic_launcher)
-            .setContentTitle(state.config.description.ifBlank { "Cronômetro regressivo" })
-            .setContentText(if (state.isCompleted) "⏰ Concluído!" else formattedTime)
+            .setContentTitle(state.config.description.ifBlank { context.getString(R.string.countdown_notification_title_default) })
+            .setContentText(if (state.isCompleted) context.getString(R.string.countdown_notification_completed) else formattedTime)
             .setContentIntent(contentPendingIntent)
             .setOngoing(!state.isCompleted)
             .setOnlyAlertOnce(true)
             .setSilent(true)
             .addAction(
                 if (state.isRunning) android.R.drawable.ic_media_pause else android.R.drawable.ic_media_play,
-                if (state.isRunning) "Pausar" else "Iniciar",
+                if (state.isRunning) context.getString(R.string.action_pause) else context.getString(R.string.action_play),
                 if (state.isRunning) actionIntent(CountdownViewModel.ACTION_COUNTDOWN_PAUSE, id.hashCode() + 1)
                 else actionIntent(CountdownViewModel.ACTION_COUNTDOWN_PLAY, id.hashCode() + 2)
             )
             .addAction(
                 android.R.drawable.ic_menu_revert,
-                "Reset",
+                context.getString(R.string.action_reset),
                 actionIntent(CountdownViewModel.ACTION_COUNTDOWN_RESET, id.hashCode() + 3)
             )
             .addAction(
                 android.R.drawable.ic_menu_close_clear_cancel,
-                "Fechar",
+                context.getString(R.string.action_stop_service),
                 actionIntent(CountdownViewModel.ACTION_COUNTDOWN_OVERLAY_HIDE, id.hashCode() + 4)
             )
             .build()
@@ -150,3 +150,4 @@ class NotificationHelper(private val context: Context) {
         const val COUNTDOWN_NOTIF_BASE_ID = 1000
     }
 }
+

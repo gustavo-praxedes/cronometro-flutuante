@@ -1,4 +1,4 @@
-package com.krono.app.core.ui.theme
+﻿package com.krono.app.core.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
@@ -27,13 +27,13 @@ private val spaceMonoFont     = GoogleFont("Space Mono")
 private val chivoMonoFont     = GoogleFont("Chivo Mono")
 private val azeretMonoFont    = GoogleFont("Azeret Mono")
 
-val JetBrainsMono = FontFamily(Font(googleFont = jetbrainsMonoFont, fontProvider = provider, weight = FontWeight.Bold))
-val FiraCode      = FontFamily(Font(googleFont = firaCodeFont,      fontProvider = provider, weight = FontWeight.Bold))
-val AnonymousPro  = FontFamily(Font(googleFont = anonymousProFont,  fontProvider = provider, weight = FontWeight.Bold))
-val RobotoMono    = FontFamily(Font(googleFont = robotoMonoFont,    fontProvider = provider, weight = FontWeight.Bold))
-val SpaceMono     = FontFamily(Font(googleFont = spaceMonoFont,     fontProvider = provider, weight = FontWeight.Bold))
-val ChivoMono     = FontFamily(Font(googleFont = chivoMonoFont,     fontProvider = provider, weight = FontWeight.Bold))
-val AzeretMono    = FontFamily(Font(googleFont = azeretMonoFont,    fontProvider = provider, weight = FontWeight.Bold))
+val JetBrainsMono = FontFamily(Font(googleFont = jetbrainsMonoFont, fontProvider = provider, weight = FontWeight.Normal))
+val FiraCode      = FontFamily(Font(googleFont = firaCodeFont,      fontProvider = provider, weight = FontWeight.Normal))
+val AnonymousPro  = FontFamily(Font(googleFont = anonymousProFont,  fontProvider = provider, weight = FontWeight.Normal))
+val RobotoMono    = FontFamily(Font(googleFont = robotoMonoFont,    fontProvider = provider, weight = FontWeight.Normal))
+val SpaceMono     = FontFamily(Font(googleFont = spaceMonoFont,     fontProvider = provider, weight = FontWeight.Normal))
+val ChivoMono     = FontFamily(Font(googleFont = chivoMonoFont,     fontProvider = provider, weight = FontWeight.Normal))
+val AzeretMono    = FontFamily(Font(googleFont = azeretMonoFont,    fontProvider = provider, weight = FontWeight.Normal))
 
 // ── Tipografia Padrão ────────────────────────────────────────
 val AppTypography = Typography(
@@ -72,3 +72,5 @@ val TimerDisplayStyle = TextStyle(
     fontSize = 40.sp,
     letterSpacing = 0.sp
 )
+
+

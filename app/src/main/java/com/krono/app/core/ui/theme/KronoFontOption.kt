@@ -1,4 +1,4 @@
-package com.krono.app.core.ui.theme
+﻿package com.krono.app.core.ui.theme
 
 enum class KronoFontOption(val label: String, val fontFamily: String) {
     SYSTEM_DEFAULT ("Sistema (Padrão)", "default"),
@@ -10,3 +10,4 @@ enum class KronoFontOption(val label: String, val fontFamily: String) {
     CHIVO_MONO  ("Chivo Mono", "chivo"),
     AZERET_MONO ("Azeret Mono", "azeret"),
 }
+

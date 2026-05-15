@@ -1,4 +1,4 @@
-package com.krono.app.core.ui.settings
+﻿package com.krono.app.core.ui.settings
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -20,7 +20,9 @@ import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import com.krono.app.BuildConfig
+import com.krono.app.R
 import com.krono.app.core.ui.theme.KronoIcons
 import com.krono.app.core.ui.theme.KronoTokens
 import com.krono.app.core.ui.components.SkeletonLoader
@@ -121,12 +123,12 @@ fun ChangelogPanel(
             modifier = Modifier.wrapContentSize()
         ) {
             Text(
-                text = "v${updateInfo.tagName}",
+                text = stringResource(R.string.version_prefix, updateInfo.tagName),
                 style = MaterialTheme.typography.labelMedium.copy(
                     fontSize = KronoTokens.Typography.statusLabel
                 ),
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
-                fontWeight = FontWeight.Bold,
+                fontWeight = FontWeight.Normal,
                 modifier = Modifier.padding(
                     horizontal = KronoTokens.Spacing.md,
                     vertical = KronoTokens.Spacing.xs
@@ -137,9 +139,9 @@ fun ChangelogPanel(
         Spacer(Modifier.height(KronoTokens.Spacing.sm))
 
         Text(
-            text = "Novidades da Versão",
+            text = stringResource(R.string.changelog_title),
             style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold,
+            fontWeight = FontWeight.Normal,
             textAlign = TextAlign.Center
         )
 
@@ -184,7 +186,7 @@ fun ChangelogPanel(
                     )
                     Spacer(Modifier.width(KronoTokens.Spacing.sm))
                     Text(
-                        text = "Você está atualizado",
+                        text = stringResource(R.string.updates_action_updated),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.primary
                     )
@@ -220,9 +222,9 @@ fun ChangelogPanel(
                     )
                     Spacer(Modifier.width(KronoTokens.Button.iconSpacing))
                     Text(
-                        text = "Verificar Atualizações",
+                        text = stringResource(R.string.updates_action_check),
                         fontSize = KronoTokens.Typography.buttonLabel,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Normal
                     )
                 }
             }
@@ -240,7 +242,7 @@ fun ChangelogPanel(
                 )
                 Spacer(Modifier.width(KronoTokens.Spacing.md))
                 Text(
-                    text = "Verificando...",
+                    text = stringResource(R.string.updates_action_checking),
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
@@ -284,3 +286,5 @@ private fun ChangelogItemRow(item: ChangelogItem) {
         )
     }
 }
+
+

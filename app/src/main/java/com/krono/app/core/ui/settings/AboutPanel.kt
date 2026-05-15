@@ -1,4 +1,4 @@
-package com.krono.app.core.ui.settings
+﻿package com.krono.app.core.ui.settings
 
 import android.content.Intent
 import android.net.Uri
@@ -16,11 +16,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.krono.app.BuildConfig
+import com.krono.app.R
 import com.krono.app.core.ui.theme.KronoIcons
 import com.krono.app.core.ui.theme.KronoTokens
 
@@ -32,6 +34,8 @@ fun AboutPanel(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
+    val appName = stringResource(R.string.app_name)
+    val shareChooser = stringResource(R.string.about_share_chooser)
 
     Column(
         modifier = modifier
@@ -55,21 +59,21 @@ fun AboutPanel(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Krono",
+                    text = appName,
                     style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.Normal,
                     fontSize = KronoTokens.Typography.dialogTitle
                 )
                 Spacer(Modifier.height(KronoTokens.Spacing.xs))
                 Text(
-                    text = "Versão ${BuildConfig.VERSION_NAME}",
+                    text = stringResource(R.string.about_version, BuildConfig.VERSION_NAME),
                     style = MaterialTheme.typography.bodySmall.copy(fontSize = KronoTokens.Typography.statusLabel),
                     color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.Normal
                 )
                 Spacer(Modifier.height(KronoTokens.Spacing.sm))
                 Text(
-                    text = "Widget flutuante de cronômetro. Gratuito, sem anúncios e código aberto.",
+                    text = stringResource(R.string.about_description),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
@@ -80,12 +84,12 @@ fun AboutPanel(
 
         Spacer(Modifier.height(KronoTokens.Spacing.xl))
 
-        SettingsGroup(title = "Projeto") {
+        SettingsGroup(title = stringResource(R.string.about_project_group_title)) {
             AboutActionRow(
                 icon = KronoIcons.Status.Source,
                 iconColor = Color(0xFF6B7FD4),
-                title = "Código Fonte",
-                subtitle = "GitHub · Contribua com o projeto",
+                title = stringResource(R.string.about_source_title),
+                subtitle = stringResource(R.string.about_source_subtitle),
                 trailing = KronoIcons.Navigation.OpenExternal,
                 onClick = {
                     context.startActivity(
@@ -100,17 +104,17 @@ fun AboutPanel(
             AboutActionRow(
                 icon = KronoIcons.Action.Share,
                 iconColor = Color(0xFF10B981),
-                title = "Compartilhar o Krono",
-                subtitle = "Envie o link do projeto para outras pessoas",
+                title = stringResource(R.string.about_share_title),
+                subtitle = stringResource(R.string.about_share_subtitle),
                 trailing = KronoIcons.Navigation.ChevronRight,
                 onClick = {
                     val shareIntent = Intent(Intent.ACTION_SEND).apply {
                         type = "text/plain"
-                        putExtra(Intent.EXTRA_SUBJECT, "Krono")
+                        putExtra(Intent.EXTRA_SUBJECT, appName)
                         putExtra(Intent.EXTRA_TEXT, LATEST_APK_URL)
                         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     }
-                    context.startActivity(Intent.createChooser(shareIntent, "Compartilhar Krono"))
+                    context.startActivity(Intent.createChooser(shareIntent, shareChooser))
                 }
             )
         }
@@ -170,3 +174,5 @@ private fun RowDivider() {
         thickness = 0.5.dp
     )
 }
+
+

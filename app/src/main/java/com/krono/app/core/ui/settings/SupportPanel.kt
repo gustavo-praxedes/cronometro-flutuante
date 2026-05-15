@@ -1,4 +1,4 @@
-package com.krono.app.core.ui.settings
+﻿package com.krono.app.core.ui.settings
 
 import android.content.Context
 import android.content.Intent
@@ -11,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -19,6 +20,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.krono.app.core.data.formatLifetimeDetailed
+import com.krono.app.R
 import com.krono.app.core.ui.theme.KronoIcons
 import com.krono.app.core.ui.theme.KronoTokens
 
@@ -63,23 +65,23 @@ fun SupportPanel(
                 Spacer(Modifier.height(KronoTokens.Spacing.md))
 
                 Text(
-                    text = "Apoie o Projeto",
+                    text = stringResource(R.string.support_title),
                     style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Normal
                 )
 
                 Spacer(Modifier.height(KronoTokens.Spacing.sm))
 
                 Text(
                     text = buildAnnotatedString {
-                        append("Você já usou o Krono por ")
+                        append(stringResource(R.string.support_used_prefix))
                         withStyle(
                             SpanStyle(
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = FontWeight.Normal,
                                 color = MaterialTheme.colorScheme.primary
                             )
                         ) { append(formattedTime) }
-                        append(". Projeto independente — seu apoio mantém tudo gratuito e sem anúncios.")
+                        append(stringResource(R.string.support_used_suffix))
                     },
                     style = MaterialTheme.typography.bodyMedium.copy(
                         platformStyle = PlatformTextStyle(includeFontPadding = false)
@@ -111,16 +113,16 @@ fun SupportPanel(
             )
             Spacer(Modifier.width(KronoTokens.Button.iconSpacing))
             Text(
-                text = "Pagar um café",
+                text = stringResource(R.string.support_button),
                 fontSize = KronoTokens.Typography.buttonLabel,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Normal
             )
         }
 
         Spacer(Modifier.height(KronoTokens.Spacing.sm))
 
         Text(
-            text = "Abre o Ko-fi em seu navegador",
+            text = stringResource(R.string.support_hint),
             style = MaterialTheme.typography.bodySmall.copy(
                 fontSize = KronoTokens.Typography.statusLabel
             ),
@@ -138,3 +140,5 @@ private fun openKofi(context: Context) {
         }
     )
 }
+
+

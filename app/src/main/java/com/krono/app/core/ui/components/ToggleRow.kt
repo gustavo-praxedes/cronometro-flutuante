@@ -1,41 +1,34 @@
 package com.krono.app.core.ui.components
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import com.krono.app.core.ui.theme.KronoTokens
 
 @Composable
 fun ToggleRow(
-    label   : String,
-    checked : Boolean,
+    label: String,
+    checked: Boolean,
     onChange: (Boolean) -> Unit,
+    subtitle: String? = null,
     modifier: Modifier = Modifier
 ) {
-    Row(
-        modifier              = modifier
-            .fillMaxWidth()
-            .clickable { onChange(!checked) }
-            .padding(
-                horizontal = KronoTokens.Spacing.lg,
-                vertical = KronoTokens.Spacing.md
-            ),
-        verticalAlignment     = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(
-            text     = label,
-            style    = MaterialTheme.typography.bodyMedium,
-            color    = MaterialTheme.colorScheme.onSurface
-        )
-
-        Switch(
-            checked = checked,
-            onCheckedChange = onChange
-        )
-    }
+    SettingsRow(
+        title = label,
+        subtitle = subtitle,
+        modifier = modifier,
+        onClick = { onChange(!checked) },
+        trailing = {
+            KronoToggle(
+                checked = checked,
+                onCheckedChange = onChange,
+                colors = SwitchDefaults.colors(
+                    checkedThumbColor = MaterialTheme.colorScheme.primary,
+                    checkedTrackColor = MaterialTheme.colorScheme.primaryContainer,
+                    uncheckedThumbColor = MaterialTheme.colorScheme.surface,
+                    uncheckedTrackColor = MaterialTheme.colorScheme.surfaceVariant
+                )
+            )
+        }
+    )
 }

@@ -1,4 +1,4 @@
-package com.krono.app
+﻿package com.krono.app
 
 import android.os.Build
 import android.provider.Settings
@@ -27,6 +27,7 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -37,6 +38,8 @@ import com.krono.app.core.util.UpdateInfo
 import com.krono.app.feature.countdown.CountdownScreen
 import com.krono.app.feature.pomodoro.PomodoroScreen
 import com.krono.app.core.ui.settings.SettingsScreen
+import com.krono.app.core.util.KronoToolAudio
+import com.krono.app.core.util.triggerPlayPauseFeedback
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -48,9 +51,22 @@ object AppRoutes {
     const val POMODORO = "pomodoro"
 }
 
+private fun routeToToolId(route: String): String = when (route) {
+    AppRoutes.TIMER -> "stopwatch"
+    AppRoutes.COUNTDOWN -> "countdown"
+    AppRoutes.POMODORO -> "pomodoro"
+    else -> "stopwatch"
+}
+
+private fun toolIdToRoute(toolId: String): String = when (toolId) {
+    "countdown" -> AppRoutes.COUNTDOWN
+    "pomodoro" -> AppRoutes.POMODORO
+    else -> AppRoutes.TIMER
+}
+
 private data class BottomTab(
     val route     : String,
-    val label     : String,
+    val labelRes  : Int,
     val iconRes   : Int?,
     val iconVector: ImageVector? = null
 )
@@ -58,19 +74,19 @@ private data class BottomTab(
 private val BOTTOM_TABS = listOf(
     BottomTab(
         route       = AppRoutes.TIMER,
-        label       = "Cronômetro",
+        labelRes    = R.string.nav_stopwatch,
         iconRes     = null,
         iconVector  = KronoIcons.Feature.Timer
     ),
     BottomTab(
         route       = AppRoutes.COUNTDOWN,
-        label       = "Timer",
+        labelRes    = R.string.nav_countdown,
         iconRes     = null,
         iconVector  = KronoIcons.Feature.HourglassBottom
     ),
     BottomTab(
         route       = AppRoutes.POMODORO,
-        label       = "Pomodoro",
+        labelRes    = R.string.nav_pomodoro,
         iconRes     = null,
         iconVector  = KronoIcons.Feature.Pomodoro
     )
@@ -123,8 +139,30 @@ fun AppNavigation(
 
     val currentRoute by navController.currentBackStackEntryAsState()
     val currentDest  = currentRoute?.destination?.route
+    var restoredLastTool by remember { mutableStateOf(false) }
 
     val showBottomBar = currentDest == AppRoutes.TIMER || currentDest == AppRoutes.COUNTDOWN || currentDest == AppRoutes.POMODORO
+
+    LaunchedEffect(currentDest, config.activeToolId) {
+        val route = currentDest ?: return@LaunchedEffect
+        if (route == AppRoutes.TIMER || route == AppRoutes.COUNTDOWN || route == AppRoutes.POMODORO) {
+            val activeId = routeToToolId(route)
+            if (config.activeToolId != activeId) {
+                dataStore.updateConfig(config.copy(activeToolId = activeId))
+            }
+            if (!restoredLastTool && !startInSettings) {
+                restoredLastTool = true
+                val targetRoute = toolIdToRoute(config.activeToolId)
+                if (targetRoute != route) {
+                    navController.navigate(targetRoute) {
+                        popUpTo(AppRoutes.TIMER) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                }
+            }
+        }
+    }
 
     Scaffold(
         bottomBar = {
@@ -138,6 +176,9 @@ fun AppNavigation(
                                 popUpTo(AppRoutes.TIMER) { saveState = true }
                                 launchSingleTop = true
                                 restoreState    = true
+                            }
+                            scope.launch {
+                                dataStore.updateConfig(config.copy(activeToolId = routeToToolId(route)))
                             }
                         }
                     }
@@ -156,9 +197,16 @@ fun AppNavigation(
             composable(AppRoutes.TIMER) {
                 StopwatchScreen(
                     state          = stopwatchState,
-                    selectedFont   = config.selectedFont,
-                    onStart        = { stopwatchViewModel.start() },
-                    onPause        = { stopwatchViewModel.pause() },
+                    selectedFont   = config.overlayFontFamily,
+                    timeFormat     = config.stopwatchFormat,
+                    onStart        = {
+                        triggerPlayPauseFeedback(context, config.playPauseSoundEnabled, config.playPauseVibrationEnabled, config.playPauseVolume, KronoToolAudio.STOPWATCH)
+                        stopwatchViewModel.start()
+                    },
+                    onPause        = {
+                        triggerPlayPauseFeedback(context, config.playPauseSoundEnabled, config.playPauseVibrationEnabled, config.playPauseVolume, KronoToolAudio.STOPWATCH)
+                        stopwatchViewModel.pause()
+                    },
                     onReset        = { stopwatchViewModel.reset() },
                     onOpenOverlay  = {
                         scope.launch {
@@ -173,6 +221,19 @@ fun AppNavigation(
             composable(AppRoutes.COUNTDOWN) {
                 CountdownScreen(
                     viewModel      = (context.applicationContext as KronoApp).countdownViewModel,
+                    timeFormat     = config.countdownFormat,
+                    selectedFont   = config.overlayFontFamily,
+                    initialConfiguredSeconds = config.countdownScreenBaseSeconds,
+                    onConfiguredTimeChange = { seconds ->
+                        scope.launch {
+                            dataStore.updateConfig(
+                                config.copy(countdownScreenBaseSeconds = seconds.coerceAtLeast(0L))
+                            )
+                        }
+                    },
+                    playPauseBeepEnabled = config.playPauseSoundEnabled,
+                    playPauseVibrationEnabled = config.playPauseVibrationEnabled,
+                    playPauseVolume = config.playPauseVolume,
                     onOpenSettings = { navController.navigate(AppRoutes.SETTINGS) }
                 )
             }
@@ -199,7 +260,19 @@ fun AppNavigation(
                 PomodoroScreen(
                     viewModel = (context.applicationContext as KronoApp).pomodoroViewModel,
                     onOpenSettings = { navController.navigate(AppRoutes.SETTINGS) },
-                    selectedFont = config.selectedFont,
+                    selectedFont = config.overlayFontFamily,
+                    timeFormat = config.pomodoroFormat,
+                    selectedPreset = config.pomodoroPreset,
+                    playPauseBeepEnabled = config.playPauseSoundEnabled,
+                    playPauseVibrationEnabled = config.playPauseVibrationEnabled,
+                    playPauseVolume = config.playPauseVolume,
+                    phaseBeepEnabled = config.pomodoroBeepFocusBreak,
+                    tickingSoundEnabled = config.pomodoroTickingSound,
+                    tickVolume = config.tickVolume,
+                    focusAlertVolume = config.focusAlertVolume,
+                    breakAlertVolume = config.breakAlertVolume,
+                    autoStartBreak = config.pomodoroAutoStartBreak,
+                    autoStartFocus = config.pomodoroAutoStartFocus,
                     onOpenOverlay = {
                         scope.launch {
                             dataStore.updateConfig(config.copy(activeToolId = "pomodoro"))
@@ -272,17 +345,18 @@ private fun KronoBottomBar(
                             else                -> tab.iconVector ?: ImageVector.vectorResource(id = tab.iconRes!!)
                         }
 
+                        val tabLabel = stringResource(tab.labelRes)
                         Icon(
                             imageVector        = icon,
-                            contentDescription = tab.label,
+                            contentDescription = tabLabel,
                             tint               = tint,
                             modifier           = Modifier.size(KronoTokens.BottomBar.iconSize)
                         )
 
                         Text(
-                            text       = tab.label,
+                            text       = tabLabel,
                             fontSize   = KronoTokens.BottomBar.labelSize,
-                            fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
+                            fontWeight = if (selected) FontWeight.Normal else FontWeight.Normal,
                             color      = tint
                         )
                     }
@@ -291,3 +365,5 @@ private fun KronoBottomBar(
         }
     }
 }
+
+

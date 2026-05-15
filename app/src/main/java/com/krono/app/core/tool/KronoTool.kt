@@ -1,4 +1,4 @@
-package com.krono.app.core.tool
+﻿package com.krono.app.core.tool
 
 import android.app.Notification
 
@@ -25,3 +25,4 @@ interface KronoTool {
      */
     fun destroy()
 }
+

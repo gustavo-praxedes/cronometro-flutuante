@@ -1,4 +1,4 @@
-package com.krono.app.feature.countdown
+﻿package com.krono.app.feature.countdown
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -37,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -44,6 +45,7 @@ import androidx.compose.ui.window.DialogProperties
 
 import androidx.compose.material3.IconButton
 import com.krono.app.core.ui.dialogs.ColorPickerDialog
+import com.krono.app.R
 import com.krono.app.core.ui.theme.adaptiveDialogWidth
 import androidx.compose.foundation.layout.wrapContentHeight
 
@@ -95,9 +97,9 @@ fun CountdownColorPickerDialog(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text       = "Cor do card",
+                        text       = stringResource(R.string.countdown_color_card_label),
                         fontSize   = KronoTokens.Typography.dialogTitle,
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.Normal,
                         color      = MaterialTheme.colorScheme.onSurface
                     )
 
@@ -109,7 +111,7 @@ fun CountdownColorPickerDialog(
                     ) {
                         Icon(
                             imageVector = KronoIcons.Navigation.Close,
-                            contentDescription = "Fechar",
+                            contentDescription = stringResource(R.string.action_close),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(KronoTokens.Icon.listItem)
                         )
@@ -142,7 +144,7 @@ fun CountdownColorPickerDialog(
                             if (isSelected) {
                                 Icon(
                                     imageVector = KronoIcons.Action.Check,
-                                    contentDescription = "Selecionado",
+                                    contentDescription = stringResource(R.string.countdown_selected_color_desc),
                                     tint = overlayTextColor(color),
                                     modifier = Modifier.size(KronoTokens.Icon.dialogHeader)
                                 )
@@ -165,7 +167,7 @@ fun CountdownColorPickerDialog(
                     )
                     Spacer(Modifier.size(KronoTokens.Button.iconSpacing))
                     Text(
-                        text     = "Cor personalizada",
+                        text     = stringResource(R.string.countdown_custom_color),
                         fontSize = KronoTokens.Typography.statusLabel
                     )
                 }
@@ -183,9 +185,9 @@ fun CountdownColorPickerDialog(
                     )
                 ) {
                     Text(
-                        "Confirmar",
+                        stringResource(R.string.action_confirm),
                         fontSize   = KronoTokens.Typography.buttonLabel,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Normal
                     )
                 }
             }
@@ -194,7 +196,7 @@ fun CountdownColorPickerDialog(
 
     if (showCustomPicker) {
         ColorPickerDialog(
-            title = "Cor personalizada",
+            title = stringResource(R.string.countdown_custom_color),
             initialColor = selected,
             initialOpacity = selected.alpha,
             onDismiss = { showCustomPicker = false },
@@ -205,3 +207,5 @@ fun CountdownColorPickerDialog(
         )
     }
 }
+
+

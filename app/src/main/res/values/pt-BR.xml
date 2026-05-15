@@ -1,0 +1,209 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- AppNavigation.kt -->
+    <string name="app_name">Krono Tools</string>
+
+    <!-- Notificação -->
+    <string name="notification_channel_name">Krono</string>
+    <string name="notification_channel_description">Mantém o cronômetro rodando em segundo plano</string>
+    <string name="notification_title">Krono Ativo</string>
+    <string name="notification_text_running">Krono em execução</string>
+    <string name="notification_text_paused">Krono pausado</string>
+
+    <!-- Ações -->
+    <string name="action_play">Iniciar</string>
+    <string name="action_pause">Pausar</string>
+    <string name="action_reset">Resetar</string>
+    <string name="action_stop_service">Fechar</string>
+    <string name="action_back">Voltar</string>
+
+    <!-- Configurações -->
+    <string name="settings_title">Configurações</string>
+    <string name="section_appearance">APARÊNCIA</string>
+    <string name="label_auto_launch">Abrir Diretamente</string>
+    <string name="label_show_hours">Exibir Horas</string>
+    <string name="label_show_seconds">Exibir Segundos</string>
+    <string name="label_show_buttons">Exibir Botões</string>
+    <string name="label_wake_lock">Manter Tela Ligada</string>
+    <string name="label_focus_mode">Modo Foco</string>
+    <string name="label_beep_enabled">Bipe Ativo</string>
+    <string name="label_vibration_enabled">Vibração Ativa</string>
+    <string name="label_theme">Tema</string>
+    <string name="label_background_color">Cor de Fundo</string>
+    <string name="label_text_color">Cor do Texto</string>
+    <string name="label_scale">Escala do Widget</string>
+    <string name="label_corner_radius">Arredondamento</string>
+    <string name="label_about">Sobre o App</string>
+
+    <string name="label_time_limit">Limite de Tempo</string>
+
+    <!-- Settings Menu -->
+    <string name="settings_select_category">Selecione uma categoria para configurar</string>
+    <string name="settings_appearance">Aparência</string>
+    <string name="settings_behavior">Comportamento</string>
+    <string name="settings_overlay">Sobreposição</string>
+    <string name="settings_stopwatch">Cronômetro</string>
+    <string name="settings_countdown">Timer</string>
+    <string name="settings_pomodoro">Pomodoro</string>
+    <string name="settings_section_general">GERAL</string>
+    <string name="settings_section_tools">FERRAMENTAS</string>
+    <string name="settings_section_info">SOBRE</string>
+    <string name="settings_about">Sobre</string>
+    <string name="settings_support">Apoio</string>
+    <string name="settings_changelog">Atualizações</string>
+    <string name="settings_bug_report">Relatar Bug</string>
+    <string name="settings_group_theme">Tema</string>
+    <string name="settings_group_colors">Cores</string>
+    <string name="settings_group_general">Geral</string>
+    <string name="settings_group_time_limit">Limite de Tempo</string>
+    <string name="settings_language_label">Idioma do app</string>
+    <string name="settings_language_pt_br">Português (Brasil)</string>
+    <string name="behavior_auto_launch_label">Iniciar direto overlay de stopwatch</string>
+    <string name="behavior_auto_launch_subtitle">Abre o overlay automaticamente ao iniciar o serviço</string>
+    <string name="behavior_keep_screen_subtitle">Evita que a tela apague durante uso do cronômetro</string>
+    <string name="behavior_focus_mode_subtitle">Ativa modo foco quando iniciar com overlay ativo</string>
+    <string name="behavior_play_pause_sound_label">Som play/pause</string>
+    <string name="behavior_play_pause_sound_subtitle">Reproduz bipe ao iniciar e pausar ferramentas</string>
+    <string name="behavior_play_pause_vibration_label">Vibração play/pause</string>
+    <string name="behavior_play_pause_vibration_subtitle">Vibra ao iniciar e pausar ferramentas</string>
+    <string name="overlay_show_buttons_subtitle">Exibe controles de ação no overlay</string>
+    <string name="overlay_show_hours_subtitle">Mostra as horas no formato do tempo</string>
+    <string name="overlay_show_seconds_subtitle">Mostra os segundos no formato do tempo</string>
+
+    <!-- AboutPanel.kt -->
+    <string name="about_version">Versão %1$s</string>
+    <string name="about_description">Widget flutuante de cronômetro. Gratuito, sem anúncios e código aberto.</string>
+    <string name="about_project_group_title">Projeto</string>
+    <string name="about_source_title">Código Fonte</string>
+    <string name="about_source_subtitle">GitHub · Contribua com o projeto</string>
+    <string name="about_share_title">Compartilhar o Krono</string>
+    <string name="about_share_subtitle">Envie o link do projeto para outras pessoas</string>
+    <string name="about_share_chooser">Compartilhar Krono</string>
+
+    <!-- BugReportPanel.kt -->
+    <string name="bug_report_title">Relatar bug</string>
+    <string name="bug_report_name_optional">Nome (opcional)</string>
+    <string name="bug_report_email_optional">Email (opcional)</string>
+    <string name="bug_report_email_invalid">Email inválido</string>
+    <string name="bug_report_description_required">Descrição do problema *</string>
+    <string name="bug_report_success">Relatório enviado com sucesso.</string>
+    <string name="bug_report_error">Falha ao enviar. Tente novamente.</string>
+    <string name="bug_report_sending">Enviando...</string>
+    <string name="bug_report_send_button">Enviar relatório</string>
+
+    <!-- Countdown Screen -->
+    <string name="countdown_overlay_desc">Overlay</string>
+    <string name="countdown_add_timer">Adicionar timer</string>
+    <string name="countdown_screen_overlay_desc">Overlay da tela</string>
+    <string name="countdown_action_reset">Reset</string>
+    <string name="countdown_action_pause">Pausar</string>
+    <string name="countdown_action_start">Iniciar</string>
+
+    <!-- Pomodoro Settings -->
+    <string name="pomodoro_title">Pomodoro</string>
+    <string name="pomodoro_group_sounds">Sons</string>
+    <string name="pomodoro_preset_label">Preset</string>
+    <string name="pomodoro_preset_classic">Clássico (25/5)</string>
+    <string name="pomodoro_preset_short">Curto (15/5)</string>
+    <string name="pomodoro_preset_long">Longo (50/10)</string>
+    <string name="pomodoro_auto_break_label">Iniciar pausa automaticamente</string>
+    <string name="pomodoro_auto_break_subtitle">Ao fim do foco, inicia a pausa sem toque manual</string>
+    <string name="pomodoro_auto_focus_label">Iniciar foco automaticamente</string>
+    <string name="pomodoro_auto_focus_subtitle">Ao fim da pausa, inicia foco sem toque manual</string>
+    <string name="pomodoro_beep_label">Bipe foco/pausa</string>
+    <string name="pomodoro_beep_subtitle">Toca alerta ao alternar entre foco e pausa</string>
+    <string name="pomodoro_tick_label">Tic-tac do relógio</string>
+    <string name="pomodoro_tick_subtitle">Emite tic-tac sincronizado com os segundos</string>
+
+    <!-- FormatSelectors.kt -->
+    <string name="settings_time_format_label">Formato</string>
+    <string name="settings_font_size_label">Tamanho da fonte no app</string>
+    <string name="settings_font_size_normal">Normal</string>
+    <string name="settings_font_size_large">Grande</string>
+
+    <!-- UpdatesPanel.kt -->
+    <string name="version_prefix">v%1$s</string>
+    <string name="updates_no_changes">Sem mudanças registradas.</string>
+    <string name="updates_pill_new_version">Nova Versão • %1$s</string>
+    <string name="updates_pill_current_version">Versão Atual • %1$s</string>
+    <string name="updates_whats_new_title">O QUE HÁ DE NOVO</string>
+    <string name="updates_action_checking">Verificando...</string>
+    <string name="updates_action_downloading">Baixando...</string>
+    <string name="updates_action_install">Instalar</string>
+    <string name="updates_action_updated">App atualizado</string>
+    <string name="updates_action_download">Baixar</string>
+    <string name="updates_action_check">Verificar atualizações</string>
+
+    <!-- AppNavigation.kt -->
+    <string name="nav_stopwatch">Cronômetro</string>
+    <string name="nav_countdown">Timer</string>
+    <string name="nav_pomodoro">Pomodoro</string>
+
+    <!-- FontSelector.kt -->
+    <string name="settings_font_label">Fonte</string>
+    <string name="settings_overlay_font_label">Fonte do overlay</string>
+    <string name="settings_volume_play_pause">Volume play/pause</string>
+    <string name="settings_volume_tick">Volume tic-tac</string>
+    <string name="settings_volume_focus_alert">Volume alerta foco</string>
+    <string name="settings_volume_break_alert">Volume alerta pausa</string>
+    <string name="settings_overlay_custom_color">Cor do overlay</string>
+    <string name="settings_overlay_custom_color_none">Padrão do tema</string>
+
+    <!-- NotificationHelper.kt -->
+    <string name="countdown_notification_title_default">Cronômetro regressivo</string>
+    <string name="countdown_notification_completed">⏰ Concluído!</string>
+    <string name="settings_menu_section_general">Funções gerais</string>
+    <string name="settings_menu_section_tools">Ferramentas</string>
+    <string name="settings_menu_section_project">Projeto</string>
+    <string name="settings_search_no_results">Nenhum resultado</string>
+    <string name="settings_search_placeholder">Pesquise configurações...</string>
+    <string name="settings_badge_alert">!</string>
+    <string name="action_clear">Limpar</string>
+    <string name="action_close">Fechar</string>
+    <string name="action_done">Concluir</string>
+    <string name="action_confirm">Confirmar</string>
+    <string name="action_cancel">Cancelar</string>
+    <string name="action_save">Salvar</string>
+    <string name="action_create">Criar</string>
+    <string name="action_edit">Editar</string>
+    <string name="permissions_title">Permissões necessárias</string>
+    <string name="permissions_subtitle">Ative as permissões abaixo para usar todos os recursos do Krono.</string>
+    <string name="permissions_notifications_title">Notificações</string>
+    <string name="permissions_notifications_desc">Exibe o cronômetro na barra de status.</string>
+    <string name="permissions_overlay_title">Exibir sobre outros apps</string>
+    <string name="permissions_overlay_desc">Permite flutuar o widget sobre qualquer app.</string>
+    <string name="permissions_install_title">Instalar atualizações</string>
+    <string name="permissions_install_desc">Opcional. Permite instalar novas versões direto no app.</string>
+    <string name="permissions_optional">Opcional</string>
+    <string name="countdown_edit_timer_title">Editar timer</string>
+    <string name="countdown_new_timer_title">Novo timer</string>
+    <string name="countdown_edit_timer_sheet_title">Editar cronômetro</string>
+    <string name="countdown_description_label">Descrição</string>
+    <string name="countdown_description_placeholder_dialog">Ex: Foco, Pausa, Trabalhar ...</string>
+    <string name="countdown_description_placeholder_sheet">Ex: Tempo de foco, Pausa...</string>
+    <string name="countdown_time_label">Tempo</string>
+    <string name="countdown_color_card_label">Cor do card</string>
+    <string name="countdown_choose_color_desc">Escolher cor</string>
+    <string name="countdown_color_card_title">Cor do Card</string>
+    <string name="countdown_selected_color_desc">Selecionado</string>
+    <string name="countdown_custom_color">Cor personalizada</string>
+    <string name="bug_report_dialog_subtitle">Descreva o problema encontrado. Nome e email são opcionais.</string>
+    <string name="bug_report_dialog_success">Relatório enviado. Obrigado!</string>
+    <string name="bug_report_dialog_error">Falha ao enviar. Verifique sua conexão.</string>
+    <string name="countdown_no_title">Sem título</string>
+    <string name="countdown_options_desc">Opções</string>
+    <string name="action_delete">Excluir</string>
+    <string name="color_picker_hex">HEX</string>
+    <string name="color_picker_r">R</string>
+    <string name="color_picker_g">G</string>
+    <string name="color_picker_b">B</string>
+    <string name="color_picker_h">H</string>
+    <string name="color_picker_s">S</string>
+    <string name="color_picker_opacity">Opacidade</string>
+    <string name="support_title">Apoie o Projeto</string>
+    <string name="support_used_prefix">Você já usou o Krono por </string>
+    <string name="support_used_suffix">. Projeto independente — seu apoio mantém tudo gratuito e sem anúncios.</string>
+    <string name="support_button">Pagar um café</string>
+    <string name="support_hint">Abre o Ko-fi em seu navegador</string>
+    <string name="changelog_title">Novidades da Versão</string>
+</resources>

@@ -19,11 +19,6 @@ sealed class SettingsDestination(
         icon = KronoIcons.Settings.Behavior
     )
 
-    data object Overlay : SettingsDestination(
-        titleRes = R.string.settings_overlay,
-        icon = KronoIcons.Settings.Overlay
-    )
-
     data object Stopwatch : SettingsDestination(
         titleRes = R.string.settings_stopwatch,
         icon = KronoIcons.Feature.Timer

@@ -1,4 +1,4 @@
-package com.krono.app.core.ui.settings
+﻿package com.krono.app.core.ui.settings
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,7 +25,7 @@ fun SettingsGroup(
                 fontSize = KronoTokens.Typography.statusLabel,
                 letterSpacing = 1.2.sp
             ),
-            fontWeight = FontWeight.Bold,
+            fontWeight = FontWeight.Normal,
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.padding(
                 start = KronoTokens.Spacing.xs,
@@ -48,3 +48,4 @@ fun SettingsGroup(
         }
     }
 }
+

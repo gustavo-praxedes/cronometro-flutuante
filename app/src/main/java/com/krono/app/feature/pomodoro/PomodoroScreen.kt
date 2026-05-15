@@ -9,6 +9,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -17,6 +21,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.krono.app.core.ui.theme.KronoIcons
 import com.krono.app.core.ui.theme.timerFontFamily
+import com.krono.app.core.data.TimerDisplayFormat
+import com.krono.app.core.data.formatSecondsByPattern
+import androidx.compose.ui.platform.LocalContext
+import com.krono.app.core.util.playPomodoroPhaseBeep
+import com.krono.app.core.util.playPomodoroTick
+import com.krono.app.core.util.KronoToolAudio
+import com.krono.app.core.util.triggerPlayPauseFeedback
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -24,10 +35,51 @@ fun PomodoroScreen(
     viewModel: PomodoroViewModel,
     onOpenSettings: () -> Unit,
     selectedFont: String = "SYSTEM_DEFAULT",
+    timeFormat: String = "HH_MM_SS",
+    selectedPreset: String = "CLASSICO",
+    playPauseBeepEnabled: Boolean = false,
+    playPauseVibrationEnabled: Boolean = false,
+    playPauseVolume: Float = 0.8f,
+    phaseBeepEnabled: Boolean = false,
+    tickingSoundEnabled: Boolean = false,
+    tickVolume: Float = 0.35f,
+    focusAlertVolume: Float = 0.9f,
+    breakAlertVolume: Float = 0.9f,
+    autoStartBreak: Boolean = true,
+    autoStartFocus: Boolean = true,
     onOpenOverlay: () -> Unit
 ) {
+    val context = LocalContext.current
     val state by viewModel.state.collectAsState()
     val isRunning = state.isRunning
+    val format = TimerDisplayFormat.fromKey(timeFormat)
+    val phaseLabel = state.phaseLabel
+    val remaining = state.remainingSeconds
+
+    LaunchedEffect(selectedPreset) {
+        viewModel.applyPreset(selectedPreset)
+    }
+    LaunchedEffect(autoStartBreak, autoStartFocus) {
+        viewModel.setAutoAdvance(autoBreak = autoStartBreak, autoFocus = autoStartFocus)
+    }
+    LaunchedEffect(state.phaseTransitionId, phaseBeepEnabled, focusAlertVolume, breakAlertVolume) {
+        if (phaseBeepEnabled && state.phaseTransitionId > 0) {
+            playPomodoroPhaseBeep(
+                context,
+                isFocusPhase = phaseLabel == "Foco",
+                volume = if (phaseLabel == "Foco") focusAlertVolume else breakAlertVolume
+            )
+        }
+    }
+    var lastTickSecond by remember { mutableStateOf<Long?>(null) }
+    LaunchedEffect(remaining, isRunning, tickingSoundEnabled, tickVolume) {
+        if (isRunning && tickingSoundEnabled) {
+            if (lastTickSecond != remaining) {
+                playPomodoroTick(context, tickVolume)
+                lastTickSecond = remaining
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -63,15 +115,10 @@ fun PomodoroScreen(
                 contentAlignment = Alignment.Center
             ) {
                 val fontSize = (maxWidth.value * 0.18f).coerceIn(32f, 76f)
-                val total = state.remainingSeconds
-                val h = total / 3600
-                val m = (total % 3600) / 60
-                val s = total % 60
-
                 Text(
-                    text = String.format("%02d:%02d:%02d", h, m, s),
+                    text = formatSecondsByPattern(state.remainingSeconds, format),
                     fontSize = fontSize.sp,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.Normal,
                     fontFamily = timerFontFamily(selectedFont),
                     color = MaterialTheme.colorScheme.onBackground,
                     maxLines = 1,
@@ -94,7 +141,16 @@ fun PomodoroScreen(
                 }
 
                 FilledIconButton(
-                    onClick = { if (isRunning) viewModel.pause() else viewModel.start() },
+                    onClick = {
+                        triggerPlayPauseFeedback(
+                            context,
+                            playPauseBeepEnabled,
+                            playPauseVibrationEnabled,
+                            playPauseVolume,
+                            KronoToolAudio.POMODORO
+                        )
+                        if (isRunning) viewModel.pause() else viewModel.start()
+                    },
                     shape = CircleShape,
                     modifier = Modifier.size(80.dp),
                     colors = IconButtonDefaults.filledIconButtonColors(
@@ -138,4 +194,5 @@ fun PomodoroScreen(
         }
     }
 }
+
 

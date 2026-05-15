@@ -24,6 +24,8 @@ import com.krono.app.core.ui.components.KronoTimerDisplay
 import com.krono.app.core.ui.components.AnimatedIconButton
 import com.krono.app.core.ui.theme.KronoIcons
 import com.krono.app.core.ui.theme.KronoTokens
+import com.krono.app.core.ui.theme.KronoThemeOption
+import com.krono.app.core.ui.theme.overlayColorsForTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -45,7 +47,10 @@ fun StopwatchOverlay(
     onMenuVisibilityChange: (Boolean) -> Unit
 ) {
     val isRunning = state.isRunning
-    val scale     = config.scale
+    val scale     = config.stopwatchOverlayScale
+    val themeOption = runCatching { KronoThemeOption.valueOf(config.selectedTheme) }.getOrDefault(KronoThemeOption.AUTO)
+    val (themeBg, themeTxt) = overlayColorsForTheme(themeOption, false)
+    val effectiveBg = config.stopwatchOverlayCustomColor ?: themeBg
 
     val entranceScale = remember { Animatable(0.88f) }
     val entranceAlpha = remember { Animatable(0f) }
@@ -69,9 +74,9 @@ fun StopwatchOverlay(
     }
 
     val currentScale  = entranceScale.value
-    val cornerRadius  = (config.cornerRadius * scale * currentScale).coerceAtMost(KronoTokens.Overlay.maxCornerRadiusFloat).dp
-    val bgColor       = Color(config.backgroundColor).copy(alpha = config.bgOpacity)
-    val txtColor      = Color(config.textColor).copy(alpha = config.textOpacity)
+    val cornerRadius  = (config.stopwatchOverlayCornerRadius * scale * currentScale).coerceAtMost(KronoTokens.Overlay.maxCornerRadiusFloat).dp
+    val bgColor       = Color(effectiveBg).copy(alpha = config.bgOpacity)
+    val txtColor      = Color(themeTxt).copy(alpha = config.textOpacity)
     val shape         = RoundedCornerShape(cornerRadius)
 
     val paddingH      = (KronoTokens.Overlay.paddingH.value * scale * currentScale).dp
@@ -158,9 +163,9 @@ fun StopwatchOverlay(
             ) {
                 KronoTimerDisplay(
                     elapsedMs = state.elapsedMs,
-                    showHours = config.showHours,
-                    showSeconds = config.showSeconds,
-                    selectedFont = config.selectedFont,
+                    showHours = config.stopwatchOverlayShowHours,
+                    showSeconds = config.stopwatchOverlayShowSeconds,
+                    selectedFont = config.overlayFontFamily,
                     scale = scale,
                     currentScale = currentScale,
                     textColor = txtColor
@@ -189,7 +194,7 @@ fun StopwatchOverlay(
                     )
                 }
 
-                if (config.showButtons) {
+                if (config.stopwatchOverlayShowButtons) {
                     MainButtonRow()
                 } else {
                     AnimatedVisibility(
@@ -232,7 +237,7 @@ fun StopwatchOverlay(
                             QuickOptionIcon(KronoIcons.Feature.Overlay, config.autoLaunch, txtColor, quickBtnSize, quickIconSize) {
                                 resetMenuTimer(); onToggleAutoLaunch()
                             }
-                            QuickOptionIcon(KronoIcons.Action.Volume, config.isBeepEnabled, txtColor, quickBtnSize, quickIconSize) {
+                            QuickOptionIcon(KronoIcons.Action.Volume, config.playPauseSoundEnabled, txtColor, quickBtnSize, quickIconSize) {
                                 resetMenuTimer(); onToggleBeep()
                             }
                         }

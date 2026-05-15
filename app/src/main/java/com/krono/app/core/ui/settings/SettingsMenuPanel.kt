@@ -1,4 +1,4 @@
-package com.krono.app.core.ui.settings
+﻿package com.krono.app.core.ui.settings
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -31,7 +31,6 @@ import com.krono.app.core.ui.theme.KronoTokens
 private fun SettingsDestination.accentColor(): Color = when (this) {
     SettingsDestination.Appearance  -> Color(0xFF6B7FD4)
     SettingsDestination.Behavior    -> Color(0xFFF59E0B)
-    SettingsDestination.Overlay     -> Color(0xFF8B5CF6)
     SettingsDestination.Stopwatch   -> Color(0xFF10B981)
     SettingsDestination.Countdown   -> Color(0xFF06B6D4)
     SettingsDestination.Pomodoro    -> Color(0xFFE11D48)
@@ -43,21 +42,20 @@ private fun SettingsDestination.accentColor(): Color = when (this) {
 
 // ── Section data ──────────────────────────────────────────────
 private data class MenuSection(
-    val title: String,
+    val titleRes: Int,
     val destinations: List<SettingsDestination>
 )
 
 private val menuSections = listOf(
     MenuSection(
-        title = "Funções Gerais",
+        titleRes = R.string.settings_menu_section_general,
         destinations = listOf(
             SettingsDestination.Appearance,
-            SettingsDestination.Behavior,
-            SettingsDestination.Overlay
+            SettingsDestination.Behavior
         )
     ),
     MenuSection(
-        title = "Ferramentas",
+        titleRes = R.string.settings_menu_section_tools,
         destinations = listOf(
             SettingsDestination.Stopwatch,
             SettingsDestination.Countdown,
@@ -65,7 +63,7 @@ private val menuSections = listOf(
         )
     ),
     MenuSection(
-        title = "Projeto",
+        titleRes = R.string.settings_menu_section_project,
         destinations = listOf(
             SettingsDestination.About,
             SettingsDestination.Support,
@@ -134,7 +132,7 @@ fun SettingsMenuPanel(
                         )
                         Spacer(Modifier.height(KronoTokens.Spacing.sm))
                         Text(
-                            text = "Nenhum resultado",
+                            text = stringResource(R.string.settings_search_no_results),
                             style = MaterialTheme.typography.bodyMedium.copy(
                                 fontSize = KronoTokens.Typography.listItem
                             ),
@@ -167,7 +165,7 @@ fun SettingsMenuPanel(
         } else {
             // ── All Sections ──────────────────────────────────
             menuSections.forEach { section ->
-                SectionLabel(title = section.title)
+                SectionLabel(title = stringResource(section.titleRes))
 
                 SectionCard(
                     modifier = Modifier
@@ -233,7 +231,7 @@ private fun SettingsSearchBar(
             Box(Modifier.weight(1f)) {
                 if (query.isEmpty()) {
                     Text(
-                        text = "Pesquise configurações...",
+                        text = stringResource(R.string.settings_search_placeholder),
                         style = MaterialTheme.typography.bodyMedium.copy(
                             fontSize = KronoTokens.Typography.listItem
                         ),
@@ -264,7 +262,7 @@ private fun SettingsSearchBar(
                 ) {
                     Icon(
                         imageVector = KronoIcons.Navigation.Close,
-                        contentDescription = "Limpar",
+                        contentDescription = stringResource(R.string.action_clear),
                         modifier = Modifier.size(16.dp),
                         tint = hintColor
                     )
@@ -283,7 +281,7 @@ private fun SectionLabel(title: String) {
             fontSize = KronoTokens.Typography.statusLabel,
             letterSpacing = 1.2.sp
         ),
-        fontWeight = FontWeight.Bold,
+        fontWeight = FontWeight.Normal,
         color = MaterialTheme.colorScheme.primary,
         modifier = Modifier.padding(
             start = KronoTokens.Spacing.lg,
@@ -380,7 +378,7 @@ private fun SettingsItem(
                 style = MaterialTheme.typography.bodyLarge.copy(
                     fontSize = KronoTokens.Typography.bodyText
                 ),
-                fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Medium,
+                fontWeight = if (selected) FontWeight.Normal else FontWeight.Medium,
                 color = textColor,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
@@ -410,7 +408,7 @@ private fun SettingsItem(
                 contentColor = MaterialTheme.colorScheme.onError,
                 modifier = Modifier.padding(end = KronoTokens.Spacing.xs)
             ) {
-                Text("!", style = MaterialTheme.typography.labelSmall.copy(fontSize = KronoTokens.Typography.statusLabel))
+                Text(stringResource(R.string.settings_badge_alert), style = MaterialTheme.typography.labelSmall.copy(fontSize = KronoTokens.Typography.statusLabel))
             }
         }
 
@@ -426,3 +424,5 @@ private fun SettingsItem(
         )
     }
 }
+
+

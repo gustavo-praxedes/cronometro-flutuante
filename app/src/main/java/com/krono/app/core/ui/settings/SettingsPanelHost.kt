@@ -1,18 +1,13 @@
-﻿package com.krono.app.core.ui.settings
+package com.krono.app.core.ui.settings
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import com.krono.app.core.data.OverlayConfig
 import com.krono.app.core.data.OverlayDataStore
-import com.krono.app.core.ui.theme.KronoTokens
 import com.krono.app.core.util.UpdateInfo
+import com.krono.app.feature.countdown.CountdownSettings
 import com.krono.app.feature.pomodoro.PomodoroSettings
+import com.krono.app.feature.stopwatch.StopwatchSettings
 import kotlinx.coroutines.CoroutineScope
 
 @Composable
@@ -38,7 +33,6 @@ fun SettingsPanelHost(
             onStartFocusMode = onStartFocusMode,
             modifier = modifier
         )
-        SettingsDestination.Overlay -> OverlayPanel(dataStore = dataStore, modifier = modifier)
         SettingsDestination.About -> AboutPanel(modifier = modifier)
         SettingsDestination.Support -> SupportPanel(
             totalLifetimeMs = totalLifetimeMs,
@@ -48,32 +42,15 @@ fun SettingsPanelHost(
         SettingsDestination.Changelog -> {
             val updateInfo = pendingUpdateInfo ?: UpdateInfo(
                 tagName = "vAtual",
-                changelog = "VersÃ£o atual instalada. Sem atualizaÃ§Ã£o pendente.",
+                changelog = "Versao atual instalada. Sem atualizacao pendente.",
                 releaseUrl = "",
                 downloadUrl = null
             )
             UpdatesPanel(updateInfo = updateInfo, modifier = modifier)
         }
         SettingsDestination.BugReport -> BugReportPanel(modifier = modifier)
-        SettingsDestination.Stopwatch -> ToolSettingsPlaceholder("CronÃ´metro", modifier)
-        SettingsDestination.Countdown -> ToolSettingsPlaceholder("Contagem Regressiva", modifier)
-        SettingsDestination.Pomodoro -> PomodoroSettings()
+        SettingsDestination.Stopwatch -> StopwatchSettings(dataStore = dataStore, modifier = modifier)
+        SettingsDestination.Countdown -> CountdownSettings(dataStore = dataStore, modifier = modifier)
+        SettingsDestination.Pomodoro -> PomodoroSettings(dataStore = dataStore, modifier = modifier)
     }
 }
-
-@Composable
-private fun ToolSettingsPlaceholder(toolName: String, modifier: Modifier = Modifier) {
-    Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-            Text(text = toolName, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-            Spacer(Modifier.height(4.dp))
-            Text(
-                text = "Em desenvolvimento",
-                style = MaterialTheme.typography.bodyMedium.copy(fontSize = KronoTokens.Typography.listItem),
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-    }
-}
-
-

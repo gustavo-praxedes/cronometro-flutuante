@@ -1,4 +1,4 @@
-package com.krono.app.core.ui.theme
+﻿package com.krono.app.core.ui.theme
 
 enum class KronoThemeOption(val label: String) {
     AUTO             ("Automático"),
@@ -13,3 +13,4 @@ enum class KronoThemeOption(val label: String) {
     AMBER_GLOW       ("Amber Glow"),
     ARCTIC           ("Arctic"),
 }
+

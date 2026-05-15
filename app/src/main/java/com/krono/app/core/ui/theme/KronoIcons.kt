@@ -1,9 +1,11 @@
-package com.krono.app.core.ui.theme
+﻿package com.krono.app.core.ui.theme
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.automirrored.rounded.Article
+import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.rounded.OpenInNew
+import androidx.compose.material.icons.automirrored.rounded.VolumeUp
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.HourglassBottom
@@ -30,7 +32,6 @@ import androidx.compose.material.icons.rounded.HourglassBottom
 import androidx.compose.material.icons.rounded.HourglassTop
 import androidx.compose.material.icons.rounded.HourglassEmpty
 import androidx.compose.material.icons.rounded.Info
-import androidx.compose.material.icons.rounded.KeyboardArrowRight
 import androidx.compose.material.icons.rounded.LightMode
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material.icons.rounded.MoreHoriz
@@ -48,10 +49,10 @@ import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material.icons.rounded.SkipNext
 import androidx.compose.material.icons.rounded.Stop
 import androidx.compose.material.icons.rounded.Timer
+import androidx.compose.material.icons.rounded.Timelapse
 import androidx.compose.material.icons.rounded.Speed
 import androidx.compose.material.icons.rounded.TrackChanges
 import androidx.compose.material.icons.rounded.Update
-import androidx.compose.material.icons.rounded.VolumeUp
 import androidx.compose.material.icons.rounded.ConfirmationNumber
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.SearchOff
@@ -69,7 +70,7 @@ object KronoIcons {
         val OpenExternal: ImageVector = Icons.AutoMirrored.Rounded.OpenInNew
         val Close: ImageVector        = Icons.Rounded.Close
         val Menu: ImageVector         = Icons.Rounded.Menu
-        val ChevronRight: ImageVector = Icons.Rounded.KeyboardArrowRight
+        val ChevronRight: ImageVector = Icons.AutoMirrored.Rounded.KeyboardArrowRight
     }
 
     // ── Ações ───────────────────────────────────────────────
@@ -89,7 +90,7 @@ object KronoIcons {
         val Settings: ImageVector     = Icons.Rounded.Settings
         val Sparkle: ImageVector      = Icons.Rounded.AutoAwesome
         val Light: ImageVector        = Icons.Rounded.LightMode
-        val Volume: ImageVector       = Icons.Rounded.VolumeUp
+        val Volume: ImageVector       = Icons.AutoMirrored.Rounded.VolumeUp
         val Focus: ImageVector        = Icons.Rounded.TrackChanges
         val Download: ImageVector     = Icons.Rounded.Download
         val Notification: ImageVector = Icons.Rounded.Notifications
@@ -119,7 +120,7 @@ object KronoIcons {
     object Feature {
         val Overlay: ImageVector      = Icons.Rounded.PictureInPicture
         val Timer: ImageVector        = Icons.Rounded.Timer
-        val Pomodoro: ImageVector     = Icons.Rounded.AvTimer
+        val Pomodoro: ImageVector     = Icons.Rounded.Timelapse
         val Hourglass: ImageVector    = Icons.Rounded.HourglassTop
         val HourglassBottom: ImageVector = Icons.Rounded.HourglassBottom
         val Countdown: ImageVector    = Icons.Outlined.HourglassBottom
@@ -137,4 +138,5 @@ object KronoIcons {
         val TicketGate: ImageVector  = Icons.Rounded.ConfirmationNumber
     }
 }
+
 

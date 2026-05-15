@@ -1,4 +1,4 @@
-package com.krono.app.core.ui.dialogs
+﻿package com.krono.app.core.ui.dialogs
 
 import android.graphics.Color.HSVToColor
 import android.graphics.Color.colorToHSV
@@ -27,6 +27,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.res.stringResource
+import com.krono.app.R
 import com.krono.app.core.ui.theme.KronoTokens
 import com.krono.app.core.ui.theme.adaptiveDialogWidth
 import androidx.compose.material3.IconButton
@@ -131,7 +133,7 @@ fun ColorPickerDialog(
                     Text(
                         text       = title,
                         style      = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.Normal,
                         fontSize   = KronoTokens.Typography.dialogTitle
                     )
 
@@ -143,7 +145,7 @@ fun ColorPickerDialog(
                     ) {
                         Icon(
                             imageVector = KronoIcons.Navigation.Close,
-                            contentDescription = "Fechar",
+                            contentDescription = stringResource(R.string.action_close),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(KronoTokens.Icon.listItem)
                         )
@@ -186,7 +188,7 @@ fun ColorPickerDialog(
                                     .take(6)
                                     .uppercase()
                             },
-                            placeholder     = { Text("HEX") },
+                            placeholder     = { Text(stringResource(R.string.color_picker_hex)) },
                             prefix          = { Text("#", fontFamily = FontFamily.Monospace) },
                             keyboardOptions = KeyboardOptions(
                                 keyboardType   = KeyboardType.Ascii,
@@ -210,21 +212,21 @@ fun ColorPickerDialog(
                             horizontalArrangement = Arrangement.spacedBy(KronoTokens.Spacing.sm)
                         ) {
                             RgbField(
-                                label    = "R",
+                                label    = stringResource(R.string.color_picker_r),
                                 value    = rText,
                                 onChange = { rText = it },
                                 onDone   = { applyRgb(rText, gText, bText) },
                                 modifier = Modifier.weight(1f)
                             )
                             RgbField(
-                                label    = "G",
+                                label    = stringResource(R.string.color_picker_g),
                                 value    = gText,
                                 onChange = { gText = it },
                                 onDone   = { applyRgb(rText, gText, bText) },
                                 modifier = Modifier.weight(1f)
                             )
                             RgbField(
-                                label    = "B",
+                                label    = stringResource(R.string.color_picker_b),
                                 value    = bText,
                                 onChange = { bText = it },
                                 onDone   = { applyRgb(rText, gText, bText) },
@@ -250,7 +252,7 @@ fun ColorPickerDialog(
                     )
                 }
                 HsbSliderRow(
-                    label         = "H",
+                    label         = stringResource(R.string.color_picker_h),
                     value         = hue,
                     displayValue  = "${hue.roundToInt()}°",
                     valueRange    = 0f..360f,
@@ -269,7 +271,7 @@ fun ColorPickerDialog(
                     }
                 }
                 HsbSliderRow(
-                    label         = "S",
+                    label         = stringResource(R.string.color_picker_s),
                     value         = sat,
                     displayValue  = "${(sat * 100).roundToInt()}%",
                     valueRange    = 0f..1f,
@@ -288,7 +290,7 @@ fun ColorPickerDialog(
                     }
                 }
                 HsbSliderRow(
-                    label         = "B",
+                    label         = stringResource(R.string.color_picker_b),
                     value         = bri,
                     displayValue  = "${(bri * 100).roundToInt()}%",
                     valueRange    = 0f..1f,
@@ -311,7 +313,7 @@ fun ColorPickerDialog(
                     }
                 }
                 HsbSliderRow(
-                    label         = "Opacidade",
+                    label         = stringResource(R.string.color_picker_opacity),
                     value         = opacity,
                     displayValue  = "${(opacity * 100).roundToInt()}%",
                     valueRange    = 0f..1f,
@@ -334,9 +336,9 @@ fun ColorPickerDialog(
                     )
                 ) {
                     Text(
-                        text       = "Confirmar",
+                        text       = stringResource(R.string.action_confirm),
                         fontSize   = KronoTokens.Typography.buttonLabel,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Normal
                     )
                 }
             }
@@ -358,7 +360,7 @@ private fun RgbField(
             onChange(input.filter { it.isDigit() }.take(3))
         },
         placeholder     = { Text(label) },
-        prefix          = { Text("$label ", style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold)) },
+        prefix          = { Text("$label ", style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Normal)) },
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Number,
             imeAction    = ImeAction.Done
@@ -392,7 +394,7 @@ private fun HsbSliderRow(
             text       = label,
             modifier   = Modifier.width(KronoTokens.Component.sliderLabelWidth), // Largura ajustada para evitar quebra
             style      = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.SemiBold,
+            fontWeight = FontWeight.Normal,
             softWrap   = false // Força o texto em uma única linha
         )
         Box(modifier = Modifier.weight(1f)) {
@@ -441,3 +443,5 @@ private fun CheckerboardBackground(modifier: Modifier = Modifier) {
         )
     )
 }
+
+

@@ -1,4 +1,4 @@
-package com.krono.app.core.data
+﻿package com.krono.app.core.data
 
 import android.content.Context
 import android.graphics.Color as AndroidColor
@@ -35,9 +35,45 @@ class OverlayDataStore(private val context: Context) {
         val LAST_UPDATE_CHECK  = longPreferencesKey("last_update_check")
         val FOCUS_MODE_ENABLED = booleanPreferencesKey("focus_mode_enabled")
         val SELECTED_THEME     = stringPreferencesKey("selected_theme")
+        val APP_LANGUAGE       = stringPreferencesKey("app_language")
         val SELECTED_FONT      = stringPreferencesKey("selected_font")
         val DONATION_PENDING   = booleanPreferencesKey("donation_pending")
         val ACTIVE_TOOL_ID     = stringPreferencesKey("active_tool_id")
+        val APP_FONT_SIZE      = stringPreferencesKey("app_font_size")
+        val STOPWATCH_FORMAT   = stringPreferencesKey("stopwatch_format")
+        val COUNTDOWN_FORMAT   = stringPreferencesKey("countdown_format")
+        val COUNTDOWN_SCREEN_BASE_SECONDS = longPreferencesKey("countdown_screen_base_seconds")
+        val POMODORO_FORMAT    = stringPreferencesKey("pomodoro_format")
+        val POMODORO_BEEP_FOCUS_BREAK = booleanPreferencesKey("pomodoro_beep_focus_break")
+        val POMODORO_TICKING_SOUND = booleanPreferencesKey("pomodoro_ticking_sound")
+        val POMODORO_AUTO_START_BREAK = booleanPreferencesKey("pomodoro_auto_start_break")
+        val POMODORO_AUTO_START_FOCUS = booleanPreferencesKey("pomodoro_auto_start_focus")
+        val POMODORO_PRESET = stringPreferencesKey("pomodoro_preset")
+        val OVERLAY_FONT_FAMILY = stringPreferencesKey("overlay_font_family")
+        val PLAY_PAUSE_SOUND_ENABLED = booleanPreferencesKey("play_pause_sound_enabled")
+        val PLAY_PAUSE_VIBRATION_ENABLED = booleanPreferencesKey("play_pause_vibration_enabled")
+        val PLAY_PAUSE_VOLUME = floatPreferencesKey("play_pause_volume")
+        val TICK_VOLUME = floatPreferencesKey("tick_volume")
+        val FOCUS_ALERT_VOLUME = floatPreferencesKey("focus_alert_volume")
+        val BREAK_ALERT_VOLUME = floatPreferencesKey("break_alert_volume")
+        val SW_OVERLAY_SHOW_BUTTONS = booleanPreferencesKey("sw_overlay_show_buttons")
+        val SW_OVERLAY_SHOW_HOURS = booleanPreferencesKey("sw_overlay_show_hours")
+        val SW_OVERLAY_SHOW_SECONDS = booleanPreferencesKey("sw_overlay_show_seconds")
+        val SW_OVERLAY_SCALE = floatPreferencesKey("sw_overlay_scale")
+        val SW_OVERLAY_CORNER_RADIUS = floatPreferencesKey("sw_overlay_corner_radius")
+        val SW_OVERLAY_CUSTOM_COLOR = intPreferencesKey("sw_overlay_custom_color")
+        val CD_OVERLAY_SHOW_BUTTONS = booleanPreferencesKey("cd_overlay_show_buttons")
+        val CD_OVERLAY_SHOW_HOURS = booleanPreferencesKey("cd_overlay_show_hours")
+        val CD_OVERLAY_SHOW_SECONDS = booleanPreferencesKey("cd_overlay_show_seconds")
+        val CD_OVERLAY_SCALE = floatPreferencesKey("cd_overlay_scale")
+        val CD_OVERLAY_CORNER_RADIUS = floatPreferencesKey("cd_overlay_corner_radius")
+        val CD_OVERLAY_CUSTOM_COLOR = intPreferencesKey("cd_overlay_custom_color")
+        val PO_OVERLAY_SHOW_BUTTONS = booleanPreferencesKey("po_overlay_show_buttons")
+        val PO_OVERLAY_SHOW_HOURS = booleanPreferencesKey("po_overlay_show_hours")
+        val PO_OVERLAY_SHOW_SECONDS = booleanPreferencesKey("po_overlay_show_seconds")
+        val PO_OVERLAY_SCALE = floatPreferencesKey("po_overlay_scale")
+        val PO_OVERLAY_CORNER_RADIUS = floatPreferencesKey("po_overlay_corner_radius")
+        val PO_OVERLAY_CUSTOM_COLOR = intPreferencesKey("po_overlay_custom_color")
     }
 
     val configFlow: Flow<OverlayConfig> = context.dataStore.data
@@ -71,7 +107,43 @@ class OverlayDataStore(private val context: Context) {
                 lastUpdateCheck    = prefs[LAST_UPDATE_CHECK]  ?: 0L,
                 focusModeEnabled   = prefs[FOCUS_MODE_ENABLED] ?: false,
                 selectedTheme      = prefs[SELECTED_THEME]     ?: "AUTO",
-                selectedFont     = prefs[SELECTED_FONT]      ?: "SYSTEM_DEFAULT",
+                appLanguage        = prefs[APP_LANGUAGE]       ?: "pt-BR",
+                selectedFont       = prefs[SELECTED_FONT]      ?: "SYSTEM_DEFAULT",
+                appFontSize        = prefs[APP_FONT_SIZE]      ?: "NORMAL",
+                stopwatchFormat    = prefs[STOPWATCH_FORMAT]   ?: "HH_MM_SS",
+                countdownFormat    = prefs[COUNTDOWN_FORMAT]   ?: "HH_MM_SS",
+                countdownScreenBaseSeconds = prefs[COUNTDOWN_SCREEN_BASE_SECONDS] ?: 0L,
+                pomodoroFormat     = prefs[POMODORO_FORMAT]    ?: "HH_MM_SS",
+                pomodoroBeepFocusBreak = prefs[POMODORO_BEEP_FOCUS_BREAK] ?: false,
+                pomodoroTickingSound = prefs[POMODORO_TICKING_SOUND] ?: false,
+                pomodoroAutoStartBreak = prefs[POMODORO_AUTO_START_BREAK] ?: true,
+                pomodoroAutoStartFocus = prefs[POMODORO_AUTO_START_FOCUS] ?: true,
+                pomodoroPreset     = prefs[POMODORO_PRESET] ?: "CLASSICO",
+                overlayFontFamily = prefs[OVERLAY_FONT_FAMILY] ?: (prefs[SELECTED_FONT] ?: "CHIVO_MONO"),
+                playPauseSoundEnabled = prefs[PLAY_PAUSE_SOUND_ENABLED] ?: (prefs[BEEP_ENABLED] ?: false),
+                playPauseVibrationEnabled = prefs[PLAY_PAUSE_VIBRATION_ENABLED] ?: (prefs[VIBRATION_ENABLED] ?: false),
+                playPauseVolume = prefs[PLAY_PAUSE_VOLUME] ?: 0.8f,
+                tickVolume = prefs[TICK_VOLUME] ?: 0.35f,
+                focusAlertVolume = prefs[FOCUS_ALERT_VOLUME] ?: 0.9f,
+                breakAlertVolume = prefs[BREAK_ALERT_VOLUME] ?: 0.9f,
+                stopwatchOverlayShowButtons = prefs[SW_OVERLAY_SHOW_BUTTONS] ?: (prefs[SHOW_BUTTONS] ?: true),
+                stopwatchOverlayShowHours = prefs[SW_OVERLAY_SHOW_HOURS] ?: (prefs[SHOW_HOURS] ?: true),
+                stopwatchOverlayShowSeconds = prefs[SW_OVERLAY_SHOW_SECONDS] ?: (prefs[SHOW_SECONDS] ?: true),
+                stopwatchOverlayScale = prefs[SW_OVERLAY_SCALE] ?: (prefs[SCALE] ?: 1.0f),
+                stopwatchOverlayCornerRadius = prefs[SW_OVERLAY_CORNER_RADIUS] ?: (prefs[CORNER_RADIUS] ?: 16f),
+                stopwatchOverlayCustomColor = prefs[SW_OVERLAY_CUSTOM_COLOR],
+                countdownOverlayShowButtons = prefs[CD_OVERLAY_SHOW_BUTTONS] ?: (prefs[SHOW_BUTTONS] ?: true),
+                countdownOverlayShowHours = prefs[CD_OVERLAY_SHOW_HOURS] ?: (prefs[SHOW_HOURS] ?: true),
+                countdownOverlayShowSeconds = prefs[CD_OVERLAY_SHOW_SECONDS] ?: (prefs[SHOW_SECONDS] ?: true),
+                countdownOverlayScale = prefs[CD_OVERLAY_SCALE] ?: (prefs[SCALE] ?: 1.0f),
+                countdownOverlayCornerRadius = prefs[CD_OVERLAY_CORNER_RADIUS] ?: (prefs[CORNER_RADIUS] ?: 16f),
+                countdownOverlayCustomColor = prefs[CD_OVERLAY_CUSTOM_COLOR],
+                pomodoroOverlayShowButtons = prefs[PO_OVERLAY_SHOW_BUTTONS] ?: (prefs[SHOW_BUTTONS] ?: true),
+                pomodoroOverlayShowHours = prefs[PO_OVERLAY_SHOW_HOURS] ?: (prefs[SHOW_HOURS] ?: true),
+                pomodoroOverlayShowSeconds = prefs[PO_OVERLAY_SHOW_SECONDS] ?: (prefs[SHOW_SECONDS] ?: true),
+                pomodoroOverlayScale = prefs[PO_OVERLAY_SCALE] ?: (prefs[SCALE] ?: 1.0f),
+                pomodoroOverlayCornerRadius = prefs[PO_OVERLAY_CORNER_RADIUS] ?: (prefs[CORNER_RADIUS] ?: 16f),
+                pomodoroOverlayCustomColor = prefs[PO_OVERLAY_CUSTOM_COLOR],
                 donationPending    = prefs[DONATION_PENDING]   ?: false,
                 activeToolId       = prefs[ACTIVE_TOOL_ID]     ?: "stopwatch"
             )
@@ -99,7 +171,43 @@ class OverlayDataStore(private val context: Context) {
             prefs[CURRENT_CYCLE_MS]   = config.currentCycleMs
             prefs[FOCUS_MODE_ENABLED] = config.focusModeEnabled
             prefs[SELECTED_THEME]     = config.selectedTheme
+            prefs[APP_LANGUAGE]       = config.appLanguage
             prefs[SELECTED_FONT]      = config.selectedFont
+            prefs[APP_FONT_SIZE]      = config.appFontSize
+            prefs[STOPWATCH_FORMAT]   = config.stopwatchFormat
+            prefs[COUNTDOWN_FORMAT]   = config.countdownFormat
+            prefs[COUNTDOWN_SCREEN_BASE_SECONDS] = config.countdownScreenBaseSeconds
+            prefs[POMODORO_FORMAT]    = config.pomodoroFormat
+            prefs[POMODORO_BEEP_FOCUS_BREAK] = config.pomodoroBeepFocusBreak
+            prefs[POMODORO_TICKING_SOUND] = config.pomodoroTickingSound
+            prefs[POMODORO_AUTO_START_BREAK] = config.pomodoroAutoStartBreak
+            prefs[POMODORO_AUTO_START_FOCUS] = config.pomodoroAutoStartFocus
+            prefs[POMODORO_PRESET] = config.pomodoroPreset
+            prefs[OVERLAY_FONT_FAMILY] = config.overlayFontFamily
+            prefs[PLAY_PAUSE_SOUND_ENABLED] = config.playPauseSoundEnabled
+            prefs[PLAY_PAUSE_VIBRATION_ENABLED] = config.playPauseVibrationEnabled
+            prefs[PLAY_PAUSE_VOLUME] = config.playPauseVolume
+            prefs[TICK_VOLUME] = config.tickVolume
+            prefs[FOCUS_ALERT_VOLUME] = config.focusAlertVolume
+            prefs[BREAK_ALERT_VOLUME] = config.breakAlertVolume
+            prefs[SW_OVERLAY_SHOW_BUTTONS] = config.stopwatchOverlayShowButtons
+            prefs[SW_OVERLAY_SHOW_HOURS] = config.stopwatchOverlayShowHours
+            prefs[SW_OVERLAY_SHOW_SECONDS] = config.stopwatchOverlayShowSeconds
+            prefs[SW_OVERLAY_SCALE] = config.stopwatchOverlayScale
+            prefs[SW_OVERLAY_CORNER_RADIUS] = config.stopwatchOverlayCornerRadius
+            if (config.stopwatchOverlayCustomColor == null) prefs.remove(SW_OVERLAY_CUSTOM_COLOR) else prefs[SW_OVERLAY_CUSTOM_COLOR] = config.stopwatchOverlayCustomColor
+            prefs[CD_OVERLAY_SHOW_BUTTONS] = config.countdownOverlayShowButtons
+            prefs[CD_OVERLAY_SHOW_HOURS] = config.countdownOverlayShowHours
+            prefs[CD_OVERLAY_SHOW_SECONDS] = config.countdownOverlayShowSeconds
+            prefs[CD_OVERLAY_SCALE] = config.countdownOverlayScale
+            prefs[CD_OVERLAY_CORNER_RADIUS] = config.countdownOverlayCornerRadius
+            if (config.countdownOverlayCustomColor == null) prefs.remove(CD_OVERLAY_CUSTOM_COLOR) else prefs[CD_OVERLAY_CUSTOM_COLOR] = config.countdownOverlayCustomColor
+            prefs[PO_OVERLAY_SHOW_BUTTONS] = config.pomodoroOverlayShowButtons
+            prefs[PO_OVERLAY_SHOW_HOURS] = config.pomodoroOverlayShowHours
+            prefs[PO_OVERLAY_SHOW_SECONDS] = config.pomodoroOverlayShowSeconds
+            prefs[PO_OVERLAY_SCALE] = config.pomodoroOverlayScale
+            prefs[PO_OVERLAY_CORNER_RADIUS] = config.pomodoroOverlayCornerRadius
+            if (config.pomodoroOverlayCustomColor == null) prefs.remove(PO_OVERLAY_CUSTOM_COLOR) else prefs[PO_OVERLAY_CUSTOM_COLOR] = config.pomodoroOverlayCustomColor
             prefs[DONATION_PENDING]   = config.donationPending
             prefs[ACTIVE_TOOL_ID]     = config.activeToolId
         }
@@ -142,3 +250,4 @@ class OverlayDataStore(private val context: Context) {
         }
     }
 }
+

@@ -1,4 +1,4 @@
-package com.krono.app.feature.countdown
+﻿package com.krono.app.feature.countdown
 
 import android.app.Notification
 import androidx.compose.runtime.Composable
@@ -26,6 +26,7 @@ class CountdownTool(
 
     @Composable
     fun SettingsContent() {
-        CountdownSettings()
+        // Settings rendered by SettingsPanelHost
     }
 }
+

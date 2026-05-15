@@ -1,4 +1,4 @@
-package com.krono.app.feature.stopwatch
+﻿package com.krono.app.feature.stopwatch
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -157,3 +157,4 @@ class StopwatchViewModel(application: Application) : AndroidViewModel(applicatio
         elapsedMs = this.elapsedMs
     )
 }
+

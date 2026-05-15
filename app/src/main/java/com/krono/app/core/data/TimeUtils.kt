@@ -1,4 +1,4 @@
-package com.krono.app.core.data
+﻿package com.krono.app.core.data
 
 import java.util.Locale
 
@@ -81,3 +81,4 @@ fun formatLifetimeDetailed(totalMs: Long): String {
     val s = totalSeconds % 60L
     return String.format(Locale.ROOT, "%dh %02dm %02ds", h, m, s)
 }
+

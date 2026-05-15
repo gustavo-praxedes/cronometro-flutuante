@@ -1,4 +1,4 @@
-package com.krono.app.feature.countdown
+﻿package com.krono.app.feature.countdown
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -23,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.krono.app.feature.countdown.CountdownConfig
+import com.krono.app.R
 import com.krono.app.core.ui.theme.KronoTokens
 import com.krono.app.core.ui.theme.adaptiveDialogWidth
 
@@ -77,11 +79,11 @@ fun CountdownConfigDialog(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = if (isEditMode) "Editar timer" else "Novo timer",
+                        text = if (isEditMode) stringResource(R.string.countdown_edit_timer_title) else stringResource(R.string.countdown_new_timer_title),
                         style = MaterialTheme.typography.headlineSmall.copy(
                             platformStyle = PlatformTextStyle(includeFontPadding = false)
                         ),
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.Normal,
                         fontSize   = KronoTokens.Typography.dialogTitle
                     )
                     IconButton(
@@ -95,7 +97,7 @@ fun CountdownConfigDialog(
                     ) {
                         Icon(
                             imageVector        = KronoIcons.Navigation.Close,
-                            contentDescription = "Fechar",
+                            contentDescription = stringResource(R.string.action_close),
                             tint               = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
@@ -107,8 +109,8 @@ fun CountdownConfigDialog(
                 OutlinedTextField(
                     value         = description,
                     onValueChange = { if (it.length <= KronoTokens.Component.descriptionMaxLen) description = it },
-                    label         = { Text("Descrição") },
-                    placeholder   = { Text("Ex: Foco, Pausa, Trabalhar ...") },
+                    label         = { Text(stringResource(R.string.countdown_description_label)) },
+                    placeholder   = { Text(stringResource(R.string.countdown_description_placeholder_dialog)) },
                     singleLine    = true,
                     keyboardOptions = KeyboardOptions(
                         capitalization = KeyboardCapitalization.Sentences,
@@ -130,7 +132,7 @@ fun CountdownConfigDialog(
                                 )
                                 Icon(
                                     imageVector        = KronoIcons.Action.Palette,
-                                    contentDescription = "Cor do card",
+                                    contentDescription = stringResource(R.string.countdown_color_card_label),
                                     tint               = overlayTextColor(bgColor).copy(alpha = KronoTokens.Alpha.medium),
                                     modifier           = Modifier.size(KronoTokens.Icon.listItem)
                                 )
@@ -181,9 +183,9 @@ fun CountdownConfigDialog(
                     )
                 ) {
                     Text(
-                        text       = if (isEditMode) "Salvar" else "Criar",
+                        text       = if (isEditMode) stringResource(R.string.action_save) else stringResource(R.string.action_create),
                         fontSize   = KronoTokens.Typography.buttonLabel,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Normal
                     )
                 }
             }
@@ -199,3 +201,5 @@ fun CountdownConfigDialog(
         )
     }
 }
+
+

@@ -1,4 +1,4 @@
-package com.krono.app.feature.countdown
+﻿package com.krono.app.feature.countdown
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -35,12 +35,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import com.krono.app.feature.stopwatch.TimeLimitField
 import com.krono.app.core.ui.dialogs.ColorPickerDialog
 import com.krono.app.feature.countdown.CountdownConfig
+import com.krono.app.R
 import com.krono.app.core.ui.theme.KronoTokens
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -74,7 +76,7 @@ fun CountdownConfigSheet(
         ) {
             // Title
             Text(
-                text = if (initial == null) "Novo cronômetro" else "Editar cronômetro",
+                text = if (initial == null) stringResource(R.string.countdown_new_timer_title) else stringResource(R.string.countdown_edit_timer_sheet_title),
                 style = MaterialTheme.typography.titleLarge
             )
 
@@ -82,8 +84,8 @@ fun CountdownConfigSheet(
             OutlinedTextField(
                 value = description,
                 onValueChange = { if (it.length <= 40) description = it },
-                label = { Text("Descrição") },
-                placeholder = { Text("Ex: Tempo de foco, Pausa...") },
+                label = { Text(stringResource(R.string.countdown_description_label)) },
+                placeholder = { Text(stringResource(R.string.countdown_description_placeholder_sheet)) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(
                     capitalization = KeyboardCapitalization.Sentences,
@@ -95,7 +97,7 @@ fun CountdownConfigSheet(
             // Time input
             Column {
                 Text(
-                    text = "Tempo",
+                    text = stringResource(R.string.countdown_time_label),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -112,7 +114,7 @@ fun CountdownConfigSheet(
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Text(
-                    text = "Cor do card",
+                    text = stringResource(R.string.countdown_color_card_label),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.weight(1f)
@@ -131,7 +133,7 @@ fun CountdownConfigSheet(
                         )
                         Icon(
                             imageVector = KronoIcons.Action.Palette,
-                            contentDescription = "Escolher cor",
+                            contentDescription = stringResource(R.string.countdown_choose_color_desc),
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }
@@ -146,7 +148,7 @@ fun CountdownConfigSheet(
                 horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End)
             ) {
                 TextButton(onClick = onDismiss) {
-                    Text("Cancelar")
+                    Text(stringResource(R.string.action_cancel))
                 }
                 Button(
                     onClick = {
@@ -163,7 +165,7 @@ fun CountdownConfigSheet(
                     },
                     enabled = totalSeconds > 0L
                 ) {
-                    Text(if (initial == null) "Criar" else "Salvar")
+                    Text(if (initial == null) stringResource(R.string.action_create) else stringResource(R.string.action_save))
                 }
             }
         }
@@ -172,7 +174,7 @@ fun CountdownConfigSheet(
     // Color picker dialog
     if (showColorPicker) {
         ColorPickerDialog(
-            title = "Cor do Card",
+            title = stringResource(R.string.countdown_color_card_title),
             initialColor = bgColor,
             initialOpacity = 1f,
             onConfirm = { color, _ -> 
@@ -183,3 +185,4 @@ fun CountdownConfigSheet(
         )
     }
 }
+

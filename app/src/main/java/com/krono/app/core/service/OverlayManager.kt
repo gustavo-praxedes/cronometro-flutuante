@@ -83,13 +83,15 @@ class OverlayManager(
                 val toolStateFlow = activeToolState()
                 val rawState = toolStateFlow?.collectAsState()?.value
 
-                KronoTheme(selectedTheme = config.selectedTheme) {
+                KronoTheme(selectedTheme = config.selectedTheme, appFontSize = config.appFontSize) {
                     when (config.activeToolId) {
                         "pomodoro" -> {
                             val pomodoroState = (rawState as? com.krono.app.feature.pomodoro.PomodoroState)
                                 ?: com.krono.app.feature.pomodoro.PomodoroState()
                             PomodoroOverlay(
                                 state = pomodoroState,
+                                config = config,
+                                timeFormat = config.pomodoroFormat,
                                 onPlay = onStart,
                                 onPause = onPause,
                                 onReset = onReset,
@@ -129,7 +131,7 @@ class OverlayManager(
                                 },
                                 onToggleBeep = {
                                     serviceScope.launch {
-                                        dataStore.updateConfig(config.copy(isBeepEnabled = !config.isBeepEnabled))
+                                        dataStore.updateConfig(config.copy(playPauseSoundEnabled = !config.playPauseSoundEnabled))
                                     }
                                 },
                                 onMenuVisibilityChange = { menuOpen -> setOverlayFocusable(menuOpen) }

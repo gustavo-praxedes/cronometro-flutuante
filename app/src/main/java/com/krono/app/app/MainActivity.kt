@@ -5,6 +5,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import java.util.Locale
 import androidx.activity.ComponentActivity
 import androidx.activity.addCallback
 import androidx.activity.compose.setContent
@@ -83,8 +84,18 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val config by dataStore.configFlow.collectAsState(initial = OverlayConfig())
+            LaunchedEffect(config.appLanguage) {
+                val localeTag = config.appLanguage.ifBlank { "pt-BR" }
+                val locale = Locale.forLanguageTag(localeTag)
+                Locale.setDefault(locale)
+                val res = resources
+                val conf = res.configuration
+                conf.setLocale(locale)
+                @Suppress("DEPRECATION")
+                res.updateConfiguration(conf, res.displayMetrics)
+            }
 
-            KronoTheme(selectedTheme = config.selectedTheme) {
+            KronoTheme(selectedTheme = config.selectedTheme, appFontSize = config.appFontSize) {
                 val surfaceColor = MaterialTheme.colorScheme.background
                 
                 Surface(
@@ -119,19 +130,16 @@ class MainActivity : ComponentActivity() {
             lifecycleScope.launch { permissionsDialogEvents.emit(Unit) }
             return
         }
-        startServiceAndMinimize()
+        startServiceWithoutMinimize()
     }
 
-    private fun startServiceAndMinimize() {
+    private fun startServiceWithoutMinimize() {
         lifecycleScope.launch {
             val config = dataStore.configFlow.first()
             val intent = Intent(this@MainActivity, MainService::class.java).apply {
                 action = if (config.focusModeEnabled) ACTION_START_FOCUS else ACTION_SHOW_OVERLAY
             }
             startForegroundService(intent)
-            android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
-                moveTaskToBack(true)
-            }, 100)
         }
     }
 

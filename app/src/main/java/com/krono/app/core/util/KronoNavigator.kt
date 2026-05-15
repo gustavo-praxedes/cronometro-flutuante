@@ -1,4 +1,4 @@
-package com.krono.app.core.util
+﻿package com.krono.app.core.util
 
 import android.content.Context
 import android.content.Intent
@@ -39,3 +39,4 @@ object KronoNavigator {
         TransparentProxyActivity.start(context, TransparentProxyActivity.TYPE_PERMISSIONS)
     }
 }
+

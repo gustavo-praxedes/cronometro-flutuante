@@ -16,7 +16,6 @@ class PomodoroTool(
 
     @Composable
     fun SettingsContent() {
-        PomodoroSettings()
+        // Settings rendered by SettingsPanelHost
     }
 }
-

@@ -1,73 +1,34 @@
 package com.krono.app.core.ui.components
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.krono.app.R
 import com.krono.app.core.ui.theme.KronoThemeOption
 import com.krono.app.core.ui.theme.KronoTokens
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ThemeSelector(
     selectedTheme: String,
-    onChange     : (String) -> Unit
+    onChange: (String) -> Unit
 ) {
-    var expanded by remember { mutableStateOf(false) }
-    val current  = KronoThemeOption.entries.find { it.name == selectedTheme }
-        ?: KronoThemeOption.AUTO
-
-    Row(
-        modifier              = Modifier.fillMaxWidth(),
-        verticalAlignment     = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+    val current = KronoThemeOption.entries.find { it.name == selectedTheme } ?: KronoThemeOption.AUTO
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = KronoTokens.Spacing.md, vertical = KronoTokens.Spacing.sm),
+        verticalArrangement = Arrangement.spacedBy(KronoTokens.Spacing.sm)
     ) {
-        Text(
-            text     = "Tema",
-            style    = MaterialTheme.typography.bodyMedium,
-            color    = MaterialTheme.colorScheme.onSurface
+        KronoDropdown(
+            value = current.name,
+            onValueChange = onChange,
+            options = KronoThemeOption.entries.map { it.name },
+            label = stringResource(R.string.label_theme),
+            textMapping = { key -> KronoThemeOption.entries.find { it.name == key }?.label ?: key }
         )
-
-        ExposedDropdownMenuBox(
-            expanded         = expanded,
-            onExpandedChange = { expanded = !expanded },
-            modifier         = Modifier.fillMaxWidth()
-        ) {
-            OutlinedTextField(
-                value         = current.label,
-                onValueChange = {},
-                readOnly      = true,
-                label         = { Text("Tema") },
-                trailingIcon  = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                shape         = KronoTokens.Shape.input,
-                colors        = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.outline
-                ),
-                modifier      = Modifier
-                    .menuAnchor(MenuAnchorType.PrimaryNotEditable)
-                    .fillMaxWidth(),
-                textStyle     = MaterialTheme.typography.bodyMedium,
-                singleLine    = true
-            )
-
-            ExposedDropdownMenu(
-                expanded         = expanded,
-                onDismissRequest = { expanded = false }
-            ) {
-                KronoThemeOption.entries.forEach { option ->
-                    DropdownMenuItem(
-                        text    = { Text(option.label) },
-                        onClick = {
-                            onChange(option.name)
-                            expanded = false
-                        }
-                    )
-                }
-            }
-        }
     }
 }

@@ -1,4 +1,4 @@
-package com.krono.app.core.ui.theme
+﻿package com.krono.app.core.ui.theme
 
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
@@ -209,3 +209,4 @@ fun overlayColorsForTheme(option: KronoThemeOption, systemIsDark: Boolean): Pair
         KronoThemeOption.AUTO             -> Pair(0xFF1E1E2E.toInt(), 0xFFCDD6F4.toInt()) // nunca alcançado
     }
 }
+

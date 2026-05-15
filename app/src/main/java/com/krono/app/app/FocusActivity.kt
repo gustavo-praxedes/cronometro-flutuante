@@ -1,4 +1,4 @@
-package com.krono.app
+﻿package com.krono.app
 
 import android.content.BroadcastReceiver
 import android.content.Context

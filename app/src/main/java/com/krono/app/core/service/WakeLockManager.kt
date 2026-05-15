@@ -1,4 +1,4 @@
-package com.krono.app.core.service
+﻿package com.krono.app.core.service
 
 import android.content.Context
 import android.os.PowerManager
@@ -31,3 +31,4 @@ class WakeLockManager(private val context: Context) {
         wakeLock = null
     }
 }
+

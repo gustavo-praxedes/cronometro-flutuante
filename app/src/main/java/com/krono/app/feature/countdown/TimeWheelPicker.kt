@@ -1,4 +1,4 @@
-package com.krono.app.feature.countdown
+﻿package com.krono.app.feature.countdown
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -104,7 +104,7 @@ private fun WheelLabel(text: String) {
     Text(
         text = text,
         fontSize = KronoTokens.Wheel.labelFontSize,
-        fontWeight = FontWeight.Bold,
+        fontWeight = FontWeight.Normal,
         color = MaterialTheme.colorScheme.primary.copy(alpha = KronoTokens.Alpha.label),
         modifier = Modifier.padding(bottom = KronoTokens.Spacing.xs),
         maxLines = 1,
@@ -198,7 +198,7 @@ private fun WheelColumn(
                     Text(
                         text = items[index].toString().padStart(2, '0'),
                         fontSize = KronoTokens.Wheel.selectedFontSize,
-                        fontWeight = if (dist == 0) FontWeight.ExtraBold else FontWeight.Bold,
+                        fontWeight = if (dist == 0) FontWeight.Normal else FontWeight.Normal,
                         color = if (dist == 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
                         textAlign = TextAlign.Center
                     )
@@ -215,7 +215,7 @@ private fun Separator() {
     Text(
         ":",
         fontSize = KronoTokens.Wheel.separatorFontSize,
-        fontWeight = FontWeight.Black,
+        fontWeight = FontWeight.Normal,
         color = MaterialTheme.colorScheme.primary.copy(alpha = KronoTokens.Alpha.separator),
         modifier = Modifier.width(KronoTokens.Wheel.separatorWidth),
         textAlign = TextAlign.Center

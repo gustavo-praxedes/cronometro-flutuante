@@ -1,4 +1,4 @@
-package com.krono.app.core.tool
+﻿package com.krono.app.core.tool
 
 /**
  * Representa os dados necessários para exibir uma notificação de ferramenta.
@@ -12,3 +12,4 @@ data class NotificationContent(
     val pauseOffset: Long = 0L,
     val elapsedMs: Long = 0L
 )
+

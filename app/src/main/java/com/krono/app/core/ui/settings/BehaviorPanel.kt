@@ -1,4 +1,4 @@
-package com.krono.app.core.ui.settings
+﻿package com.krono.app.core.ui.settings
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -13,7 +13,6 @@ import com.krono.app.core.data.OverlayConfig
 import com.krono.app.core.data.OverlayDataStore
 import com.krono.app.core.ui.theme.KronoTokens
 import com.krono.app.core.ui.components.ToggleRow
-import com.krono.app.feature.stopwatch.TimeLimitField
 import kotlinx.coroutines.launch
 
 @Composable
@@ -37,7 +36,8 @@ fun BehaviorPanel(
 
         SettingsGroup(title = stringResource(R.string.settings_group_general)) {
             ToggleRow(
-                label = stringResource(R.string.label_auto_launch),
+                label = stringResource(R.string.behavior_auto_launch_label),
+                subtitle = stringResource(R.string.behavior_auto_launch_subtitle),
                 checked = config.autoLaunch,
                 onChange = {
                     scope.launch { dataStore.updateConfig(config.copy(autoLaunch = it)) }
@@ -46,6 +46,7 @@ fun BehaviorPanel(
 
             ToggleRow(
                 label = stringResource(R.string.label_wake_lock),
+                subtitle = stringResource(R.string.behavior_keep_screen_subtitle),
                 checked = config.keepScreenOn,
                 onChange = {
                     scope.launch { dataStore.updateConfig(config.copy(keepScreenOn = it)) }
@@ -56,6 +57,7 @@ fun BehaviorPanel(
 
             ToggleRow(
                 label = stringResource(R.string.label_focus_mode),
+                subtitle = stringResource(R.string.behavior_focus_mode_subtitle),
                 checked = config.focusModeEnabled,
                 onChange = { isEnabled ->
                     scope.launch { dataStore.updateConfig(config.copy(focusModeEnabled = isEnabled)) }
@@ -63,32 +65,10 @@ fun BehaviorPanel(
                 }
             )
 
-            GroupDivider()
-
-            ToggleRow(
-                label = stringResource(R.string.label_beep_enabled),
-                checked = config.isBeepEnabled,
-                onChange = {
-                    scope.launch { dataStore.updateConfig(config.copy(isBeepEnabled = it)) }
-                }
-            )
-
-            GroupDivider()
-
-            ToggleRow(
-                label = stringResource(R.string.label_vibration_enabled),
-                checked = config.isVibrationEnabled,
-                onChange = {
-                    scope.launch { dataStore.updateConfig(config.copy(isVibrationEnabled = it)) }
-                }
-            )
-        }
-
-        SettingsGroup(title = stringResource(R.string.settings_group_time_limit)) {
-            TimeLimitField(
-                timeLimitSeconds = config.timeLimitSeconds,
-                onConfirm = { seconds ->
-                    scope.launch { dataStore.updateConfig(config.copy(timeLimitSeconds = seconds)) }
+            AppFontSizeSelector(
+                selected = config.appFontSize,
+                onChange = { size ->
+                    scope.launch { dataStore.updateConfig(config.copy(appFontSize = size)) }
                 }
             )
         }
@@ -104,3 +84,4 @@ private fun GroupDivider() {
         thickness = 0.5.dp
     )
 }
+

@@ -1,4 +1,4 @@
-package com.krono.app.core.ui.settings
+﻿package com.krono.app.core.ui.settings
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -7,11 +7,13 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.krono.app.BuildConfig
+import com.krono.app.R
 import com.krono.app.core.ui.theme.KronoIcons
 import com.krono.app.core.ui.theme.KronoTokens
 import kotlinx.coroutines.Dispatchers
@@ -59,12 +61,12 @@ fun BugReportPanel(modifier: Modifier = Modifier) {
     ) {
         Spacer(Modifier.height(KronoTokens.Spacing.sm))
 
-        SettingsGroup(title = "Relatar bug") {
+        SettingsGroup(title = stringResource(R.string.bug_report_title)) {
             Column(modifier = Modifier.padding(KronoTokens.Spacing.lg)) {
                 OutlinedTextField(
                     value = name,
                     onValueChange = { if (it.length <= 50) name = it },
-                    label = { Text("Nome (opcional)") },
+                    label = { Text(stringResource(R.string.bug_report_name_optional)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words)
@@ -75,12 +77,12 @@ fun BugReportPanel(modifier: Modifier = Modifier) {
                 OutlinedTextField(
                     value = email,
                     onValueChange = { if (it.length <= 50) email = it },
-                    label = { Text("Email (opcional)") },
+                    label = { Text(stringResource(R.string.bug_report_email_optional)) },
                     singleLine = true,
                     isError = emailError,
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                    supportingText = { if (emailError) Text("Email inválido", color = MaterialTheme.colorScheme.error) }
+                    supportingText = { if (emailError) Text(stringResource(R.string.bug_report_email_invalid), color = MaterialTheme.colorScheme.error) }
                 )
 
                 Spacer(Modifier.height(KronoTokens.Spacing.md))
@@ -88,7 +90,7 @@ fun BugReportPanel(modifier: Modifier = Modifier) {
                 OutlinedTextField(
                     value = message,
                     onValueChange = { if (it.length <= 250) message = it },
-                    label = { Text("Descrição do problema *") },
+                    label = { Text(stringResource(R.string.bug_report_description_required)) },
                     minLines = 4,
                     maxLines = 8,
                     modifier = Modifier.fillMaxWidth(),
@@ -98,8 +100,8 @@ fun BugReportPanel(modifier: Modifier = Modifier) {
                 Spacer(Modifier.height(KronoTokens.Spacing.md))
 
                 when (submitState) {
-                    is InlineSubmitState.Success -> Text("Relatório enviado com sucesso.", color = MaterialTheme.colorScheme.primary)
-                    is InlineSubmitState.Error -> Text("Falha ao enviar. Tente novamente.", color = MaterialTheme.colorScheme.error)
+                    is InlineSubmitState.Success -> Text(stringResource(R.string.bug_report_success), color = MaterialTheme.colorScheme.primary)
+                    is InlineSubmitState.Error -> Text(stringResource(R.string.bug_report_error), color = MaterialTheme.colorScheme.error)
                     else -> Unit
                 }
 
@@ -124,11 +126,11 @@ fun BugReportPanel(modifier: Modifier = Modifier) {
                             color = MaterialTheme.colorScheme.onPrimary
                         )
                         Spacer(Modifier.width(KronoTokens.Button.iconSpacing))
-                        Text("Enviando...")
+                        Text(stringResource(R.string.bug_report_sending))
                     } else {
                         Icon(KronoIcons.Status.Bug, contentDescription = null)
                         Spacer(Modifier.width(KronoTokens.Button.iconSpacing))
-                        Text("Enviar relatório", textAlign = TextAlign.Center)
+                        Text(stringResource(R.string.bug_report_send_button), textAlign = TextAlign.Center)
                     }
                 }
             }
@@ -170,3 +172,4 @@ private suspend fun submitBugReport(
         InlineSubmitState.Error
     }
 }
+

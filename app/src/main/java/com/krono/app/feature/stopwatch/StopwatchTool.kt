@@ -1,4 +1,4 @@
-package com.krono.app.feature.stopwatch
+﻿package com.krono.app.feature.stopwatch
 
 import android.app.Notification
 import androidx.compose.runtime.Composable
@@ -43,3 +43,4 @@ class StopwatchTool(
         // Na Fase 2.4 abstrairemos isso via KronoTool.
     }
 }
+

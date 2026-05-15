@@ -1,4 +1,4 @@
-package com.krono.app.core.ui.settings
+﻿package com.krono.app.core.ui.settings
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.ui.zIndex
@@ -136,7 +136,7 @@ Column(modifier = Modifier.fillMaxSize()) {
                             style = MaterialTheme.typography.titleLarge.copy(
                                 fontSize = KronoTokens.Typography.dialogTitle
                             ),
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Normal
                         )
                     }
 
@@ -171,14 +171,14 @@ Column(modifier = Modifier.fillMaxSize()) {
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = 48.dp, start = KronoTokens.Spacing.lg),
-                        verticalAlignment = Alignment.Top
+                        verticalAlignment = Alignment.Bottom
                     ) {
                         Text(
                             text = stringResource(selectedDestination.titleRes),
                             style = MaterialTheme.typography.titleLarge.copy(
                                 fontSize = KronoTokens.Typography.dialogTitle
                             ),
-                            fontWeight = FontWeight.Bold,
+                            fontWeight = FontWeight.Normal,
                             color = MaterialTheme.colorScheme.onSurface
                         )
                     }
@@ -271,7 +271,7 @@ private fun NarrowScreenLayout(
                             stringResource(selectedDestination.titleRes)
                         else
                             stringResource(R.string.settings_title),
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.Normal,
                         fontSize = 20.sp
                     )
                 },
@@ -359,3 +359,5 @@ private fun NarrowScreenLayout(
         }
     }
 }
+
+

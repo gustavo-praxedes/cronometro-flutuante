@@ -1,4 +1,4 @@
-package com.krono.app.core.ui.theme
+﻿package com.krono.app.core.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.material3.Typography
 
 /**
  * KronoTheme: Componente principal de tema do aplicativo.
@@ -14,6 +15,7 @@ import androidx.compose.ui.Modifier
 @Composable
 fun KronoTheme(
     selectedTheme: String,
+    appFontSize: String = "NORMAL",
     content: @Composable () -> Unit
 ) {
     val systemIsDark = isSystemInDarkTheme()
@@ -32,12 +34,30 @@ fun KronoTheme(
         KronoThemeOption.AUTO             -> if (systemIsDark) DarkModernColors else LightModernColors
     }
 
+    val fontScale = when (appFontSize) {
+        "LARGE" -> 1.15f
+        else -> 1f
+    }
+    val scaledTypography = AppTypography.scaled(fontScale)
+
     MaterialTheme(
         colorScheme = colorScheme,
-        typography  = AppTypography,
+        typography  = scaledTypography,
         content     = content
     )
 }
+
+private fun Typography.scaled(scale: Float): Typography = copy(
+    bodyLarge = bodyLarge.copy(fontSize = bodyLarge.fontSize * scale, lineHeight = bodyLarge.lineHeight * scale),
+    bodyMedium = bodyMedium.copy(fontSize = bodyMedium.fontSize * scale, lineHeight = bodyMedium.lineHeight * scale),
+    bodySmall = bodySmall.copy(fontSize = bodySmall.fontSize * scale, lineHeight = bodySmall.lineHeight * scale),
+    titleLarge = titleLarge.copy(fontSize = titleLarge.fontSize * scale, lineHeight = titleLarge.lineHeight * scale),
+    titleMedium = titleMedium.copy(fontSize = titleMedium.fontSize * scale, lineHeight = titleMedium.lineHeight * scale),
+    titleSmall = titleSmall.copy(fontSize = titleSmall.fontSize * scale, lineHeight = titleSmall.lineHeight * scale),
+    labelLarge = labelLarge.copy(fontSize = labelLarge.fontSize * scale, lineHeight = labelLarge.lineHeight * scale),
+    labelMedium = labelMedium.copy(fontSize = labelMedium.fontSize * scale, lineHeight = labelMedium.lineHeight * scale),
+    labelSmall = labelSmall.copy(fontSize = labelSmall.fontSize * scale, lineHeight = labelSmall.lineHeight * scale)
+)
 
 /**
  * Modificador para tornar o diálogo adaptativo: usa uma fração da tela,
@@ -47,3 +67,4 @@ fun KronoTheme(
 fun Modifier.adaptiveDialogWidth(): Modifier = this
     .fillMaxWidth(KronoTokens.Spacing.dialogWidthFrac)
     .widthIn(max = KronoTokens.Spacing.maxDialogWidth)
+

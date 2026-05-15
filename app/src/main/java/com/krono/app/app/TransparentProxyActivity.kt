@@ -1,4 +1,4 @@
-package com.krono.app
+﻿package com.krono.app
 
 import android.content.Intent
 import android.net.Uri
@@ -110,7 +110,7 @@ class TransparentProxyActivity : ComponentActivity() {
             }
             val hasInstall = remember(trigger) { packageManager.canRequestPackageInstalls() }
 
-            KronoTheme(selectedTheme = config.selectedTheme) {
+            KronoTheme(selectedTheme = config.selectedTheme, appFontSize = config.appFontSize) {
                 Surface(modifier = Modifier.fillMaxSize(), color = Color.Transparent) {
                     when (type) {
                         TYPE_PERMISSIONS -> PermissionsDialog(
@@ -131,3 +131,4 @@ class TransparentProxyActivity : ComponentActivity() {
         }
     }
 }
+

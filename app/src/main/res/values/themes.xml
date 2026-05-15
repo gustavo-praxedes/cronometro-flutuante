@@ -1,4 +1,4 @@
-<resources>
+﻿<resources>
     <!-- Base application theme. -->
     <style name="Theme.Krono" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
@@ -25,3 +25,4 @@
         <item name="android:backgroundDimEnabled">true</item>
     </style>
 </resources>
+

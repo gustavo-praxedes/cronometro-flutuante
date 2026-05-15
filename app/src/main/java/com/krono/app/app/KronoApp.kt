@@ -1,4 +1,4 @@
-package com.krono.app
+﻿package com.krono.app
 
 import android.app.Application
 import android.app.NotificationChannel
@@ -70,3 +70,4 @@ class KronoApp : Application() {
         }
     }
 }
+

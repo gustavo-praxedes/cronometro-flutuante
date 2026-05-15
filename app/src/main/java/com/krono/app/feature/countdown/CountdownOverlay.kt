@@ -1,4 +1,4 @@
-package com.krono.app.feature.countdown
+﻿package com.krono.app.feature.countdown
 
 import androidx.compose.animation.Animatable
 import androidx.compose.animation.animateColorAsState
@@ -20,7 +20,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.krono.app.core.data.TimeUtils
+import com.krono.app.core.data.TimerDisplayFormat
+import com.krono.app.core.data.formatSecondsByPattern
 import com.krono.app.core.ui.theme.KronoIcons
 import com.krono.app.core.ui.theme.KronoTokens
 import kotlinx.coroutines.launch
@@ -38,13 +39,22 @@ fun CountdownOverlayUi(
     onBottomExtraAction: (() -> Unit)? = null,
     bottomExtraIcon: ImageVector? = null,
     bottomExtraDescription: String = "",
+    timeFormat: String = "HH_MM_SS",
+    showButtons: Boolean = true,
+    showHours: Boolean = true,
+    showSeconds: Boolean = true,
+    selectedFont: String = "CHIVO_MONO",
+    overlayScale: Float = 1f,
+    overlayCornerRadius: Float = KronoTokens.Overlay.defaultCornerRadius.value,
+    overlayCustomColor: Int? = null,
     overlayWidthScale: Float = 0.96f,
     bottomExtraButtonScale: Float = 1f,
     bottomExtraIconScale: Float = 1f,
     modifier: Modifier = Modifier
 ) {
-    val bgColor = Color(state.config.backgroundColor)
+    val bgColor = Color(overlayCustomColor ?: state.config.backgroundColor)
     val textColor = overlayTextColor(bgColor)
+    val displayFormat = TimerDisplayFormat.fromKey(timeFormat)
     val entranceScale = remember { Animatable(KronoTokens.Alpha.entranceInitialScale) }
     val entranceAlpha = remember { Animatable(0f) }
     var isDragging by remember { mutableStateOf(false) }
@@ -65,20 +75,22 @@ fun CountdownOverlayUi(
     )
 
     val currentScale = entranceScale.value
-    val cornerRadius = (KronoTokens.Overlay.defaultCornerRadius.value * currentScale)
+    val cornerRadius = (overlayCornerRadius * currentScale * overlayScale)
         .coerceAtMost(KronoTokens.Overlay.maxCornerRadiusFloat).dp
     val shape = RoundedCornerShape(cornerRadius)
-    val paddingH = (KronoTokens.Overlay.paddingH.value * currentScale).dp
-    val paddingV = (KronoTokens.Overlay.paddingV.value * currentScale).dp
-    val btnTopPadding = (KronoTokens.Overlay.btnTopPadding.value * currentScale).dp
-    val iconSizeDp = (KronoTokens.Overlay.iconSize.value * currentScale).dp
-    val btnSize = (KronoTokens.Overlay.buttonSize.value * currentScale).dp
-    val controlGap = (KronoTokens.Spacing.sm.value * currentScale).dp
+    val paddingH = (KronoTokens.Overlay.paddingH.value * currentScale * overlayScale).dp
+    val paddingV = (KronoTokens.Overlay.paddingV.value * currentScale * overlayScale).dp
+    val btnTopPadding = (KronoTokens.Overlay.btnTopPadding.value * currentScale * overlayScale).dp
+    val iconSizeDp = (KronoTokens.Overlay.iconSize.value * currentScale * overlayScale).dp
+    val btnSize = (KronoTokens.Overlay.buttonSize.value * currentScale * overlayScale).dp
+    val controlGap = (KronoTokens.Spacing.sm.value * currentScale * overlayScale).dp
     val closeBtnSize = (KronoTokens.Overlay.buttonSize.value * currentScale * 0.78f).dp
     val closeIconSize = (KronoTokens.Overlay.iconSize.value * currentScale * 0.78f).dp
-    val minWidth = (KronoTokens.Overlay.minWidth.value * currentScale * overlayWidthScale).dp
+    val minWidth = (KronoTokens.Overlay.minWidth.value * currentScale * overlayWidthScale * overlayScale).dp
     val maxWidth = (KronoTokens.Overlay.maxWidth.value * overlayWidthScale).dp
-    val controlsCount = 2 + (if (onBottomExtraAction != null && bottomExtraIcon != null) 1 else 0) + (if (showBottomClose) 1 else 0)
+    val controlsCount = if (showButtons) {
+        2 + (if (onBottomExtraAction != null && bottomExtraIcon != null) 1 else 0) + (if (showBottomClose) 1 else 0)
+    } else 1
     val controlsWidth = (btnSize * controlsCount) + (controlGap * (controlsCount - 1).coerceAtLeast(0))
 
     val borderColor by animateColorAsState(
@@ -94,6 +106,8 @@ fun CountdownOverlayUi(
         animationSpec = tween(KronoTokens.Motion.durationNormal),
         label = "bg_color"
     )
+    val labelText = state.config.description.trim()
+    val hasLabel = labelText.isNotEmpty()
 
     Box(
         modifier = modifier
@@ -132,8 +146,8 @@ fun CountdownOverlayUi(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = state.config.description.ifBlank { "Cronometro" },
-                    color = textColor.copy(alpha = KronoTokens.Alpha.medium),
+                    text = if (hasLabel) labelText else " ",
+                    color = if (hasLabel) textColor.copy(alpha = KronoTokens.Alpha.medium) else Color.Transparent,
                     fontSize = (KronoTokens.Typography.statusLabel.value * currentScale).sp,
                     fontWeight = FontWeight.Medium,
                     maxLines = 1,
@@ -156,17 +170,26 @@ fun CountdownOverlayUi(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = TimeUtils.formatSeconds(state.remainingSeconds),
+                    text = formatSecondsByPattern(
+                        state.remainingSeconds,
+                        when {
+                            showHours && showSeconds -> displayFormat
+                            showHours && !showSeconds -> TimerDisplayFormat.HH_MM
+                            !showHours && showSeconds -> TimerDisplayFormat.MM_SS
+                            else -> TimerDisplayFormat.MM_SS
+                        }
+                    ),
                     color = textColor,
                     fontSize = (KronoTokens.Overlay.timerFontSize.value * KronoTokens.Alpha.overlayTimerScale * currentScale).sp,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.Normal,
+                    fontFamily = com.krono.app.core.ui.theme.timerFontFamily(selectedFont),
                     maxLines = 1,
                     softWrap = false
                 )
 
                 Spacer(Modifier.weight(1f))
 
-                Row(
+                if (showButtons) Row(
                     horizontalArrangement = Arrangement.spacedBy(controlGap),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -221,3 +244,4 @@ private fun AnimatedIconButton(
 ) {
     IconButton(onClick = onClick, modifier = modifier) { content() }
 }
+

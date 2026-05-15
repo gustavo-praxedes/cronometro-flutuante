@@ -1,4 +1,4 @@
-package com.krono.app.core.service
+﻿package com.krono.app.core.service
 
 import android.content.Context
 import android.media.AudioManager
@@ -26,10 +26,13 @@ class FeedbackManager(context: Context) {
     }
 
     fun triggerFeedback(config: OverlayConfig) {
-        if (config.isBeepEnabled) {
+        if (config.playPauseSoundEnabled) {
+            val volume = (config.playPauseVolume.coerceIn(0f, 1f) * 100).toInt().coerceIn(0, 100)
+            toneGenerator?.release()
+            toneGenerator = try { ToneGenerator(AudioManager.STREAM_ALARM, volume) } catch (_: Exception) { null }
             toneGenerator?.startTone(ToneGenerator.TONE_PROP_BEEP, 150)
         }
-        if (config.isVibrationEnabled) {
+        if (config.playPauseVibrationEnabled) {
             vibrator?.vibrate(
                 VibrationEffect.createOneShot(50L, VibrationEffect.DEFAULT_AMPLITUDE)
             )
@@ -60,3 +63,4 @@ class FeedbackManager(context: Context) {
         toneGenerator = null
     }
 }
+

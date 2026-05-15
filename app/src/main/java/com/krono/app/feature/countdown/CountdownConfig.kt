@@ -1,4 +1,4 @@
-package com.krono.app.feature.countdown
+﻿package com.krono.app.feature.countdown
 
 import android.graphics.Color
 import kotlinx.serialization.Serializable
@@ -12,3 +12,4 @@ data class CountdownConfig(
     val backgroundColor: Int    = Color.WHITE,                 // branco por padrão
     val createdAt      : Long   = System.currentTimeMillis()
 )
+

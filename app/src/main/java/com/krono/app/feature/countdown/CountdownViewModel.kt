@@ -1,4 +1,4 @@
-package com.krono.app.feature.countdown
+﻿package com.krono.app.feature.countdown
 
 import android.content.Context
 import android.content.Intent
@@ -64,15 +64,18 @@ class CountdownViewModel(
 
     private val _countdowns = MutableStateFlow<List<CountdownState>>(emptyList())
     val countdowns: StateFlow<List<CountdownState>> = _countdowns.asStateFlow()
+    private val transientIds = mutableSetOf<String>()
 
     init {
         viewModelScope.launch {
             dataStore.configs.collect { configs ->
                 val current = _countdowns.value.associateBy { it.config.id }
-                _countdowns.value = configs.map { config ->
+                val persistedStates = configs.map { config ->
                     current[config.id]?.copy(config = config)
                         ?: CountdownState(config = config)
                 }
+                val transientStates = _countdowns.value.filter { it.config.id in transientIds }
+                _countdowns.value = persistedStates + transientStates
             }
         }
     }
@@ -80,24 +83,60 @@ class CountdownViewModel(
     // ── CRUD ──────────────────────────────────────────────────────────────────
 
     fun addCountdown(config: CountdownConfig) {
-        if (_countdowns.value.size >= MAX_COUNTDOWNS) return
+        if (persistentConfigs().size >= MAX_COUNTDOWNS) return
         viewModelScope.launch {
-            dataStore.save(_countdowns.value.map { it.config } + config)
+            dataStore.save(persistentConfigs() + config)
         }
     }
 
     fun updateConfig(config: CountdownConfig) {
         viewModelScope.launch {
-            dataStore.save(_countdowns.value.map {
-                if (it.config.id == config.id) config else it.config
+            dataStore.save(persistentConfigs().map {
+                if (it.id == config.id) config else it
             })
         }
     }
 
     fun deleteCountdown(context: Context, id: String) {
         sendAction(context, ACTION_COUNTDOWN_DESTROY, id)
+        if (id in transientIds) {
+            transientIds.remove(id)
+            _countdowns.update { list -> list.filter { it.config.id != id } }
+            return
+        }
         viewModelScope.launch {
-            dataStore.save(_countdowns.value.filter { it.config.id != id }.map { it.config })
+            dataStore.save(persistentConfigs().filter { it.id != id })
+        }
+    }
+
+    fun upsertTransientCountdown(
+        config: CountdownConfig,
+        remainingSeconds: Long,
+        isRunning: Boolean
+    ) {
+        transientIds.add(config.id)
+        val safeRemaining = remainingSeconds.coerceAtLeast(0L)
+        _countdowns.update { list ->
+            val index = list.indexOfFirst { it.config.id == config.id }
+            if (index >= 0) {
+                list.map { state ->
+                    if (state.config.id == config.id) {
+                        state.copy(
+                            config = config,
+                            remainingSeconds = safeRemaining,
+                            isRunning = isRunning,
+                            isCompleted = safeRemaining <= 0L && !isRunning
+                        )
+                    } else state
+                }
+            } else {
+                list + CountdownState(
+                    config = config,
+                    remainingSeconds = safeRemaining,
+                    isRunning = isRunning,
+                    isCompleted = safeRemaining <= 0L && !isRunning
+                )
+            }
         }
     }
 
@@ -193,4 +232,10 @@ class CountdownViewModel(
             }
         )
     }
+
+    private fun persistentConfigs(): List<CountdownConfig> =
+        _countdowns.value
+            .filterNot { it.config.id in transientIds }
+            .map { it.config }
 }
+

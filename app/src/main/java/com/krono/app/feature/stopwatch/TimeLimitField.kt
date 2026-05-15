@@ -1,4 +1,4 @@
-package com.krono.app.feature.stopwatch
+﻿package com.krono.app.feature.stopwatch
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions

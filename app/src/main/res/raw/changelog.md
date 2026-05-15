@@ -1,4 +1,5 @@
 # ✨ Novidades
+- feat: Pomodoro adicionado
 - feat: settings two-panel navigation
 - feat: add SettingsPanelHost dispatcher
 - feat: add SettingsMenuPanel

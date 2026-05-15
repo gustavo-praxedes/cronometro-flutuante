@@ -1,4 +1,4 @@
-package com.krono.app.core.ui.dialogs
+﻿package com.krono.app.core.ui.dialogs
 
 import android.os.Build
 import androidx.compose.animation.AnimatedVisibility
@@ -15,10 +15,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import com.krono.app.core.ui.theme.KronoTokens
+import com.krono.app.R
 import com.krono.app.core.ui.theme.adaptiveDialogWidth
 import androidx.compose.ui.unit.dp
 
@@ -62,11 +64,11 @@ fun PermissionsDialog(
                     contentAlignment = Alignment.Center
                 ) {
                      Text(
-                         text       = "Permissões Necessárias",
+                         text       = stringResource(R.string.permissions_title),
                          style      = MaterialTheme.typography.headlineSmall.copy(
                              platformStyle = PlatformTextStyle(includeFontPadding = false)
                          ),
-                         fontWeight = FontWeight.Bold,
+                         fontWeight = FontWeight.Normal,
                          fontSize   = KronoTokens.Typography.dialogTitle,
                          textAlign  = TextAlign.Center,
                          modifier   = Modifier.padding(horizontal = KronoTokens.Spacing.dialogPadding)
@@ -80,7 +82,7 @@ fun PermissionsDialog(
                     ) {
                         Icon(
                             imageVector        = KronoIcons.Navigation.Close,
-                            contentDescription = "Fechar",
+                            contentDescription = stringResource(R.string.action_close),
                             tint               = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
@@ -89,7 +91,7 @@ fun PermissionsDialog(
                 Spacer(Modifier.height(KronoTokens.Spacing.sectionGap))
 
                 Text(
-                    text      = "Ative as permissões abaixo para usar todos os recursos do Krono.",
+                    text      = stringResource(R.string.permissions_subtitle),
                     style     = MaterialTheme.typography.bodyMedium.copy(
                         platformStyle = PlatformTextStyle(includeFontPadding = false)
                     ),
@@ -104,8 +106,8 @@ fun PermissionsDialog(
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     PermissionItem(
                         icon        = KronoIcons.Action.Notification,
-                        title       = "Notificações",
-                        description = "Exibe o cronômetro na barra de status.",
+                        title       = stringResource(R.string.permissions_notifications_title),
+                        description = stringResource(R.string.permissions_notifications_desc),
                         granted     = hasNotificationPermission,
                         optional    = false,
                         onClick     = onRequestNotification
@@ -116,8 +118,8 @@ fun PermissionsDialog(
                 // ── Permissão: Overlay ────────────────────────
                 PermissionItem(
                     icon        = KronoIcons.Action.Settings,
-                    title       = "Exibir sobre outros apps",
-                    description = "Permite flutuar o widget sobre qualquer app.",
+                    title       = stringResource(R.string.permissions_overlay_title),
+                    description = stringResource(R.string.permissions_overlay_desc),
                     granted     = hasOverlayPermission,
                     optional    = false,
                     onClick     = onRequestOverlay
@@ -128,8 +130,8 @@ fun PermissionsDialog(
                 // ── Permissão: Instalar APK (opcional) ───────
                 PermissionItem(
                     icon        = KronoIcons.Action.Download,
-                    title       = "Instalar atualizações",
-                    description = "Opcional. Permite instalar novas versões direto no app.",
+                    title       = stringResource(R.string.permissions_install_title),
+                    description = stringResource(R.string.permissions_install_desc),
                     granted     = hasInstallPermission,
                     optional    = true,
                     onClick     = onRequestInstall
@@ -167,9 +169,9 @@ fun PermissionsDialog(
                         )
                         Spacer(Modifier.width(KronoTokens.Button.iconSpacing))
                         Text(
-                            text       = "Concluir",
+                            text       = stringResource(R.string.action_done),
                             fontSize   = KronoTokens.Typography.buttonLabel,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Normal
                         )
                     }
                 }
@@ -227,13 +229,13 @@ private fun PermissionItem(
                     Text(
                         text       = title,
                         style      = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.SemiBold,
+                        fontWeight = FontWeight.Normal,
                         color      = MaterialTheme.colorScheme.onSurface
                     )
                     if (optional) {
                         Spacer(Modifier.width(KronoTokens.Spacing.xs))
                         Text(
-                            text  = "opcional",
+                            text  = stringResource(R.string.permissions_optional),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                         )
@@ -257,3 +259,5 @@ private fun PermissionItem(
         }
     }
 }
+
+

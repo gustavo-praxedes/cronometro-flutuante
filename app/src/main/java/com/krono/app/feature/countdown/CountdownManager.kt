@@ -1,4 +1,4 @@
-package com.krono.app.feature.countdown
+﻿package com.krono.app.feature.countdown
 
 import android.content.Context
 import android.view.WindowManager
@@ -149,3 +149,4 @@ class CountdownManager(
     private fun vmState(id: String): CountdownState? =
         countdownViewModel.countdowns.value.find { it.config.id == id }
 }
+

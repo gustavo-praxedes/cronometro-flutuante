@@ -1,4 +1,4 @@
-package com.krono.app.core.ui.theme
+﻿package com.krono.app.core.ui.theme
 
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -230,3 +230,4 @@ object KronoTokens {
         val alphaSelected  = 0.46f
     }
 }
+
