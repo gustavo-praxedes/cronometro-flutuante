@@ -19,6 +19,7 @@ import com.krono.app.core.ui.theme.KronoTokens
 import com.krono.app.feature.countdown.overlayTextColor
 import com.krono.app.core.data.TimerDisplayFormat
 import com.krono.app.core.data.formatSecondsByPattern
+import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
 
 @Composable
@@ -37,9 +38,26 @@ fun CountdownCard(
     val bgColor = Color(state.config.backgroundColor)
     val textColor = overlayTextColor(bgColor)
     val format = TimerDisplayFormat.fromKey(timeFormat)
+    var flashOn by remember(state.config.id) { mutableStateOf(false) }
+    var completionHandled by remember(state.config.id) { mutableStateOf(false) }
+    LaunchedEffect(state.isCompleted) {
+        if (state.isCompleted && !completionHandled) {
+            completionHandled = true
+            repeat(3) {
+                flashOn = true
+                delay(130L)
+                flashOn = false
+                delay(110L)
+            }
+        }
+        if (!state.isCompleted) {
+            completionHandled = false
+            flashOn = false
+        }
+    }
 
     val containerColor by animateColorAsState(
-        targetValue = if (state.isCompleted) MaterialTheme.colorScheme.error else bgColor,
+        targetValue = if (flashOn) MaterialTheme.colorScheme.error else bgColor,
         animationSpec = spring(stiffness = KronoTokens.Motion.durationNormal.toFloat()),
         label = "card_bg"
     )

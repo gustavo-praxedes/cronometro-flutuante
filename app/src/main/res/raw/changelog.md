@@ -14,6 +14,7 @@
 - fix: Bug introduzido na refatoração corrigido
 
 # 🔧 Manutenção
+- chore: Mais refatoração.
 - chore: refatoração de settings
 - Ajuste em Settings
 - Ajustes de design na settings

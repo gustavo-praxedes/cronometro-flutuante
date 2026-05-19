@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.krono.app.R
@@ -24,6 +25,9 @@ import com.krono.app.core.data.OverlayDataStore
 import com.krono.app.core.ui.theme.KronoIcons
 import com.krono.app.core.ui.theme.KronoTokens
 import com.krono.app.core.util.UpdateInfo
+
+private val SettingsHeaderControlSize = 48.dp
+private val SettingsHeaderGap = 8.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -113,29 +117,41 @@ private fun WideScreenLayout(
                 tonalElevation = 0.dp
             ) {
                 Column(modifier = Modifier.fillMaxSize()) {
-                // Header fixo no topo
+                    // Header fixo no topo
+                    Spacer(Modifier.height(KronoTokens.Settings.stickyHeaderTop))
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
+                            .height(SettingsHeaderControlSize)
                             .padding(
                                 start = KronoTokens.Settings.panelHorizontalInset,
-                                end = KronoTokens.Settings.panelHorizontalInset,
-                                top = KronoTokens.Settings.stickyHeaderTop
+                                end = KronoTokens.Settings.panelHorizontalInset
                             ),
-                        verticalAlignment = Alignment.Bottom
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        IconButton(onClick = onBack) {
-                            Icon(
-                                imageVector = KronoIcons.Navigation.Back,
-                                contentDescription = stringResource(R.string.action_back)
-                            )
+                        Box(
+                            modifier = Modifier.size(SettingsHeaderControlSize),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            IconButton(
+                                onClick = onBack,
+                                modifier = Modifier.size(SettingsHeaderControlSize)
+                            ) {
+                                Icon(
+                                    imageVector = KronoIcons.Navigation.Back,
+                                    contentDescription = stringResource(R.string.action_back)
+                                )
+                            }
                         }
+                        Spacer(Modifier.width(SettingsHeaderGap))
                         Text(
                             text = stringResource(R.string.settings_title),
                             style = MaterialTheme.typography.titleLarge.copy(
                                 fontSize = KronoTokens.Typography.dialogTitle
                             ),
-                            fontWeight = FontWeight.Normal
+                            fontWeight = FontWeight.Normal,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
 
@@ -162,19 +178,19 @@ private fun WideScreenLayout(
                 modifier = Modifier
                     .weight(0.65f)
                     .fillMaxHeight()
-                    .padding(horizontal = KronoTokens.Settings.panelHorizontalInset)
             ) {
-                // Sticky header - alinhado com Row do painel esquerdo
+                // Sticky header - mesma baseline vertical do painel esquerdo
                 if (selectedDestination != null) {
+                    Spacer(Modifier.height(KronoTokens.Settings.stickyHeaderTop))
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
+                            .height(SettingsHeaderControlSize)
                             .padding(
-                                top = KronoTokens.Settings.stickyHeaderTop,
                                 start = KronoTokens.Settings.panelHorizontalInset,
                                 end = KronoTokens.Settings.panelHorizontalInset
                             ),
-                        verticalAlignment = Alignment.Bottom
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
                             text = stringResource(selectedDestination.titleRes),
@@ -182,7 +198,9 @@ private fun WideScreenLayout(
                                 fontSize = KronoTokens.Typography.dialogTitle
                             ),
                             fontWeight = FontWeight.Normal,
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = MaterialTheme.colorScheme.onSurface,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
                 }

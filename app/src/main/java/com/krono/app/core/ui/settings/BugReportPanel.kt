@@ -70,7 +70,6 @@ fun BugReportPanel(modifier: Modifier = Modifier) {
                 subtitle = stringResource(R.string.bug_report_dialog_subtitle),
                 leadingIcon = KronoIcons.Status.Bug
             )
-            Spacer(Modifier.height(KronoTokens.Settings.panelSectionGap))
 
             val inputModifier = Modifier
                 .fillMaxWidth()
@@ -103,7 +102,6 @@ fun BugReportPanel(modifier: Modifier = Modifier) {
                     }
                 }
             )
-            Spacer(Modifier.height(KronoTokens.Settings.panelSectionGap))
 
             OutlinedTextField(
                 value = message,

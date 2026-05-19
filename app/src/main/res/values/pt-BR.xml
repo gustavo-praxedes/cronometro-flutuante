@@ -182,7 +182,7 @@
     <string name="settings_menu_section_tools">Ferramentas</string>
     <string name="settings_menu_section_project">Projeto</string>
     <string name="settings_search_no_results">Nenhum resultado</string>
-    <string name="settings_search_placeholder">Pesquise em configurações...</string>
+    <string name="settings_search_placeholder">Pesquise configurações...</string>
     <string name="settings_badge_alert">!</string>
     <string name="action_clear">Limpar</string>
     <string name="action_close">Fechar</string>

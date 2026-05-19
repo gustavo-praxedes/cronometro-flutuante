@@ -25,6 +25,7 @@ import com.krono.app.core.data.formatSecondsByPattern
 import com.krono.app.core.ui.theme.KronoIcons
 import com.krono.app.core.ui.theme.KronoTokens
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 
 @Composable
 fun CountdownOverlayUi(
@@ -56,6 +57,23 @@ fun CountdownOverlayUi(
     val bgColor = Color(overlayCustomColor ?: state.config.backgroundColor)
     val textColor = overlayCustomTextColor?.let { Color(it) } ?: overlayTextColor(bgColor)
     val displayFormat = TimerDisplayFormat.fromKey(timeFormat)
+    var flashOn by remember(state.config.id) { mutableStateOf(false) }
+    var completionHandled by remember(state.config.id) { mutableStateOf(false) }
+    LaunchedEffect(state.isCompleted) {
+        if (state.isCompleted && !completionHandled) {
+            completionHandled = true
+            repeat(3) {
+                flashOn = true
+                delay(130L)
+                flashOn = false
+                delay(110L)
+            }
+        }
+        if (!state.isCompleted) {
+            completionHandled = false
+            flashOn = false
+        }
+    }
     val entranceScale = remember { Animatable(KronoTokens.Alpha.entranceInitialScale) }
     val entranceAlpha = remember { Animatable(0f) }
     var isDragging by remember { mutableStateOf(false) }
@@ -108,7 +126,7 @@ fun CountdownOverlayUi(
     )
 
     val containerBg by animateColorAsState(
-        targetValue = if (state.isCompleted) MaterialTheme.colorScheme.error else bgColor,
+        targetValue = if (flashOn) MaterialTheme.colorScheme.error else bgColor,
         animationSpec = tween(KronoTokens.Motion.durationNormal),
         label = "bg_color"
     )
