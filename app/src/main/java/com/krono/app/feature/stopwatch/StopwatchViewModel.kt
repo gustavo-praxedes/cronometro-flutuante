@@ -42,8 +42,6 @@ class StopwatchViewModel(application: Application) : AndroidViewModel(applicatio
         }
 
     private var timerJob: Job? = null
-    private var timeLimitSeconds: Long = 0L
-
     init {
         if (_stopwatchState.value.isRunning) {
             startUpdateLoop()
@@ -67,10 +65,6 @@ class StopwatchViewModel(application: Application) : AndroidViewModel(applicatio
         state.isRunning && state.startTime != -1L ->
             state.pauseOffset + (System.currentTimeMillis() - state.startTime)
         else -> state.pauseOffset
-    }
-
-    fun setTimeLimit(seconds: Long) {
-        timeLimitSeconds = seconds
     }
 
     override fun start() {
@@ -125,20 +119,6 @@ class StopwatchViewModel(application: Application) : AndroidViewModel(applicatio
                 if (!current.isRunning) break
 
                 val elapsed = current.pauseOffset + (System.currentTimeMillis() - current.startTime)
-
-                if (timeLimitSeconds > 0L && elapsed >= timeLimitSeconds * 1000L) {
-                    val limitMs = timeLimitSeconds * 1000L
-                    val limitState = current.copy(
-                        pauseOffset = limitMs,
-                        startTime = -1L,
-                        isRunning = false,
-                        isAtLimit = true,
-                        elapsedMs = limitMs
-                    )
-                    _stopwatchState.value = limitState
-                    timerPreferences.saveStateSync(limitState.toStopwatchState())
-                    break
-                }
 
                 _stopwatchState.value = current.copy(elapsedMs = elapsed)
             }

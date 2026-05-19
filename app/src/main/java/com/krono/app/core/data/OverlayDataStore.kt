@@ -25,7 +25,6 @@ class OverlayDataStore(private val context: Context) {
         val SHOW_BUTTONS       = booleanPreferencesKey("show_buttons")
         val KEEP_SCREEN_ON     = booleanPreferencesKey("keep_screen_on")
         val AUTO_LAUNCH        = booleanPreferencesKey("auto_launch")
-        val TIME_LIMIT_SECONDS = longPreferencesKey("time_limit_seconds")
         val BEEP_ENABLED       = booleanPreferencesKey("beep_enabled")
         val VIBRATION_ENABLED  = booleanPreferencesKey("vibration_enabled")
         val LAST_X             = intPreferencesKey("last_x")
@@ -75,6 +74,8 @@ class OverlayDataStore(private val context: Context) {
         val SW_OVERLAY_CORNER_RADIUS = floatPreferencesKey("sw_overlay_corner_radius")
         val SW_OVERLAY_CUSTOM_COLOR = intPreferencesKey("sw_overlay_custom_color")
         val SW_OVERLAY_CUSTOM_TEXT_COLOR = intPreferencesKey("sw_overlay_custom_text_color")
+        val SW_OVERLAY_LAST_X = intPreferencesKey("sw_overlay_last_x")
+        val SW_OVERLAY_LAST_Y = intPreferencesKey("sw_overlay_last_y")
         val CD_OVERLAY_SHOW_BUTTONS = booleanPreferencesKey("cd_overlay_show_buttons")
         val CD_OVERLAY_SHOW_HOURS = booleanPreferencesKey("cd_overlay_show_hours")
         val CD_OVERLAY_SHOW_SECONDS = booleanPreferencesKey("cd_overlay_show_seconds")
@@ -89,6 +90,8 @@ class OverlayDataStore(private val context: Context) {
         val PO_OVERLAY_CORNER_RADIUS = floatPreferencesKey("po_overlay_corner_radius")
         val PO_OVERLAY_CUSTOM_COLOR = intPreferencesKey("po_overlay_custom_color")
         val PO_OVERLAY_CUSTOM_TEXT_COLOR = intPreferencesKey("po_overlay_custom_text_color")
+        val PO_OVERLAY_LAST_X = intPreferencesKey("po_overlay_last_x")
+        val PO_OVERLAY_LAST_Y = intPreferencesKey("po_overlay_last_y")
     }
 
     val configFlow: Flow<OverlayConfig> = context.dataStore.data
@@ -112,7 +115,6 @@ class OverlayDataStore(private val context: Context) {
                 showButtons        = prefs[SHOW_BUTTONS]       ?: true,
                 keepScreenOn       = prefs[KEEP_SCREEN_ON]     ?: false,
                 autoLaunch         = prefs[AUTO_LAUNCH]        ?: false,
-                timeLimitSeconds   = prefs[TIME_LIMIT_SECONDS] ?: 0L,
                 isBeepEnabled      = prefs[BEEP_ENABLED]       ?: false,
                 isVibrationEnabled = prefs[VIBRATION_ENABLED]  ?: false,
                 lastX              = prefs[LAST_X]             ?: -1,
@@ -160,6 +162,8 @@ class OverlayDataStore(private val context: Context) {
                 stopwatchOverlayCornerRadius = prefs[SW_OVERLAY_CORNER_RADIUS] ?: (prefs[CORNER_RADIUS] ?: 16f),
                 stopwatchOverlayCustomColor = prefs[SW_OVERLAY_CUSTOM_COLOR],
                 stopwatchOverlayCustomTextColor = prefs[SW_OVERLAY_CUSTOM_TEXT_COLOR],
+                stopwatchOverlayLastX = prefs[SW_OVERLAY_LAST_X] ?: (prefs[LAST_X] ?: -1),
+                stopwatchOverlayLastY = prefs[SW_OVERLAY_LAST_Y] ?: (prefs[LAST_Y] ?: -1),
                 countdownOverlayShowButtons = prefs[CD_OVERLAY_SHOW_BUTTONS] ?: (prefs[SHOW_BUTTONS] ?: true),
                 countdownOverlayShowHours = prefs[CD_OVERLAY_SHOW_HOURS] ?: (prefs[SHOW_HOURS] ?: true),
                 countdownOverlayShowSeconds = prefs[CD_OVERLAY_SHOW_SECONDS] ?: (prefs[SHOW_SECONDS] ?: true),
@@ -174,6 +178,8 @@ class OverlayDataStore(private val context: Context) {
                 pomodoroOverlayCornerRadius = prefs[PO_OVERLAY_CORNER_RADIUS] ?: (prefs[CORNER_RADIUS] ?: 16f),
                 pomodoroOverlayCustomColor = prefs[PO_OVERLAY_CUSTOM_COLOR],
                 pomodoroOverlayCustomTextColor = prefs[PO_OVERLAY_CUSTOM_TEXT_COLOR],
+                pomodoroOverlayLastX = prefs[PO_OVERLAY_LAST_X] ?: -1,
+                pomodoroOverlayLastY = prefs[PO_OVERLAY_LAST_Y] ?: -1,
                 donationPending    = prefs[DONATION_PENDING]   ?: false,
                 activeToolId       = prefs[ACTIVE_TOOL_ID]     ?: "stopwatch"
             )
@@ -192,7 +198,6 @@ class OverlayDataStore(private val context: Context) {
             prefs[SHOW_BUTTONS]       = config.showButtons
             prefs[KEEP_SCREEN_ON]     = config.keepScreenOn
             prefs[AUTO_LAUNCH]        = config.autoLaunch
-            prefs[TIME_LIMIT_SECONDS] = config.timeLimitSeconds
             prefs[BEEP_ENABLED]       = config.isBeepEnabled
             prefs[VIBRATION_ENABLED]  = config.isVibrationEnabled
             prefs[LAST_X]             = config.lastX
@@ -239,6 +244,8 @@ class OverlayDataStore(private val context: Context) {
             prefs[SW_OVERLAY_CORNER_RADIUS] = config.stopwatchOverlayCornerRadius
             if (config.stopwatchOverlayCustomColor == null) prefs.remove(SW_OVERLAY_CUSTOM_COLOR) else prefs[SW_OVERLAY_CUSTOM_COLOR] = config.stopwatchOverlayCustomColor
             if (config.stopwatchOverlayCustomTextColor == null) prefs.remove(SW_OVERLAY_CUSTOM_TEXT_COLOR) else prefs[SW_OVERLAY_CUSTOM_TEXT_COLOR] = config.stopwatchOverlayCustomTextColor
+            prefs[SW_OVERLAY_LAST_X] = config.stopwatchOverlayLastX
+            prefs[SW_OVERLAY_LAST_Y] = config.stopwatchOverlayLastY
             prefs[CD_OVERLAY_SHOW_BUTTONS] = config.countdownOverlayShowButtons
             prefs[CD_OVERLAY_SHOW_HOURS] = config.countdownOverlayShowHours
             prefs[CD_OVERLAY_SHOW_SECONDS] = config.countdownOverlayShowSeconds
@@ -253,6 +260,8 @@ class OverlayDataStore(private val context: Context) {
             prefs[PO_OVERLAY_CORNER_RADIUS] = config.pomodoroOverlayCornerRadius
             if (config.pomodoroOverlayCustomColor == null) prefs.remove(PO_OVERLAY_CUSTOM_COLOR) else prefs[PO_OVERLAY_CUSTOM_COLOR] = config.pomodoroOverlayCustomColor
             if (config.pomodoroOverlayCustomTextColor == null) prefs.remove(PO_OVERLAY_CUSTOM_TEXT_COLOR) else prefs[PO_OVERLAY_CUSTOM_TEXT_COLOR] = config.pomodoroOverlayCustomTextColor
+            prefs[PO_OVERLAY_LAST_X] = config.pomodoroOverlayLastX
+            prefs[PO_OVERLAY_LAST_Y] = config.pomodoroOverlayLastY
             prefs[DONATION_PENDING]   = config.donationPending
             prefs[ACTIVE_TOOL_ID]     = config.activeToolId
         }
@@ -262,6 +271,23 @@ class OverlayDataStore(private val context: Context) {
         context.dataStore.edit { prefs ->
             prefs[LAST_X] = x
             prefs[LAST_Y] = y
+        }
+    }
+
+    suspend fun savePosition(toolId: String, x: Int, y: Int) {
+        context.dataStore.edit { prefs ->
+            when (toolId) {
+                "pomodoro" -> {
+                    prefs[PO_OVERLAY_LAST_X] = x
+                    prefs[PO_OVERLAY_LAST_Y] = y
+                }
+                else -> {
+                    prefs[SW_OVERLAY_LAST_X] = x
+                    prefs[SW_OVERLAY_LAST_Y] = y
+                    prefs[LAST_X] = x
+                    prefs[LAST_Y] = y
+                }
+            }
         }
     }
 

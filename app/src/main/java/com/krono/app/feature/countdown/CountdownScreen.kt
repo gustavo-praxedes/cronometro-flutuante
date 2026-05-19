@@ -58,7 +58,7 @@ import com.krono.app.core.ui.theme.timerFontFamily
 import com.krono.app.core.util.KronoToolAudio
 import com.krono.app.core.util.triggerPlayPauseFeedback
 
-private const val SCREEN_OVERLAY_ID = "countdown-screen-overlay"
+private val SCREEN_OVERLAY_ID = CountdownViewModel.SCREEN_OVERLAY_ID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

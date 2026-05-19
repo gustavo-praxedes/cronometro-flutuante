@@ -12,7 +12,6 @@ data class OverlayConfig(
     val showButtons       : Boolean = true,
     val keepScreenOn      : Boolean = false,
     val autoLaunch        : Boolean = false,
-    val timeLimitSeconds  : Long    = 0L,
     val isBeepEnabled     : Boolean = false,
     val isVibrationEnabled: Boolean = false,
     val lastX             : Int     = -1,
@@ -60,6 +59,8 @@ data class OverlayConfig(
     val stopwatchOverlayCornerRadius: Float = 16f,
     val stopwatchOverlayCustomColor: Int? = null,
     val stopwatchOverlayCustomTextColor: Int? = null,
+    val stopwatchOverlayLastX: Int = -1,
+    val stopwatchOverlayLastY: Int = -1,
     val countdownOverlayShowButtons: Boolean = true,
     val countdownOverlayShowHours: Boolean = true,
     val countdownOverlayShowSeconds: Boolean = true,
@@ -74,6 +75,8 @@ data class OverlayConfig(
     val pomodoroOverlayCornerRadius: Float = 16f,
     val pomodoroOverlayCustomColor: Int? = null,
     val pomodoroOverlayCustomTextColor: Int? = null,
+    val pomodoroOverlayLastX: Int = -1,
+    val pomodoroOverlayLastY: Int = -1,
     val donationPending   : Boolean = false,
     val activeToolId      : String  = "stopwatch"
 )

@@ -35,6 +35,7 @@ class NotificationHelper(private val context: Context) {
         fun actionIntent(action: String, requestCode: Int): PendingIntent {
             val i = Intent(context, NotificationActionReceiver::class.java).apply {
                 this.action = action
+                putExtra(EXTRA_TOOL_ID, "stopwatch")
             }
             return PendingIntent.getBroadcast(
                 context, requestCode, i,

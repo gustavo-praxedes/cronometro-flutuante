@@ -39,7 +39,7 @@ class CountdownOverlayManager(
     private val onClose: () -> Unit
 ) : LifecycleOwner, ViewModelStoreOwner, SavedStateRegistryOwner {
     companion object {
-        private const val SCREEN_OVERLAY_ID = "countdown-screen-overlay"
+        private const val SCREEN_OVERLAY_ID = CountdownViewModel.SCREEN_OVERLAY_ID
     }
 
     // ── Lifecycle boilerplate ──────────────────────────────────────────────

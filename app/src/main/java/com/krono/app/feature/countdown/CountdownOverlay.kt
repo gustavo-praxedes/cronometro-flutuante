@@ -1,30 +1,25 @@
 ﻿package com.krono.app.feature.countdown
 
-import androidx.compose.animation.Animatable
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.*
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.krono.app.R
 import com.krono.app.core.data.TimerDisplayFormat
 import com.krono.app.core.data.formatSecondsByPattern
+import com.krono.app.core.ui.components.AnimatedIconButton
+import com.krono.app.core.ui.overlay.OverlayContainer
 import com.krono.app.core.ui.theme.KronoIcons
 import com.krono.app.core.ui.theme.KronoTokens
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
 
 @Composable
@@ -74,56 +69,9 @@ fun CountdownOverlayUi(
             flashOn = false
         }
     }
-    val entranceScale = remember { Animatable(KronoTokens.Alpha.entranceInitialScale) }
-    val entranceAlpha = remember { Animatable(0f) }
-    var isDragging by remember { mutableStateOf(false) }
-
-    LaunchedEffect(Unit) {
-        launch {
-            entranceScale.animateTo(1f, spring(dampingRatio = 0.40f, stiffness = Spring.StiffnessLow))
-        }
-        launch {
-            entranceAlpha.animateTo(1f, tween(durationMillis = KronoTokens.Motion.durationSlow, easing = LinearOutSlowInEasing))
-        }
-    }
-
-    val dragScale by animateFloatAsState(
-        targetValue = if (isDragging) KronoTokens.Alpha.dragScaleTarget else 1f,
-        animationSpec = spring(dampingRatio = 0.6f, stiffness = Spring.StiffnessLow),
-        label = "dragScale"
-    )
-
-    val currentScale = entranceScale.value
-    val cornerRadius = (overlayCornerRadius * currentScale * overlayScale)
-        .coerceAtMost(KronoTokens.Overlay.maxCornerRadiusFloat).dp
-    val shape = RoundedCornerShape(cornerRadius)
-    val paddingH = (KronoTokens.Overlay.paddingH.value * currentScale * overlayScale).dp
-    val paddingV = (KronoTokens.Overlay.paddingV.value * currentScale * overlayScale).dp
-    val btnTopPadding = (KronoTokens.Overlay.btnTopPadding.value * currentScale * overlayScale).dp
-    val iconSizeDp = (KronoTokens.Overlay.iconSize.value * currentScale * overlayScale).dp
-    val btnSize = (KronoTokens.Overlay.buttonSize.value * currentScale * overlayScale).dp
-    val controlGap = (KronoTokens.Spacing.sm.value * currentScale * overlayScale).dp
-    val closeBtnSize = (KronoTokens.Overlay.buttonSize.value * currentScale * overlayScale * 0.78f).dp
-    val closeIconSize = (KronoTokens.Overlay.iconSize.value * currentScale * overlayScale * 0.78f).dp
-    val compactFactor = when {
-        !showHours && !showSeconds -> 0.64f
-        !showButtons -> 0.84f
-        else -> 1f
-    }
-    val minWidth = (KronoTokens.Overlay.minWidth.value * currentScale * overlayWidthScale * overlayScale * compactFactor).dp
-    val maxWidth = (KronoTokens.Overlay.maxWidth.value * currentScale * overlayWidthScale * overlayScale * compactFactor).dp
     val controlsCount = if (showButtons) {
         2 + (if (onBottomExtraAction != null && bottomExtraIcon != null) 1 else 0) + (if (showBottomClose) 1 else 0)
     } else 1
-    val controlsWidth = (btnSize * controlsCount) + (controlGap * (controlsCount - 1).coerceAtLeast(0))
-
-    val borderColor by animateColorAsState(
-        targetValue = if (state.isRunning)
-            MaterialTheme.colorScheme.primary.copy(alpha = KronoTokens.Alpha.divider)
-        else textColor.copy(alpha = KronoTokens.Alpha.glassBorder),
-        animationSpec = tween(KronoTokens.Motion.durationSlow + 200),
-        label = "borderColor"
-    )
 
     val containerBg by animateColorAsState(
         targetValue = if (flashOn) MaterialTheme.colorScheme.error else bgColor,
@@ -133,35 +81,28 @@ fun CountdownOverlayUi(
     val labelText = state.config.description.trim()
     val hasLabel = labelText.isNotEmpty()
 
-    Box(
-        modifier = modifier
-            .wrapContentSize()
-            .graphicsLayer {
-                val finalScale = currentScale * dragScale
-                scaleX = finalScale
-                scaleY = finalScale
-                alpha = entranceAlpha.value
-                this.shape = shape
-                clip = true
-            }
-            .background(containerBg, shape)
-            .border(width = KronoTokens.Stroke.overlayBorder, color = borderColor, shape = shape)
-            .pointerInput(Unit) {
-                detectDragGestures(
-                    onDragStart = { isDragging = true },
-                    onDragEnd = { isDragging = false; onDragEnd() },
-                    onDragCancel = { isDragging = false; onDragEnd() },
-                    onDrag = { change, dragAmount ->
-                        change.consume()
-                        onDrag(dragAmount.x, dragAmount.y)
-                    }
-                )
-            }
-    ) {
+    OverlayContainer(
+        isRunning = state.isRunning,
+        scale = overlayScale,
+        cornerRadius = overlayCornerRadius,
+        bgColor = containerBg,
+        textColor = textColor,
+        onDrag = onDrag,
+        onDragEnd = onDragEnd,
+        modifier = modifier,
+        showHours = showHours,
+        showSeconds = showSeconds,
+        showButtons = showButtons,
+        widthScale = overlayWidthScale,
+        bottomExtraButtonScale = bottomExtraButtonScale,
+        bottomExtraIconScale = bottomExtraIconScale
+    ) { currentScale, txtColor, dimensions ->
+        val controlsWidth = (dimensions.btnSize * controlsCount) +
+            (dimensions.controlGap * (controlsCount - 1).coerceAtLeast(0))
         Column(
             modifier = Modifier
-                .widthIn(min = minWidth, max = maxWidth)
-                .padding(horizontal = paddingH, vertical = paddingV),
+                .widthIn(min = dimensions.minWidth, max = dimensions.maxWidth)
+                .padding(horizontal = dimensions.paddingH, vertical = dimensions.paddingV),
             horizontalAlignment = Alignment.Start
         ) {
             Row(
@@ -182,14 +123,19 @@ fun CountdownOverlayUi(
                     modifier = Modifier.width(controlsWidth),
                     contentAlignment = Alignment.CenterEnd
                 ) {
-                    AnimatedIconButton(onClick = onClose, modifier = Modifier.size(closeBtnSize)) {
-                    Icon(KronoIcons.Navigation.Close, "Fechar", tint = textColor.copy(alpha = KronoTokens.Alpha.label), modifier = Modifier.size(closeIconSize))
+                    AnimatedIconButton(onClick = onClose, modifier = Modifier.size(dimensions.closeBtnSize)) {
+                        Icon(
+                            KronoIcons.Navigation.Close,
+                            stringResource(R.string.action_close),
+                            tint = txtColor.copy(alpha = KronoTokens.Alpha.label),
+                            modifier = Modifier.size(dimensions.closeIconSize)
+                        )
                     }
                 }
             }
 
             Row(
-                modifier = Modifier.fillMaxWidth().padding(top = btnTopPadding),
+                modifier = Modifier.fillMaxWidth().padding(top = dimensions.btnTopPadding),
                 horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -203,7 +149,7 @@ fun CountdownOverlayUi(
                             else -> TimerDisplayFormat.MM_SS
                         }
                     ),
-                    color = textColor,
+                    color = txtColor,
                     fontSize = (KronoTokens.Overlay.timerFontSize.value * KronoTokens.Alpha.overlayTimerScale * currentScale).sp,
                     fontWeight = FontWeight.Normal,
                     fontFamily = com.krono.app.core.ui.theme.timerFontFamily(selectedFont),
@@ -214,39 +160,44 @@ fun CountdownOverlayUi(
                 Spacer(Modifier.weight(1f))
 
                 if (showButtons) Row(
-                    horizontalArrangement = Arrangement.spacedBy(controlGap),
+                    horizontalArrangement = Arrangement.spacedBy(dimensions.controlGap),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    AnimatedIconButton(onClick = { if (state.isRunning) onPause() else onPlay() }, modifier = Modifier.size(btnSize)) {
+                    AnimatedIconButton(onClick = { if (state.isRunning) onPause() else onPlay() }, modifier = Modifier.size(dimensions.btnSize)) {
                         Icon(
                             imageVector = if (state.isRunning) KronoIcons.Action.Pause else KronoIcons.Action.Play,
-                            contentDescription = if (state.isRunning) "Pausar" else "Iniciar",
-                            tint = if (state.isRunning) MaterialTheme.colorScheme.primary else textColor,
-                            modifier = Modifier.size(iconSizeDp)
+                            contentDescription = if (state.isRunning) stringResource(R.string.action_pause) else stringResource(R.string.action_play),
+                            tint = if (state.isRunning) MaterialTheme.colorScheme.primary else txtColor,
+                            modifier = Modifier.size(dimensions.iconSize)
                         )
                     }
 
-                    AnimatedIconButton(onClick = onReset, modifier = Modifier.size(btnSize)) {
-                        Icon(KronoIcons.Action.StopFilled, "Reset", tint = textColor, modifier = Modifier.size(iconSizeDp))
+                    AnimatedIconButton(onClick = onReset, modifier = Modifier.size(dimensions.btnSize)) {
+                        Icon(KronoIcons.Action.StopFilled, stringResource(R.string.action_reset), tint = txtColor, modifier = Modifier.size(dimensions.iconSize))
                     }
 
                     if (onBottomExtraAction != null && bottomExtraIcon != null) {
                         AnimatedIconButton(
                             onClick = onBottomExtraAction,
-                            modifier = Modifier.size(btnSize * bottomExtraButtonScale)
+                            modifier = Modifier.size(dimensions.extraBtnSize)
                         ) {
                             Icon(
                                 bottomExtraIcon,
                                 bottomExtraDescription,
-                                tint = textColor,
-                                modifier = Modifier.size(iconSizeDp * bottomExtraIconScale)
+                                tint = txtColor,
+                                modifier = Modifier.size(dimensions.extraIconSize)
                             )
                         }
                     }
 
                     if (showBottomClose) {
-                        AnimatedIconButton(onClick = onClose, modifier = Modifier.size(btnSize)) {
-                            Icon(KronoIcons.Navigation.Close, "Fechar", tint = textColor.copy(alpha = KronoTokens.Alpha.label), modifier = Modifier.size(iconSizeDp))
+                        AnimatedIconButton(onClick = onClose, modifier = Modifier.size(dimensions.btnSize)) {
+                            Icon(
+                                KronoIcons.Navigation.Close,
+                                stringResource(R.string.action_close),
+                                tint = txtColor.copy(alpha = KronoTokens.Alpha.label),
+                                modifier = Modifier.size(dimensions.iconSize)
+                            )
                         }
                     }
                 }
@@ -259,13 +210,3 @@ internal fun overlayTextColor(bg: Color): Color {
     val lum = 0.299f * bg.red + 0.587f * bg.green + 0.114f * bg.blue
     return if (lum > KronoTokens.Alpha.overlayLuminanceThreshold) Color(0xFF1C1B1F) else Color(0xFFECECEC)
 }
-
-@Composable
-private fun AnimatedIconButton(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
-) {
-    IconButton(onClick = onClick, modifier = modifier) { content() }
-}
-

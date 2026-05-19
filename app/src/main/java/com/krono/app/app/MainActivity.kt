@@ -116,7 +116,7 @@ class MainActivity : ComponentActivity() {
                         onRequestOverlay          = { openOverlayPermissionSettings() },
                         onRequestInstall          = { openInstallPermissionSettings() },
                         onStartFocusMode          = { startFocusMode() },
-                        onShowOverlay             = { showOverlay() },
+                        onShowOverlay             = { toolId -> showOverlay(toolId) },
                         onReset                   = { sendResetToService() },
                         isServiceRunning          = { isServiceRunning() }
                     )
@@ -138,6 +138,7 @@ class MainActivity : ComponentActivity() {
             val config = dataStore.configFlow.first()
             val intent = Intent(this@MainActivity, MainService::class.java).apply {
                 action = if (config.focusModeEnabled) ACTION_START_FOCUS else ACTION_SHOW_OVERLAY
+                putExtra(EXTRA_TOOL_ID, config.activeToolId)
             }
             startForegroundService(intent)
         }
@@ -158,15 +159,36 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun sendResetToService() {
-        startForegroundService(Intent(this, MainService::class.java).apply { action = ACTION_RESET })
+        lifecycleScope.launch {
+            val config = dataStore.configFlow.first()
+            startForegroundService(
+                Intent(this@MainActivity, MainService::class.java).apply {
+                    action = ACTION_RESET
+                    putExtra(EXTRA_TOOL_ID, config.activeToolId)
+                }
+            )
+        }
     }
 
     private fun startFocusMode() {
-        startForegroundService(Intent(this, MainService::class.java).apply { action = ACTION_START_FOCUS })
+        lifecycleScope.launch {
+            val config = dataStore.configFlow.first()
+            startForegroundService(
+                Intent(this@MainActivity, MainService::class.java).apply {
+                    action = ACTION_START_FOCUS
+                    putExtra(EXTRA_TOOL_ID, config.activeToolId)
+                }
+            )
+        }
     }
 
-    private fun showOverlay() {
-        startForegroundService(Intent(this, MainService::class.java).apply { action = ACTION_SHOW_OVERLAY })
+    private fun showOverlay(toolId: String? = null) {
+        startForegroundService(
+            Intent(this, MainService::class.java).apply {
+                action = ACTION_SHOW_OVERLAY
+                toolId?.let { putExtra(EXTRA_TOOL_ID, it) }
+            }
+        )
     }
 
     @Suppress("DEPRECATION")

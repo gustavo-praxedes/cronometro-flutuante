@@ -8,6 +8,7 @@ import com.krono.app.ACTION_PLAY
 import com.krono.app.ACTION_RESET
 import com.krono.app.ACTION_SHOW_OVERLAY
 import com.krono.app.ACTION_STOP_SERVICE
+import com.krono.app.EXTRA_TOOL_ID
 import com.krono.app.core.service.MainService
 import com.krono.app.ACTION_HIDE_OVERLAY
 import com.krono.app.feature.countdown.CountdownViewModel
@@ -28,6 +29,7 @@ class NotificationActionReceiver : BroadcastReceiver() {
 
         val serviceIntent = Intent(context, MainService::class.java).apply {
             action = intent.action
+            intent.getStringExtra(EXTRA_TOOL_ID)?.let { putExtra(EXTRA_TOOL_ID, it) }
         }
 
         when (intent.action) {

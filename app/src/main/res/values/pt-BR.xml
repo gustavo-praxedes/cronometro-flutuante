@@ -12,6 +12,7 @@
     <string name="action_play">Iniciar</string>
     <string name="action_pause">Pausar</string>
     <string name="action_reset">Resetar</string>
+    <string name="action_next">Próximo</string>
     <string name="action_stop_service">Fechar</string>
     <string name="action_back">Voltar</string>
     <!-- ConfiguraÃ§Ãµes -->
@@ -31,7 +32,6 @@
     <string name="label_scale">Escala do Widget</string>
     <string name="label_corner_radius">Arredondamento</string>
     <string name="label_about">Sobre o App</string>
-    <string name="label_time_limit">Limite de Tempo</string>
     <!-- Settings Menu -->
     <string name="settings_select_category">Selecione uma categoria para configurar</string>
     <string name="settings_appearance">Aparência</string>
@@ -53,7 +53,6 @@
     <string name="settings_subgroup_presets">Presets</string>
     <string name="settings_group_colors">Cores</string>
     <string name="settings_group_general">Geral</string>
-    <string name="settings_group_time_limit">Limite de Tempo</string>
     <string name="settings_language_label">Idioma do app</string>
     <string name="settings_language_pt_br">Português (Brasil)</string>
     <string name="behavior_auto_launch_label">Iniciar direto overlay de stopwatch</string>

@@ -13,6 +13,7 @@ import com.krono.app.ACTION_RESET
 import com.krono.app.ACTION_SHOW_OVERLAY
 import com.krono.app.ACTION_START_FOCUS
 import com.krono.app.ACTION_STOP_SERVICE
+import com.krono.app.EXTRA_TOOL_ID
 import com.krono.app.KronoApp
 import com.krono.app.NOTIFICATION_ID
 import com.krono.app.core.data.OverlayConfig
@@ -25,7 +26,6 @@ import com.krono.app.core.tool.ToolViewModel
 import com.krono.app.core.tool.KronoTool
 import com.krono.app.feature.countdown.CountdownViewModel
 import com.krono.app.feature.countdown.CountdownManager
-import com.krono.app.feature.stopwatch.StopwatchViewModel
 import com.krono.app.feature.stopwatch.StopwatchTool
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
@@ -83,7 +83,7 @@ class MainService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStateRe
                 ?: StopwatchTool(dataStore, app.stopwatchViewModel)
         }
 
-        overlayManager = OverlayManager(this, windowManager, dataStore, { activeViewModel?.toolState }, serviceScope, this, this, this)
+        overlayManager = OverlayManager(this, windowManager, dataStore, serviceScope, this, this, this)
 
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_START)
 
@@ -106,23 +106,25 @@ class MainService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStateRe
         val app = application as KronoApp
 
         val id = intent?.getStringExtra(CountdownViewModel.EXTRA_COUNTDOWN_ID)
+        val targetToolId = intent?.getStringExtra(EXTRA_TOOL_ID)
 
         when (intent?.action) {
             ACTION_PLAY -> {
                 if (!checkPermissions()) return START_STICKY
-                activeViewModel?.start()
+                viewModelForTarget(targetToolId)?.start()
                 feedbackManager.triggerFeedback(currentConfig)
             }
             ACTION_PAUSE -> {
-                handlePause()
+                handlePause(targetToolId)
                 feedbackManager.triggerFeedback(currentConfig)
             }
-            ACTION_RESET -> handleReset()
+            ACTION_RESET -> handleReset(targetToolId)
             ACTION_STOP_SERVICE -> closeAndStop()
-            ACTION_SHOW_OVERLAY -> showOverlay()
-            ACTION_HIDE_OVERLAY -> hideOverlay()
+            ACTION_SHOW_OVERLAY -> showOverlay(targetToolId)
+            ACTION_HIDE_OVERLAY -> hideOverlay(targetToolId)
             ACTION_START_FOCUS -> if (checkPermissions()) {
-                if (!overlayManager.overlayVisible) showOverlay()
+                val focusToolId = targetToolId ?: currentConfig.activeToolId
+                if (!overlayManager.isOverlayVisible(focusToolId)) showOverlay(focusToolId)
                 KronoNavigator.startFocusMode(this)
             }
             
@@ -145,7 +147,7 @@ class MainService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStateRe
             }
             CountdownViewModel.ACTION_COUNTDOWN_DESTROY      -> id?.let { countdownManager.destroy(it) }
 
-            else -> if (checkPermissions() && !overlayManager.overlayVisible) showOverlay()
+            else -> if (checkPermissions() && !overlayManager.overlayVisible) showOverlay(targetToolId)
         }
         return START_STICKY
     }
@@ -182,7 +184,7 @@ class MainService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStateRe
         }
     }
 
-    private fun showOverlay() {
+    private fun showOverlay(toolId: String? = null) {
         serviceScope.launch(Dispatchers.Main.immediate) {
             runCatching {
                 if (activeTool == null) {
@@ -191,18 +193,41 @@ class MainService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStateRe
                 }
 
                 currentConfig = dataStore.configFlow.first()
+                val hasExplicitTarget = !toolId.isNullOrBlank()
+                val requestedToolId = toolId?.takeIf { it.isNotBlank() } ?: currentConfig.activeToolId
+                if (requestedToolId == "countdown") {
+                    countdownManager.showOverlay(CountdownViewModel.SCREEN_OVERLAY_ID)
+                    return@runCatching
+                }
+
+                val overlayTool = ToolRegistry.getTool(requestedToolId)
+                    ?: if (!hasExplicitTarget) {
+                        ToolRegistry.getTool("stopwatch")
+                            ?: StopwatchTool(dataStore, (application as KronoApp).stopwatchViewModel)
+                    } else {
+                        return@runCatching
+                    }
+                if (overlayTool.id != "stopwatch" && overlayTool.id != "pomodoro") {
+                    return@runCatching
+                }
+                val overlayViewModel = overlayTool.viewModel
                 overlayManager.showOverlay(
                     currentConfig = currentConfig,
+                    toolId = overlayTool.id,
+                    toolState = overlayViewModel.toolState,
                     onStart = { 
                         if (checkPermissions()) {
-                            activeViewModel?.start()
+                            overlayViewModel.start()
                             feedbackManager.triggerFeedback(currentConfig)
                         }
                     },
-                    onPause = { handlePause(); feedbackManager.triggerFeedback(currentConfig) },
-                    onReset = { handleReset() },
-                    onNext = { (activeViewModel as? com.krono.app.feature.pomodoro.PomodoroViewModel)?.skipPhase() },
-                    onClose = { hideOverlay() },
+                    onPause = {
+                        overlayViewModel.pause()
+                        feedbackManager.triggerFeedback(currentConfig)
+                    },
+                    onReset = { overlayViewModel.reset() },
+                    onNext = { (overlayViewModel as? com.krono.app.feature.pomodoro.PomodoroViewModel)?.skipPhase() },
+                    onClose = { hideOverlay(overlayTool.id) },
                     onSettings = { KronoNavigator.openSettings(this@MainService) },
                     onFocusModeStarted = { KronoNavigator.startFocusMode(this@MainService) }
                 )
@@ -210,12 +235,20 @@ class MainService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStateRe
         }
     }
 
-    private fun handlePause() {
-        activeViewModel?.pause()
+    private fun handlePause(toolId: String? = null) {
+        viewModelForTarget(toolId)?.pause()
     }
 
-    private fun handleReset() {
-        activeViewModel?.reset()
+    private fun handleReset(toolId: String? = null) {
+        viewModelForTarget(toolId)?.reset()
+    }
+
+    private fun viewModelForTarget(toolId: String?): ToolViewModel? {
+        val hasExplicitTarget = !toolId.isNullOrBlank()
+        val targetId = toolId?.takeIf { it.isNotBlank() } ?: currentConfig.activeToolId
+        if (targetId == "countdown") return null
+        return ToolRegistry.getTool(targetId)?.viewModel
+            ?: if (!hasExplicitTarget) activeViewModel else null
     }
 
     private fun checkAndShowDonation() {
@@ -239,8 +272,13 @@ class MainService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStateRe
         }
     }
 
-    private fun hideOverlay() {
-        overlayManager.hideOverlay {
+    private fun hideOverlay(toolId: String? = null) {
+        if (toolId == "countdown") {
+            countdownManager.hideOverlay(CountdownViewModel.SCREEN_OVERLAY_ID)
+            sendBroadcast(Intent(ACTION_FOCUS_DISMISSED).apply { `package` = packageName })
+            return
+        }
+        overlayManager.hideOverlay(toolId) {
             sendBroadcast(Intent(ACTION_FOCUS_DISMISSED).apply { `package` = packageName })
         }
     }
@@ -294,8 +332,6 @@ class MainService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStateRe
             dataStore.configFlow.collectLatest { config ->
                 val focusTrigger = !currentConfig.focusModeEnabled && config.focusModeEnabled
                 currentConfig = config
-                (activeViewModel as? StopwatchViewModel)?.setTimeLimit(config.timeLimitSeconds)
-                
                 if (!config.focusModeEnabled) {
                     sendBroadcast(Intent(ACTION_FOCUS_DISMISSED).apply { `package` = packageName })
                 } else if (focusTrigger && (activeViewModel?.toolState?.value?.isRunning == true) && overlayManager.overlayVisible) {

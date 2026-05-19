@@ -27,6 +27,7 @@ class CountdownViewModel(
 
     companion object {
         const val MAX_COUNTDOWNS = 20
+        const val SCREEN_OVERLAY_ID = "countdown-screen-overlay"
 
         const val ACTION_COUNTDOWN_PLAY         = "com.krono.app.COUNTDOWN_PLAY"
         const val ACTION_COUNTDOWN_PAUSE        = "com.krono.app.COUNTDOWN_PAUSE"

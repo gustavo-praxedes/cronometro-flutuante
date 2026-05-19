@@ -109,7 +109,7 @@ fun AppNavigation(
     onRequestOverlay          : () -> Unit,
     onRequestInstall          : () -> Unit,
     onStartFocusMode          : () -> Unit,
-    onShowOverlay             : () -> Unit,
+    onShowOverlay             : (String) -> Unit,
     onReset                   : () -> Unit,
     isServiceRunning          : () -> Boolean
 ) {
@@ -251,7 +251,7 @@ fun AppNavigation(
                     onOpenOverlay  = {
                         scope.launch {
                             dataStore.updateConfig(config.copy(activeToolId = "stopwatch"))
-                            onTryStartService()
+                            onShowOverlay("stopwatch")
                         }
                     },
                     onOpenSettings = { navController.navigate(AppRoutes.SETTINGS) }
@@ -292,7 +292,7 @@ fun AppNavigation(
                     pendingUpdateInfo  = pendingUpdateInfo,
                     isServiceRunning  = isServiceRunning,
                     onStartFocusMode  = onStartFocusMode,
-                    onShowOverlay     = onShowOverlay,
+                    onShowOverlay     = { onShowOverlay(config.activeToolId) },
                     onBack            = navigateBack
                 )
             }
@@ -325,7 +325,7 @@ fun AppNavigation(
                     onOpenOverlay = {
                         scope.launch {
                             dataStore.updateConfig(config.copy(activeToolId = "pomodoro"))
-                            onTryStartService()
+                            onShowOverlay("pomodoro")
                         }
                     }
                 )

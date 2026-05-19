@@ -63,14 +63,4 @@ fun timerFontFamily(selectedFont: String): FontFamily {
     }
 }
 
-/**
- * Estilo base para o display do cronômetro.
- */
-val TimerDisplayStyle = TextStyle(
-    fontFamily = FontFamily.Monospace,
-    fontWeight = FontWeight.Normal,
-    fontSize = 40.sp,
-    letterSpacing = 0.sp
-)
-
 
