@@ -26,9 +26,9 @@ fun triggerPlayPauseFeedback(
                 (volume.coerceIn(0f, 1f) * 100).toInt().coerceIn(0, 100)
             )
             val toneType = when (tool) {
-                KronoToolAudio.STOPWATCH -> ToneGenerator.TONE_PROP_BEEP
-                KronoToolAudio.COUNTDOWN -> ToneGenerator.TONE_PROP_BEEP2
-                KronoToolAudio.POMODORO -> ToneGenerator.TONE_CDMA_ONE_MIN_BEEP
+                KronoToolAudio.STOPWATCH -> ToneGenerator.TONE_PROP_ACK
+                KronoToolAudio.COUNTDOWN -> ToneGenerator.TONE_SUP_CONFIRM
+                KronoToolAudio.POMODORO -> ToneGenerator.TONE_SUP_PIP
             }
             tone.startTone(toneType, 120)
             tone.release()
@@ -45,29 +45,36 @@ fun triggerPlayPauseFeedback(
     }
 }
 
-fun playPomodoroPhaseBeep(context: Context, isFocusPhase: Boolean, volume: Float) {
+fun playPomodoroPhaseBeep(context: Context, isFocusPhase: Boolean, volume: Float, soundType: String) {
     runCatching {
         val tone = ToneGenerator(
             AudioManager.STREAM_ALARM,
             (volume.coerceIn(0f, 1f) * 100).toInt().coerceIn(0, 100)
         )
-        val toneType = if (isFocusPhase) {
-            ToneGenerator.TONE_CDMA_ABBR_ALERT
-        } else {
-            ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD
+        val toneType = when (soundType) {
+            "FOCUS_B", "BREAK_B" -> ToneGenerator.TONE_PROP_BEEP
+            "FOCUS_C", "BREAK_C" -> ToneGenerator.TONE_SUP_PIP
+            "FOCUS_D", "BREAK_D" -> ToneGenerator.TONE_SUP_CONFIRM
+            else -> if (isFocusPhase) ToneGenerator.TONE_PROP_ACK else ToneGenerator.TONE_SUP_RINGTONE
         }
-        tone.startTone(toneType, 220)
+        tone.startTone(toneType, 240)
         tone.release()
     }
 }
 
-fun playPomodoroTick(context: Context, volume: Float) {
+fun playPomodoroTick(context: Context, volume: Float, soundType: String) {
     runCatching {
         val tone = ToneGenerator(
             AudioManager.STREAM_MUSIC,
             (volume.coerceIn(0f, 1f) * 100).toInt().coerceIn(0, 100)
         )
-        tone.startTone(ToneGenerator.TONE_PROP_BEEP2, 65)
+        val toneType = when (soundType) {
+            "TICK_B" -> ToneGenerator.TONE_PROP_ACK
+            "TICK_C" -> ToneGenerator.TONE_SUP_PIP
+            "TICK_D" -> ToneGenerator.TONE_SUP_CONFIRM
+            else -> ToneGenerator.TONE_PROP_BEEP
+        }
+        tone.startTone(toneType, 70)
         tone.release()
     }
 }

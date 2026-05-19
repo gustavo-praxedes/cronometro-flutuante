@@ -47,13 +47,14 @@ fun CountdownOverlayUi(
     overlayScale: Float = 1f,
     overlayCornerRadius: Float = KronoTokens.Overlay.defaultCornerRadius.value,
     overlayCustomColor: Int? = null,
+    overlayCustomTextColor: Int? = null,
     overlayWidthScale: Float = 0.96f,
     bottomExtraButtonScale: Float = 1f,
     bottomExtraIconScale: Float = 1f,
     modifier: Modifier = Modifier
 ) {
     val bgColor = Color(overlayCustomColor ?: state.config.backgroundColor)
-    val textColor = overlayTextColor(bgColor)
+    val textColor = overlayCustomTextColor?.let { Color(it) } ?: overlayTextColor(bgColor)
     val displayFormat = TimerDisplayFormat.fromKey(timeFormat)
     val entranceScale = remember { Animatable(KronoTokens.Alpha.entranceInitialScale) }
     val entranceAlpha = remember { Animatable(0f) }
@@ -84,10 +85,15 @@ fun CountdownOverlayUi(
     val iconSizeDp = (KronoTokens.Overlay.iconSize.value * currentScale * overlayScale).dp
     val btnSize = (KronoTokens.Overlay.buttonSize.value * currentScale * overlayScale).dp
     val controlGap = (KronoTokens.Spacing.sm.value * currentScale * overlayScale).dp
-    val closeBtnSize = (KronoTokens.Overlay.buttonSize.value * currentScale * 0.78f).dp
-    val closeIconSize = (KronoTokens.Overlay.iconSize.value * currentScale * 0.78f).dp
-    val minWidth = (KronoTokens.Overlay.minWidth.value * currentScale * overlayWidthScale * overlayScale).dp
-    val maxWidth = (KronoTokens.Overlay.maxWidth.value * overlayWidthScale).dp
+    val closeBtnSize = (KronoTokens.Overlay.buttonSize.value * currentScale * overlayScale * 0.78f).dp
+    val closeIconSize = (KronoTokens.Overlay.iconSize.value * currentScale * overlayScale * 0.78f).dp
+    val compactFactor = when {
+        !showHours && !showSeconds -> 0.64f
+        !showButtons -> 0.84f
+        else -> 1f
+    }
+    val minWidth = (KronoTokens.Overlay.minWidth.value * currentScale * overlayWidthScale * overlayScale * compactFactor).dp
+    val maxWidth = (KronoTokens.Overlay.maxWidth.value * currentScale * overlayWidthScale * overlayScale * compactFactor).dp
     val controlsCount = if (showButtons) {
         2 + (if (onBottomExtraAction != null && bottomExtraIcon != null) 1 else 0) + (if (showBottomClose) 1 else 0)
     } else 1

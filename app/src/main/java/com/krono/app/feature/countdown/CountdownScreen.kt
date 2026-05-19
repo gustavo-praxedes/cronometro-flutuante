@@ -19,13 +19,13 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.FilledTonalIconButton
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -107,8 +107,11 @@ fun CountdownScreen(
         )
     }
 
-    LaunchedEffect(Unit) {
-        if (!userConfiguredTime) {
+    LaunchedEffect(screenOverlayState?.config?.id) {
+        // Só cria estado inicial quando não existe countdown transitório da tela.
+        // Se já existir, preserva o valor atual selecionado pelo usuário.
+        val existing = screenOverlayState
+        if (existing == null) {
             draftSeconds = hydratedInitial
             baseSeconds = hydratedInitial
             lastSavedConfiguredSeconds = hydratedInitial
@@ -124,10 +127,15 @@ fun CountdownScreen(
                 isRunning = false
             )
             syncOverlay(SCREEN_OVERLAY_ID)
+        } else {
+            val safeExisting = existing.remainingSeconds.coerceIn(0L, maxSeconds)
+            draftSeconds = safeExisting
+            baseSeconds = safeExisting
+            lastSavedConfiguredSeconds = safeExisting
         }
     }
-    LaunchedEffect(currentRemainingSeconds, baseSeconds, isRunning) {
-        if (isRunning || currentRemainingSeconds != baseSeconds) {
+    LaunchedEffect(isRunning) {
+        if (isRunning) {
             hasStartedSession = true
         }
     }
@@ -139,6 +147,11 @@ fun CountdownScreen(
                 lastSavedConfiguredSeconds = safe
                 onConfiguredTimeChange(safe)
             }
+        }
+    }
+    LaunchedEffect(isRunning, currentRemainingSeconds, baseSeconds) {
+        if (!isRunning && currentRemainingSeconds == baseSeconds) {
+            hasStartedSession = false
         }
     }
 
@@ -180,7 +193,7 @@ fun CountdownScreen(
                 ) {
                     Spacer(Modifier.weight(1f))
 
-                    if (!isRunning && !hasStartedSession && currentRemainingSeconds == baseSeconds) {
+                    if (!isRunning && !hasStartedSession) {
                         key(wheelResetToken) {
                             CountdownScreenWheelPicker(
                                 totalSeconds = currentRemainingSeconds,
@@ -234,18 +247,15 @@ fun CountdownScreen(
                     ) {
                         FilledTonalIconButton(
                             onClick = {
-                                hasStartedSession = false
-                                viewModel.upsertTransientCountdown(
-                                    config = CountdownConfig(
-                                        id = SCREEN_OVERLAY_ID,
-                                        description = "",
+                                if (hasStartedSession) {
+                                    viewModel.accumulateElapsedByTotalAndRemaining(
                                         totalSeconds = baseSeconds,
-                                        backgroundColor = screenCardBgColor
-                                    ),
-                                    remainingSeconds = baseSeconds,
-                                    isRunning = false
-                                )
-                                viewModel.reset(context, SCREEN_OVERLAY_ID)
+                                        remainingSeconds = currentRemainingSeconds
+                                    )
+                                }
+                                hasStartedSession = false
+                                viewModel.pause(context, SCREEN_OVERLAY_ID)
+                                viewModel.setRemainingAndSync(context, SCREEN_OVERLAY_ID, baseSeconds, clearCompleted = true)
                                 syncOverlay(SCREEN_OVERLAY_ID)
                             },
                             modifier = Modifier.size(56.dp)
@@ -316,11 +326,6 @@ fun CountdownScreen(
             }
 
             if (hasCards) {
-                HorizontalDivider(
-                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.35f),
-                    thickness = 0.5.dp
-                )
-
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -368,6 +373,7 @@ fun CountdownScreen(
             onPreview = null
         )
     }
+
 }
 
 

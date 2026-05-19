@@ -16,7 +16,8 @@ class CountdownManager(
     private val windowManager: WindowManager,
     private val feedbackManager: FeedbackManager,
     private val notificationHelper: NotificationHelper,
-    private val countdownViewModel: CountdownViewModel
+    private val countdownViewModel: CountdownViewModel,
+    private val currentConfigProvider: () -> com.krono.app.core.data.OverlayConfig
 ) {
     private val scope = CoroutineScope(SupervisorJob())
 
@@ -37,7 +38,8 @@ class CountdownManager(
         val state = vmState(id) ?: return
         if (state.isCompleted) return
 
-        remainingMap.putIfAbsent(id, state.remainingSeconds)
+        // Sempre parte do valor atual da tela/VM para evitar restaurar cache antigo.
+        remainingMap[id] = state.remainingSeconds
 
         activeTimers[id] = scope.launch {
             while (true) {
@@ -81,6 +83,14 @@ class CountdownManager(
         vmState(id)?.let { if (it.isOverlayVisible) notificationHelper.postCountdownNotification(it) }
     }
 
+    fun setRemaining(id: String, seconds: Long) {
+        val next = seconds.coerceAtLeast(0L)
+        remainingMap[id] = next
+        countdownViewModel.setRemainingSeconds(id, next, clearCompleted = true)
+        syncOverlay(id)
+        vmState(id)?.let { if (it.isOverlayVisible) notificationHelper.postCountdownNotification(it) }
+    }
+
     // ── Overlay ────────────────────────────────────────────────────────────
 
     fun showOverlay(id: String) {
@@ -91,8 +101,16 @@ class CountdownManager(
                 windowManager = windowManager,
                 id = id,
                 getPeers = ::peers,
-                onPlay  = { play(id); countdownViewModel.play(context, id) },
-                onPause = { pause(id); countdownViewModel.pause(context, id) },
+                onPlay  = {
+                    feedbackManager.triggerFeedback(currentConfigProvider())
+                    play(id)
+                    countdownViewModel.play(context, id)
+                },
+                onPause = {
+                    feedbackManager.triggerFeedback(currentConfigProvider())
+                    pause(id)
+                    countdownViewModel.pause(context, id)
+                },
                 onReset = { reset(id); countdownViewModel.reset(context, id) },
                 onPlusOne = { addOneMinute(id) },
                 onClose = {

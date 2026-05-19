@@ -48,8 +48,9 @@ fun StopwatchOverlay(
 ) {
     val isRunning = state.isRunning
     val scale     = config.stopwatchOverlayScale
+    val systemIsDark = androidx.compose.foundation.isSystemInDarkTheme()
     val themeOption = runCatching { KronoThemeOption.valueOf(config.selectedTheme) }.getOrDefault(KronoThemeOption.AUTO)
-    val (themeBg, themeTxt) = overlayColorsForTheme(themeOption, false)
+    val (themeBg, themeTxt) = overlayColorsForTheme(themeOption, systemIsDark)
     val effectiveBg = config.stopwatchOverlayCustomColor ?: themeBg
 
     val entranceScale = remember { Animatable(0.88f) }
@@ -76,13 +77,18 @@ fun StopwatchOverlay(
     val currentScale  = entranceScale.value
     val cornerRadius  = (config.stopwatchOverlayCornerRadius * scale * currentScale).coerceAtMost(KronoTokens.Overlay.maxCornerRadiusFloat).dp
     val bgColor       = Color(effectiveBg).copy(alpha = config.bgOpacity)
-    val txtColor      = Color(themeTxt).copy(alpha = config.textOpacity)
+    val txtColor      = Color(config.stopwatchOverlayCustomTextColor ?: themeTxt).copy(alpha = config.textOpacity)
     val shape         = RoundedCornerShape(cornerRadius)
 
     val paddingH      = (KronoTokens.Overlay.paddingH.value * scale * currentScale).dp
     val paddingV      = (KronoTokens.Overlay.paddingV.value * scale * currentScale).dp
     val menuPaddingV  = (KronoTokens.Overlay.menuPaddingV.value * scale * currentScale).dp
-    val minColWidth   = (KronoTokens.Overlay.minWidth.value * scale * currentScale).dp
+    val compactFactor = when {
+        !config.stopwatchOverlayShowHours && !config.stopwatchOverlayShowSeconds -> 0.64f
+        !config.stopwatchOverlayShowButtons -> 0.84f
+        else -> 1f
+    }
+    val minColWidth   = (KronoTokens.Overlay.minWidth.value * scale * currentScale * compactFactor).dp
     val quickIconSize = (KronoTokens.Overlay.quickIconSize.value * scale * currentScale).dp
     val quickBtnSize  = (KronoTokens.Overlay.quickBtnSize.value * scale * currentScale).dp
 

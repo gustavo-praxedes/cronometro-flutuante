@@ -1,17 +1,17 @@
 ﻿package com.krono.app.core.ui.settings
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.runtime.*
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.krono.app.R
 import com.krono.app.core.data.OverlayConfig
 import com.krono.app.core.data.OverlayDataStore
 import com.krono.app.core.ui.theme.KronoTokens
+import com.krono.app.core.ui.theme.KronoIcons
+import com.krono.app.core.ui.components.SettingsDivider
 import com.krono.app.core.ui.components.ToggleRow
 import kotlinx.coroutines.launch
 
@@ -25,63 +25,41 @@ fun BehaviorPanel(
     val config = dataStore.configFlow.collectAsState(initial = OverlayConfig()).value
     val scope = rememberCoroutineScope()
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = KronoTokens.Spacing.lg),
-        verticalArrangement = Arrangement.spacedBy(KronoTokens.Spacing.lg)
-    ) {
-        Spacer(Modifier.height(KronoTokens.Spacing.sm))
-
-        SettingsGroup(title = stringResource(R.string.settings_group_general)) {
+    SettingsPanelLayout(modifier = modifier) {
+        SettingsGroup(title = stringResource(R.string.settings_subgroup_general)) {
             ToggleRow(
                 label = stringResource(R.string.behavior_auto_launch_label),
                 subtitle = stringResource(R.string.behavior_auto_launch_subtitle),
                 checked = config.autoLaunch,
+                leadingIcon = KronoIcons.Feature.Timer,
                 onChange = {
                     scope.launch { dataStore.updateConfig(config.copy(autoLaunch = it)) }
                 }
             )
-
+            SettingsDivider()
             ToggleRow(
                 label = stringResource(R.string.label_wake_lock),
                 subtitle = stringResource(R.string.behavior_keep_screen_subtitle),
                 checked = config.keepScreenOn,
+                leadingIcon = KronoIcons.Action.Light,
                 onChange = {
                     scope.launch { dataStore.updateConfig(config.copy(keepScreenOn = it)) }
                 }
             )
 
-            GroupDivider()
+            SettingsDivider()
 
             ToggleRow(
                 label = stringResource(R.string.label_focus_mode),
                 subtitle = stringResource(R.string.behavior_focus_mode_subtitle),
                 checked = config.focusModeEnabled,
+                leadingIcon = KronoIcons.Action.Focus,
                 onChange = { isEnabled ->
                     scope.launch { dataStore.updateConfig(config.copy(focusModeEnabled = isEnabled)) }
                     if (isEnabled && isServiceRunning()) onStartFocusMode()
                 }
             )
-
-            AppFontSizeSelector(
-                selected = config.appFontSize,
-                onChange = { size ->
-                    scope.launch { dataStore.updateConfig(config.copy(appFontSize = size)) }
-                }
-            )
         }
-
-        Spacer(Modifier.height(KronoTokens.Spacing.xxl))
     }
-}
-
-@Composable
-private fun GroupDivider() {
-    HorizontalDivider(
-        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f),
-        thickness = 0.5.dp
-    )
 }
 

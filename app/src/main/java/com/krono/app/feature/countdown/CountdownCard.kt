@@ -140,7 +140,7 @@ fun CountdownCard(
                         Icon(
                             imageVector        = if (state.isRunning) KronoIcons.Action.Pause else KronoIcons.Action.Play,
                             contentDescription = if (state.isRunning) stringResource(R.string.action_pause) else stringResource(R.string.action_play),
-                            tint               = textColor,
+                            tint               = if (state.isRunning) MaterialTheme.colorScheme.primary else textColor,
                             modifier           = Modifier.size(KronoTokens.Icon.cardAction)
                         )
                     }

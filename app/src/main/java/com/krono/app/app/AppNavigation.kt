@@ -39,6 +39,8 @@ import com.krono.app.feature.countdown.CountdownScreen
 import com.krono.app.feature.pomodoro.PomodoroScreen
 import com.krono.app.core.ui.settings.SettingsScreen
 import com.krono.app.core.util.KronoToolAudio
+import com.krono.app.core.util.playPomodoroPhaseBeep
+import com.krono.app.core.util.playPomodoroTick
 import com.krono.app.core.util.triggerPlayPauseFeedback
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.first
@@ -114,6 +116,9 @@ fun AppNavigation(
     val navController = rememberNavController()
     val stopwatchState    by stopwatchViewModel.StopwatchState.collectAsState()
     val context       = LocalContext.current
+    val app = context.applicationContext as KronoApp
+    val pomodoroViewModel = app.pomodoroViewModel
+    val pomodoroState by pomodoroViewModel.state.collectAsState()
     val scope         = rememberCoroutineScope()
     val config        by dataStore.configFlow.collectAsState(initial = OverlayConfig())
 
@@ -142,6 +147,41 @@ fun AppNavigation(
     var restoredLastTool by remember { mutableStateOf(false) }
 
     val showBottomBar = currentDest == AppRoutes.TIMER || currentDest == AppRoutes.COUNTDOWN || currentDest == AppRoutes.POMODORO
+
+    var lastPomodoroTick by remember { mutableStateOf<Long?>(null) }
+    LaunchedEffect(pomodoroState.remainingSeconds, pomodoroState.isRunning, config.pomodoroTickingSound, config.tickVolume, config.pomodoroTickSoundType) {
+        if (pomodoroState.isRunning && config.pomodoroTickingSound) {
+            if (lastPomodoroTick != pomodoroState.remainingSeconds) {
+                playPomodoroTick(context, config.tickVolume, config.pomodoroTickSoundType)
+                lastPomodoroTick = pomodoroState.remainingSeconds
+            }
+        }
+    }
+    LaunchedEffect(
+        pomodoroState.phaseTransitionId,
+        pomodoroState.phaseLabel,
+        pomodoroState.phaseSoundType,
+        config.pomodoroFocusAlertEnabled,
+        config.pomodoroBreakAlertEnabled,
+        config.focusAlertVolume,
+        config.breakAlertVolume,
+        config.pomodoroFocusAlertSoundType,
+        config.pomodoroBreakAlertSoundType
+    ) {
+        if (pomodoroState.phaseTransitionId <= 0L) return@LaunchedEffect
+        val isFocus = pomodoroState.phaseSoundType.startsWith("FOCUS")
+        val enabled = if (isFocus) config.pomodoroFocusAlertEnabled else config.pomodoroBreakAlertEnabled
+        if (!enabled) return@LaunchedEffect
+        val phaseSound = pomodoroState.phaseSoundType.ifBlank {
+            if (isFocus) config.pomodoroFocusAlertSoundType else config.pomodoroBreakAlertSoundType
+        }
+        playPomodoroPhaseBeep(
+            context = context,
+            isFocusPhase = isFocus,
+            volume = if (isFocus) config.focusAlertVolume else config.breakAlertVolume,
+            soundType = phaseSound
+        )
+    }
 
     LaunchedEffect(currentDest, config.activeToolId) {
         val route = currentDest ?: return@LaunchedEffect
@@ -258,21 +298,30 @@ fun AppNavigation(
             }
             composable(AppRoutes.POMODORO) {
                 PomodoroScreen(
-                    viewModel = (context.applicationContext as KronoApp).pomodoroViewModel,
+                    viewModel = pomodoroViewModel,
                     onOpenSettings = { navController.navigate(AppRoutes.SETTINGS) },
                     selectedFont = config.overlayFontFamily,
                     timeFormat = config.pomodoroFormat,
                     selectedPreset = config.pomodoroPreset,
+                    presetsSpec = config.pomodoroPresetsSpec,
+                    customPresetPhasesSpec = config.pomodoroCustomPhasesSpec,
+                    customFocusMinutes = config.pomodoroCustomFocusMinutes,
+                    customBreakMinutes = config.pomodoroCustomBreakMinutes,
+                    customCycles = config.pomodoroCustomCycles,
                     playPauseBeepEnabled = config.playPauseSoundEnabled,
                     playPauseVibrationEnabled = config.playPauseVibrationEnabled,
                     playPauseVolume = config.playPauseVolume,
-                    phaseBeepEnabled = config.pomodoroBeepFocusBreak,
+                    phaseBeepEnabled = config.pomodoroFocusAlertEnabled || config.pomodoroBreakAlertEnabled,
+                    focusAlertEnabled = config.pomodoroFocusAlertEnabled,
+                    breakAlertEnabled = config.pomodoroBreakAlertEnabled,
                     tickingSoundEnabled = config.pomodoroTickingSound,
                     tickVolume = config.tickVolume,
                     focusAlertVolume = config.focusAlertVolume,
                     breakAlertVolume = config.breakAlertVolume,
-                    autoStartBreak = config.pomodoroAutoStartBreak,
-                    autoStartFocus = config.pomodoroAutoStartFocus,
+                    tickSoundType = config.pomodoroTickSoundType,
+                    focusAlertSoundType = config.pomodoroFocusAlertSoundType,
+                    breakAlertSoundType = config.pomodoroBreakAlertSoundType,
+                    autoStartNextCycle = config.pomodoroAutoNextCycle,
                     onOpenOverlay = {
                         scope.launch {
                             dataStore.updateConfig(config.copy(activeToolId = "pomodoro"))

@@ -14,6 +14,7 @@
 - fix: Bug introduzido na refatoração corrigido
 
 # 🔧 Manutenção
+- chore: refatoração de settings
 - Ajuste em Settings
 - Ajustes de design na settings
 - ui: add dynamic sticky header to content panel

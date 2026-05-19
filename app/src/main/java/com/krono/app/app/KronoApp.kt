@@ -34,9 +34,12 @@ class KronoApp : Application() {
     }
 
     val countdownViewModel: CountdownViewModel by lazy {
-        CountdownViewModel(CountdownDataStore(this))
+        CountdownViewModel(
+            dataStore = CountdownDataStore(this),
+            overlayDataStore = OverlayDataStore(this)
+        )
     }
-    val pomodoroViewModel: PomodoroViewModel by lazy { PomodoroViewModel() }
+    val pomodoroViewModel: PomodoroViewModel by lazy { PomodoroViewModel(this) }
 
     override fun onCreate() {
         super.onCreate()

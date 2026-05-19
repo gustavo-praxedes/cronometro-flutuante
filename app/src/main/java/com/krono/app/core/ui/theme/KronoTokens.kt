@@ -66,8 +66,33 @@ object KronoTokens {
 
     // ── Tamanhos de Componentes Genéricos ───────────────────────
     object Size {
-        val iconBox         = 40.dp
+        val iconBox         = 44.dp
         val iconInner       = 22.dp
+    }
+
+    // ── Layout de Settings ───────────────────────────────────────
+    object Settings {
+        val panelHorizontalInset = 16.dp
+        val panelTopSpacing = 8.dp
+        val panelBottomSpacing = 24.dp
+        val panelSectionGap = 16.dp
+        val rowVerticalInset = 16.dp
+        val groupTitleBottom = 8.dp
+        val groupTitleTop = 4.dp
+        val searchHeight = 48.dp
+        val searchCorner = 16.dp
+        val searchIcon = 18.dp
+        val searchClearButton = 24.dp
+        val searchClearIcon = 16.dp
+        val searchInnerHorizontal = 12.dp
+        val stickyHeaderTop = 52.dp
+        val dividerThickness = 0.5.dp
+        val dividerAlpha = 0.35f
+        val selectedRowAlpha = 0.70f
+        val menuSelectedRowAlpha = 0.65f
+        val mutedIconAlpha = 0.6f
+        val emptyStateIconAlpha = 0.4f
+        val emptyStateTextAlpha = 0.6f
     }
 
     // ── Tipografia (Valores Base) ──────────────────────────
@@ -78,6 +103,8 @@ object KronoTokens {
         val buttonLabel      = 16.sp
         val buttonLabelSmall = 14.sp
         val statusLabel      = 12.sp
+        val statusLabelLine  = 18.sp
+        val titleRowLine     = 24.sp
         val errorLabel       = 12.sp
         val bodyText         = 16.sp
         val timerCard        = 34.sp
@@ -169,7 +196,7 @@ object KronoTokens {
         val inlineSpinner  = 18.dp
         val buttonSpinner  = 20.dp
         val listItemHeight = 48.dp
-        val rowMin         = 56.dp
+        val rowMin         = 60.dp
         val colorSwatch    = 36.dp
         val colorPreview   = 120.dp
         val colorInputWidth = 180.dp

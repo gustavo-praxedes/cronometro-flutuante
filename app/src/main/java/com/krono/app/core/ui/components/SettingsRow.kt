@@ -6,7 +6,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import com.krono.app.core.ui.theme.KronoTokens
 
 @Composable
@@ -15,6 +19,9 @@ fun SettingsRow(
     modifier: Modifier = Modifier,
     subtitle: String? = null,
     leadingIcon: ImageVector? = null,
+    leadingTextIcon: String? = null,
+    iconTint: Color = MaterialTheme.colorScheme.onSurfaceVariant,
+    iconContainerColor: Color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f),
     trailing: @Composable (() -> Unit)? = null,
     onClick: (() -> Unit)? = null
 ) {
@@ -29,26 +36,35 @@ fun SettingsRow(
                 }
             )
             .padding(
-                horizontal = KronoTokens.Spacing.lg,
-                vertical = KronoTokens.Spacing.md
+                horizontal = KronoTokens.Settings.panelHorizontalInset,
+                vertical = KronoTokens.Settings.rowVerticalInset
             )
             .heightIn(min = KronoTokens.Component.rowMin),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(KronoTokens.Spacing.rowInner)
     ) {
-        leadingIcon?.let { icon ->
+        if (leadingIcon != null || !leadingTextIcon.isNullOrBlank()) {
             Surface(
                 shape = KronoTokens.Shape.iconBox,
-                color = MaterialTheme.colorScheme.surfaceVariant,
+                color = iconContainerColor,
                 modifier = Modifier.size(KronoTokens.Size.iconBox)
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    Icon(
-                        imageVector = icon,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(KronoTokens.Size.iconInner)
-                    )
+                    if (leadingIcon != null) {
+                        Icon(
+                            imageVector = leadingIcon,
+                            contentDescription = null,
+                            tint = iconTint,
+                            modifier = Modifier.size(KronoTokens.Size.iconInner)
+                        )
+                    } else {
+                        Text(
+                            text = leadingTextIcon.orEmpty(),
+                            color = iconTint,
+                            style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
+                            textAlign = TextAlign.Center
+                        )
+                    }
                 }
             }
         }
@@ -59,14 +75,20 @@ fun SettingsRow(
         ) {
             Text(
                 text = title,
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontWeight = FontWeight.Normal,
+                    lineHeight = KronoTokens.Typography.titleRowLine
+                ),
                 color = MaterialTheme.colorScheme.onSurface
             )
             subtitle?.let {
                 Text(
                     text = it,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        lineHeight = KronoTokens.Typography.statusLabelLine,
+                        letterSpacing = 0.sp
+                    ),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.92f)
                 )
             }
         }

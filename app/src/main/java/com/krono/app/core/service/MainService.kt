@@ -92,7 +92,8 @@ class MainService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStateRe
             windowManager = windowManager,
             feedbackManager = feedbackManager,
             notificationHelper = notificationHelper,
-            countdownViewModel = app.countdownViewModel
+            countdownViewModel = app.countdownViewModel,
+            currentConfigProvider = { currentConfig }
         )
 
         startForegroundWithNotification()
@@ -102,6 +103,7 @@ class MainService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStateRe
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_START)
         ensureObserversStarted()
+        val app = application as KronoApp
 
         val id = intent?.getStringExtra(CountdownViewModel.EXTRA_COUNTDOWN_ID)
 
@@ -126,10 +128,21 @@ class MainService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStateRe
             
             CountdownViewModel.ACTION_COUNTDOWN_PLAY         -> id?.let { countdownManager.play(it) }
             CountdownViewModel.ACTION_COUNTDOWN_PAUSE        -> id?.let { countdownManager.pause(it) }
-            CountdownViewModel.ACTION_COUNTDOWN_RESET        -> id?.let { countdownManager.reset(it) }
+            CountdownViewModel.ACTION_COUNTDOWN_RESET        -> id?.let {
+                val alreadyAccumulated = intent.getBooleanExtra(CountdownViewModel.EXTRA_COUNTDOWN_ACCUMULATED, false)
+                if (!alreadyAccumulated) {
+                    app.countdownViewModel.accumulateElapsedForId(it)
+                }
+                countdownManager.reset(it)
+            }
             CountdownViewModel.ACTION_COUNTDOWN_OVERLAY_SHOW -> id?.let { countdownManager.showOverlay(it) }
             CountdownViewModel.ACTION_COUNTDOWN_OVERLAY_HIDE -> id?.let { countdownManager.hideOverlay(it) }
             CountdownViewModel.ACTION_COUNTDOWN_SYNC         -> id?.let { countdownManager.syncOverlay(it) }
+            CountdownViewModel.ACTION_COUNTDOWN_PLUS_ONE     -> id?.let { countdownManager.addOneMinute(it) }
+            CountdownViewModel.ACTION_COUNTDOWN_SET_SECONDS  -> {
+                val seconds = intent.getLongExtra(CountdownViewModel.EXTRA_COUNTDOWN_SECONDS, 0L)
+                id?.let { countdownManager.setRemaining(it, seconds) }
+            }
             CountdownViewModel.ACTION_COUNTDOWN_DESTROY      -> id?.let { countdownManager.destroy(it) }
 
             else -> if (checkPermissions() && !overlayManager.overlayVisible) showOverlay()
@@ -198,21 +211,11 @@ class MainService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStateRe
     }
 
     private fun handlePause() {
-        val sessionMs = (activeViewModel as? StopwatchViewModel)?.currentSessionMs ?: 0L
         activeViewModel?.pause()
-        serviceScope.launch {
-            dataStore.accumulateTime(sessionMs)
-            checkAndShowDonation()
-        }
     }
 
     private fun handleReset() {
-        val sessionMs = (activeViewModel as? StopwatchViewModel)?.currentSessionMs ?: 0L
         activeViewModel?.reset()
-        serviceScope.launch {
-            dataStore.accumulateTime(sessionMs)
-            checkAndShowDonation()
-        }
     }
 
     private fun checkAndShowDonation() {
@@ -229,7 +232,10 @@ class MainService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStateRe
             dataStore.configFlow
                 .map { it.donationPending }
                 .distinctUntilChanged()
-                .collect { pending -> pendingDonation = pending }
+                .collect { pending ->
+                    pendingDonation = pending
+                    if (pending) checkAndShowDonation()
+                }
         }
     }
 

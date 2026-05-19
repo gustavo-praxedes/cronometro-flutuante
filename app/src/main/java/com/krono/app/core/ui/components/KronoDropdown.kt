@@ -1,6 +1,5 @@
 package com.krono.app.core.ui.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -9,7 +8,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.KeyboardArrowDown
 import androidx.compose.material.icons.rounded.KeyboardArrowUp
@@ -27,9 +25,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import com.krono.app.core.ui.theme.KronoTokens
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -39,6 +37,7 @@ fun <T> KronoDropdown(
     onValueChange: (T) -> Unit,
     options: List<T>,
     label: String? = null,
+    leadingIcon: ImageVector? = null,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     textMapping: (T) -> String = { it.toString() }
@@ -47,40 +46,32 @@ fun <T> KronoDropdown(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val currentText = textMapping(value)
 
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(
-                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f),
-                RoundedCornerShape(12.dp)
-            )
-            .clickable(enabled = enabled) { open = true }
-            .padding(horizontal = KronoTokens.Spacing.md, vertical = KronoTokens.Spacing.sm),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(KronoTokens.Spacing.sm)
-    ) {
-        Text(
-            text = label ?: "",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurface,
-            fontWeight = FontWeight.Normal,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.weight(1f)
-        )
-        Text(
-            text = currentText,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
-        Icon(
-            imageVector = if (open) Icons.Rounded.KeyboardArrowUp else Icons.Rounded.KeyboardArrowDown,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-    }
+    SettingsRow(
+        title = label.orEmpty(),
+        leadingIcon = leadingIcon,
+        subtitle = null,
+        modifier = modifier,
+        onClick = if (enabled) ({ open = true }) else null,
+        trailing = {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(KronoTokens.Spacing.xs)
+            ) {
+                Text(
+                    text = currentText,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Icon(
+                    imageVector = if (open) Icons.Rounded.KeyboardArrowUp else Icons.Rounded.KeyboardArrowDown,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+    )
 
     if (open) {
         ModalBottomSheet(

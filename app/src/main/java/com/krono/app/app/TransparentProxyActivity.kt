@@ -9,7 +9,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -41,6 +44,14 @@ class TransparentProxyActivity : ComponentActivity() {
     }
     private val installLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         permissionsRefreshTrigger.intValue++
+    }
+
+    private fun openKofi() {
+        startActivity(
+            Intent(Intent.ACTION_VIEW, Uri.parse("https://ko-fi.com/gustavopraxedes")).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+        )
     }
 
     companion object {
@@ -123,7 +134,44 @@ class TransparentProxyActivity : ComponentActivity() {
                             onDismiss                 = { finish() }
                         )
                         TYPE_UPDATE -> finish()
-                        TYPE_DONATION -> finish()
+                        TYPE_DONATION -> {
+                            AlertDialog(
+                                onDismissRequest = {
+                                    scope.launch { dataStore.resetDonationCycle() }
+                                    finish()
+                                },
+                                title = { Text(text = getString(R.string.support_title)) },
+                                text = {
+                                    Text(
+                                        text = getString(
+                                            R.string.support_message_with_time,
+                                            com.krono.app.core.data.formatLifetimeDetailed(config.totalLifetimeMs)
+                                        )
+                                    )
+                                },
+                                dismissButton = {
+                                    TextButton(
+                                        onClick = {
+                                            scope.launch { dataStore.resetDonationCycle() }
+                                            finish()
+                                        }
+                                    ) {
+                                        Text(text = getString(R.string.action_cancel))
+                                    }
+                                },
+                                confirmButton = {
+                                    TextButton(
+                                        onClick = {
+                                            openKofi()
+                                            scope.launch { dataStore.resetDonationCycle() }
+                                            finish()
+                                        }
+                                    ) {
+                                        Text(text = getString(R.string.support_button))
+                                    }
+                                }
+                            )
+                        }
                         else -> finish()
                     }
                 }

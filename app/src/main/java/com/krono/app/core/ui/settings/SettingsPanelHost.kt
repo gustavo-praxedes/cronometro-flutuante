@@ -2,6 +2,9 @@ package com.krono.app.core.ui.settings
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.krono.app.BuildConfig
+import com.krono.app.R
 import com.krono.app.core.data.OverlayConfig
 import com.krono.app.core.data.OverlayDataStore
 import com.krono.app.core.util.UpdateInfo
@@ -33,16 +36,15 @@ fun SettingsPanelHost(
             onStartFocusMode = onStartFocusMode,
             modifier = modifier
         )
-        SettingsDestination.About -> AboutPanel(modifier = modifier)
-        SettingsDestination.Support -> SupportPanel(
+        SettingsDestination.About -> AboutPanel(
             totalLifetimeMs = totalLifetimeMs,
             onDonate = onSupportClick,
             modifier = modifier
         )
         SettingsDestination.Changelog -> {
             val updateInfo = pendingUpdateInfo ?: UpdateInfo(
-                tagName = "vAtual",
-                changelog = "Versao atual instalada. Sem atualizacao pendente.",
+                tagName = BuildConfig.VERSION_NAME,
+                changelog = stringResource(R.string.updates_current_version_fallback),
                 releaseUrl = "",
                 downloadUrl = null
             )

@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.krono.app.feature.countdown.CountdownConfig
 import com.krono.app.feature.countdown.CountdownDataStore
 import com.krono.app.feature.countdown.CountdownState
+import com.krono.app.core.data.OverlayDataStore
 import com.krono.app.core.service.MainService
 import com.krono.app.core.tool.ToolViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,7 +21,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class CountdownViewModel(
-    private val dataStore: CountdownDataStore
+    private val dataStore: CountdownDataStore,
+    private val overlayDataStore: OverlayDataStore
 ) : ViewModel(), ToolViewModel {
 
     companion object {
@@ -34,7 +36,11 @@ class CountdownViewModel(
         const val ACTION_COUNTDOWN_DESTROY      = "com.krono.app.COUNTDOWN_DESTROY"
         /** Empurra estado atual do ViewModel para o overlay ativo (preview ao vivo) */
         const val ACTION_COUNTDOWN_SYNC         = "com.krono.app.COUNTDOWN_SYNC"
+        const val ACTION_COUNTDOWN_PLUS_ONE     = "com.krono.app.COUNTDOWN_PLUS_ONE"
+        const val ACTION_COUNTDOWN_SET_SECONDS  = "com.krono.app.COUNTDOWN_SET_SECONDS"
         const val EXTRA_COUNTDOWN_ID            = "countdown_id"
+        const val EXTRA_COUNTDOWN_SECONDS       = "countdown_seconds"
+        const val EXTRA_COUNTDOWN_ACCUMULATED   = "countdown_accumulated"
     }
 
     override val toolState: StateFlow<ToolState>
@@ -56,6 +62,7 @@ class CountdownViewModel(
 
     override fun reset() {
         _countdowns.value.firstOrNull()?.let { state ->
+            accumulateElapsed(state)
             updateRuntime(state.config.id) {
                 it.copy(isRunning = false, isCompleted = false, remainingSeconds = it.config.totalSeconds)
             }
@@ -174,10 +181,17 @@ class CountdownViewModel(
     }
 
     fun reset(context: Context, id: String) {
+        _countdowns.value.find { it.config.id == id }?.let { accumulateElapsed(it) }
         updateRuntime(id) {
             it.copy(isRunning = false, isCompleted = false, remainingSeconds = it.config.totalSeconds)
         }
-        sendAction(context, ACTION_COUNTDOWN_RESET, id)
+        context.startService(
+            Intent(context, MainService::class.java).apply {
+                action = ACTION_COUNTDOWN_RESET
+                putExtra(EXTRA_COUNTDOWN_ID, id)
+                putExtra(EXTRA_COUNTDOWN_ACCUMULATED, true)
+            }
+        )
     }
 
     // ── Overlay ───────────────────────────────────────────────────────────────
@@ -216,6 +230,36 @@ class CountdownViewModel(
         }
     }
 
+    fun setRemainingAndSync(context: Context, id: String, seconds: Long, clearCompleted: Boolean = false) {
+        setRemainingSeconds(id, seconds, clearCompleted)
+        context.startService(
+            Intent(context, MainService::class.java).apply {
+                action = ACTION_COUNTDOWN_SET_SECONDS
+                putExtra(EXTRA_COUNTDOWN_ID, id)
+                putExtra(EXTRA_COUNTDOWN_SECONDS, seconds.coerceAtLeast(0L))
+            }
+        )
+    }
+
+    fun addOneMinute(context: Context, id: String) {
+        val current = _countdowns.value.find { it.config.id == id }?.remainingSeconds ?: 0L
+        val next = (current + 60L).coerceAtMost(99L * 3600L + 59L * 60L + 59L)
+        setRemainingAndSync(context, id, next, clearCompleted = true)
+        sendAction(context, ACTION_COUNTDOWN_PLUS_ONE, id)
+    }
+
+    fun accumulateElapsedByTotalAndRemaining(totalSeconds: Long, remainingSeconds: Long) {
+        val elapsedMs = ((totalSeconds - remainingSeconds).coerceAtLeast(0L)) * 1000L
+        if (elapsedMs <= 0L) return
+        viewModelScope.launch {
+            overlayDataStore.accumulateTime(elapsedMs)
+        }
+    }
+
+    fun accumulateElapsedForId(id: String) {
+        _countdowns.value.find { it.config.id == id }?.let { accumulateElapsed(it) }
+    }
+
     // ── Helpers ───────────────────────────────────────────────────────────────
 
     private fun updateRuntime(id: String, transform: (CountdownState) -> CountdownState) {
@@ -237,5 +281,13 @@ class CountdownViewModel(
         _countdowns.value
             .filterNot { it.config.id in transientIds }
             .map { it.config }
+
+    private fun accumulateElapsed(state: CountdownState) {
+        val elapsedMs = ((state.config.totalSeconds - state.remainingSeconds).coerceAtLeast(0L)) * 1000L
+        if (elapsedMs <= 0L) return
+        viewModelScope.launch {
+            overlayDataStore.accumulateTime(elapsedMs)
+        }
+    }
 }
 

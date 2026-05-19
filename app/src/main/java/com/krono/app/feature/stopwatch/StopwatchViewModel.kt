@@ -3,6 +3,7 @@
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.krono.app.core.data.OverlayDataStore
 import com.krono.app.core.data.TimerPreferences
 import com.krono.app.core.tool.ToolViewModel
 import com.krono.app.feature.stopwatch.StopwatchState
@@ -19,6 +20,7 @@ import kotlinx.coroutines.launch
 class StopwatchViewModel(application: Application) : AndroidViewModel(application), ToolViewModel {
 
     private val timerPreferences = TimerPreferences(application)
+    private val overlayDataStore = OverlayDataStore(application)
 
     private val _stopwatchState = MutableStateFlow(loadInitialState())
     
@@ -102,10 +104,16 @@ class StopwatchViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
     override fun reset() {
+        val elapsedToAccumulate = _stopwatchState.value.elapsedMs.coerceAtLeast(0L)
         stopUpdateLoop()
         val newState = StopwatchState()
         _stopwatchState.value = newState
         timerPreferences.clearState()
+        if (elapsedToAccumulate > 0L) {
+            viewModelScope.launch {
+                overlayDataStore.accumulateTime(elapsedToAccumulate)
+            }
+        }
     }
 
     private fun startUpdateLoop() {

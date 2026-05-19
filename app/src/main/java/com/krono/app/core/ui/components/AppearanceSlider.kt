@@ -17,9 +17,10 @@ internal fun AppearanceSlider(
     maxLabel: String,
     range   : ClosedFloatingPointRange<Float>,
     display : String,
-    onChange: (Float) -> Unit
+    onChange: (Float) -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    Column(modifier = Modifier.fillMaxWidth()) {
+    Column(modifier = modifier.fillMaxWidth()) {
         Row(
             modifier              = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,

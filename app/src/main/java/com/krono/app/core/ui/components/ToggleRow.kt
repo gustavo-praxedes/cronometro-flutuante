@@ -4,6 +4,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 
 @Composable
 fun ToggleRow(
@@ -11,11 +12,15 @@ fun ToggleRow(
     checked: Boolean,
     onChange: (Boolean) -> Unit,
     subtitle: String? = null,
+    leadingIcon: ImageVector? = null,
+    leadingTextIcon: String? = null,
     modifier: Modifier = Modifier
 ) {
     SettingsRow(
         title = label,
         subtitle = subtitle,
+        leadingIcon = leadingIcon,
+        leadingTextIcon = leadingTextIcon,
         modifier = modifier,
         onClick = { onChange(!checked) },
         trailing = {

@@ -38,6 +38,9 @@ class CountdownOverlayManager(
     private val onPlusOne: () -> Unit,
     private val onClose: () -> Unit
 ) : LifecycleOwner, ViewModelStoreOwner, SavedStateRegistryOwner {
+    companion object {
+        private const val SCREEN_OVERLAY_ID = "countdown-screen-overlay"
+    }
 
     // ── Lifecycle boilerplate ──────────────────────────────────────────────
     private val lifecycleRegistry = LifecycleRegistry(this)
@@ -200,14 +203,15 @@ class CountdownOverlayManager(
                 val overlayConfig by OverlayDataStore(context).configFlow.collectAsState(initial = OverlayConfig())
                 KronoTheme(selectedTheme = overlayConfig.selectedTheme, appFontSize = overlayConfig.appFontSize) {
                     overlayState.value?.let { s ->
+                        val showPlusOne = this@CountdownOverlayManager.id == SCREEN_OVERLAY_ID
                         CountdownOverlayUi(
                             state = s,
                             onPlay = onPlay,
                             onPause = onPause,
                             onReset = onReset,
-                            onBottomExtraAction = onPlusOne,
-                            bottomExtraIcon = com.krono.app.core.ui.theme.KronoIcons.Action.PlusOne,
-                            bottomExtraDescription = "+1 min",
+                            onBottomExtraAction = if (showPlusOne) onPlusOne else null,
+                            bottomExtraIcon = if (showPlusOne) com.krono.app.core.ui.theme.KronoIcons.Action.PlusOne else null,
+                            bottomExtraDescription = if (showPlusOne) "+1 min" else "",
                             timeFormat = overlayConfig.countdownFormat,
                             showButtons = overlayConfig.countdownOverlayShowButtons,
                             showHours = overlayConfig.countdownOverlayShowHours,
@@ -216,6 +220,7 @@ class CountdownOverlayManager(
                             overlayScale = overlayConfig.countdownOverlayScale,
                             overlayCornerRadius = overlayConfig.countdownOverlayCornerRadius,
                             overlayCustomColor = overlayConfig.countdownOverlayCustomColor,
+                            overlayCustomTextColor = overlayConfig.countdownOverlayCustomTextColor,
                             overlayWidthScale = 0.96f,
                             onClose = onClose,
                             onDrag = { dx, dy -> onDrag(dx, dy) },

@@ -14,7 +14,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -113,17 +112,17 @@ private fun WideScreenLayout(
                 color = MaterialTheme.colorScheme.surface,
                 tonalElevation = 0.dp
             ) {
-Column(modifier = Modifier.fillMaxSize()) {
+                Column(modifier = Modifier.fillMaxSize()) {
                 // Header fixo no topo
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(
-                                start = KronoTokens.Spacing.sm,
-                                end = KronoTokens.Spacing.sm,
-                                top = 48.dp
+                                start = KronoTokens.Settings.panelHorizontalInset,
+                                end = KronoTokens.Settings.panelHorizontalInset,
+                                top = KronoTokens.Settings.stickyHeaderTop
                             ),
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.Bottom
                     ) {
                         IconButton(onClick = onBack) {
                             Icon(
@@ -154,8 +153,8 @@ Column(modifier = Modifier.fillMaxSize()) {
 
             VerticalDivider(
                 modifier = Modifier.fillMaxHeight(),
-                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),
-                thickness = 0.5.dp
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = KronoTokens.Settings.dividerAlpha),
+                thickness = KronoTokens.Settings.dividerThickness
             )
 
             // Detail panel
@@ -163,14 +162,18 @@ Column(modifier = Modifier.fillMaxSize()) {
                 modifier = Modifier
                     .weight(0.65f)
                     .fillMaxHeight()
-                    .padding(horizontal = KronoTokens.Spacing.lg)
+                    .padding(horizontal = KronoTokens.Settings.panelHorizontalInset)
             ) {
                 // Sticky header - alinhado com Row do painel esquerdo
                 if (selectedDestination != null) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = 48.dp, start = KronoTokens.Spacing.lg),
+                            .padding(
+                                top = KronoTokens.Settings.stickyHeaderTop,
+                                start = KronoTokens.Settings.panelHorizontalInset,
+                                end = KronoTokens.Settings.panelHorizontalInset
+                            ),
                         verticalAlignment = Alignment.Bottom
                     ) {
                         Text(
@@ -196,8 +199,8 @@ Column(modifier = Modifier.fillMaxSize()) {
                             Icon(
                                 imageVector = KronoIcons.Action.Settings,
                                 contentDescription = null,
-                                modifier = Modifier.size(80.dp),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
+                                modifier = Modifier.size(KronoTokens.StateIcon.emptyLarge),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = KronoTokens.Settings.emptyStateIconAlpha)
                             )
                             Spacer(modifier = Modifier.height(KronoTokens.Spacing.lg))
                             Text(
@@ -205,11 +208,11 @@ Column(modifier = Modifier.fillMaxSize()) {
                                 style = MaterialTheme.typography.bodyLarge.copy(
                                     fontSize = KronoTokens.Typography.bodyText
                                 ),
-                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = KronoTokens.Settings.emptyStateTextAlpha)
                             )
                         }
                     }
-                } else if (selectedDestination != null) {
+                } else {
                     AnimatedContent(
                         targetState = selectedDestination,
                         transitionSpec = {
@@ -232,11 +235,11 @@ Column(modifier = Modifier.fillMaxSize()) {
                             config = config,
                             dataStore = dataStore,
                             scope = scope,
-                            totalLifetimeMs = 0L,
+                            totalLifetimeMs = config.totalLifetimeMs,
                             pendingUpdateInfo = updateInfo,
                             isServiceRunning = isServiceRunning,
                             onStartFocusMode = onStartFocusMode,
-                            onSupportClick = { onDestinationSelected(SettingsDestination.Support) },
+                            onSupportClick = {},
                             onShowChangelog = { onDestinationSelected(SettingsDestination.Changelog) },
                             onUpdateAvailable = { onDestinationSelected(SettingsDestination.Changelog) },
                             modifier = Modifier.fillMaxSize()
@@ -339,11 +342,11 @@ private fun NarrowScreenLayout(
                     config = config,
                     dataStore = dataStore,
                     scope = scope,
-                    totalLifetimeMs = 0L,
+                    totalLifetimeMs = config.totalLifetimeMs,
                     pendingUpdateInfo = updateInfo,
                     isServiceRunning = isServiceRunning,
                     onStartFocusMode = onStartFocusMode,
-                    onSupportClick = { onDestinationSelected(SettingsDestination.Support) },
+                    onSupportClick = {},
                     onShowChangelog = { onDestinationSelected(SettingsDestination.Changelog) },
                     onUpdateAvailable = { onDestinationSelected(SettingsDestination.Changelog) },
                     modifier = Modifier.fillMaxSize()

@@ -2,6 +2,7 @@
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -24,10 +25,9 @@ import com.krono.app.core.ui.theme.timerFontFamily
 import com.krono.app.core.data.TimerDisplayFormat
 import com.krono.app.core.data.formatSecondsByPattern
 import androidx.compose.ui.platform.LocalContext
-import com.krono.app.core.util.playPomodoroPhaseBeep
-import com.krono.app.core.util.playPomodoroTick
 import com.krono.app.core.util.KronoToolAudio
 import com.krono.app.core.util.triggerPlayPauseFeedback
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -37,16 +37,25 @@ fun PomodoroScreen(
     selectedFont: String = "SYSTEM_DEFAULT",
     timeFormat: String = "HH_MM_SS",
     selectedPreset: String = "CLASSICO",
+    presetsSpec: String = "",
+    customPresetPhasesSpec: String = "",
+    customFocusMinutes: Int = 25,
+    customBreakMinutes: Int = 5,
+    customCycles: Int = 4,
     playPauseBeepEnabled: Boolean = false,
     playPauseVibrationEnabled: Boolean = false,
     playPauseVolume: Float = 0.8f,
     phaseBeepEnabled: Boolean = false,
+    focusAlertEnabled: Boolean = true,
+    breakAlertEnabled: Boolean = true,
     tickingSoundEnabled: Boolean = false,
     tickVolume: Float = 0.35f,
     focusAlertVolume: Float = 0.9f,
     breakAlertVolume: Float = 0.9f,
-    autoStartBreak: Boolean = true,
-    autoStartFocus: Boolean = true,
+    tickSoundType: String = "TICK_A",
+    focusAlertSoundType: String = "FOCUS_A",
+    breakAlertSoundType: String = "BREAK_A",
+    autoStartNextCycle: Boolean = true,
     onOpenOverlay: () -> Unit
 ) {
     val context = LocalContext.current
@@ -54,34 +63,39 @@ fun PomodoroScreen(
     val isRunning = state.isRunning
     val format = TimerDisplayFormat.fromKey(timeFormat)
     val phaseLabel = state.phaseLabel
-    val remaining = state.remainingSeconds
+    var flashColor by remember { mutableStateOf<Color?>(null) }
+    val displayBg by animateColorAsState(
+        targetValue = flashColor ?: Color.Transparent,
+        animationSpec = tween(120),
+        label = "pomodoro_display_flash"
+    )
 
-    LaunchedEffect(selectedPreset) {
-        viewModel.applyPreset(selectedPreset)
+    LaunchedEffect(selectedPreset, presetsSpec, customFocusMinutes, customBreakMinutes, customCycles, customPresetPhasesSpec) {
+        viewModel.applyPreset(
+            presetKey = selectedPreset,
+            presetsSpec = presetsSpec,
+            customFocusMinutes = customFocusMinutes,
+            customBreakMinutes = customBreakMinutes,
+            customCycles = customCycles,
+            customPhasesSpec = customPresetPhasesSpec
+        )
     }
-    LaunchedEffect(autoStartBreak, autoStartFocus) {
-        viewModel.setAutoAdvance(autoBreak = autoStartBreak, autoFocus = autoStartFocus)
+    LaunchedEffect(autoStartNextCycle) {
+        viewModel.setAutoAdvance(autoNextCycle = autoStartNextCycle)
     }
-    LaunchedEffect(state.phaseTransitionId, phaseBeepEnabled, focusAlertVolume, breakAlertVolume) {
-        if (phaseBeepEnabled && state.phaseTransitionId > 0) {
-            playPomodoroPhaseBeep(
-                context,
-                isFocusPhase = phaseLabel == "Foco",
-                volume = if (phaseLabel == "Foco") focusAlertVolume else breakAlertVolume
-            )
-        }
-    }
-    var lastTickSecond by remember { mutableStateOf<Long?>(null) }
-    LaunchedEffect(remaining, isRunning, tickingSoundEnabled, tickVolume) {
-        if (isRunning && tickingSoundEnabled) {
-            if (lastTickSecond != remaining) {
-                playPomodoroTick(context, tickVolume)
-                lastTickSecond = remaining
+    LaunchedEffect(state.phaseTransitionId) {
+        if (state.phaseTransitionId > 0) {
+            val target = Color(state.phaseColor)
+            repeat(3) {
+                flashColor = target.copy(alpha = 0.28f)
+                delay(140)
+                flashColor = null
+                delay(110)
             }
         }
     }
-
     Scaffold(
+        containerColor = displayBg,
         topBar = {
             CenterAlignedTopAppBar(
                 title = { },
@@ -123,7 +137,9 @@ fun PomodoroScreen(
                     color = MaterialTheme.colorScheme.onBackground,
                     maxLines = 1,
                     softWrap = false,
-                    modifier = Modifier.animateContentSize()
+                    modifier = Modifier
+                        .animateContentSize()
+                        .padding(horizontal = 12.dp, vertical = 4.dp)
                 )
             }
 

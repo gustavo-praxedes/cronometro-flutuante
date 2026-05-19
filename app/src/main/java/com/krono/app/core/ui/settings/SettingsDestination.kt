@@ -38,11 +38,6 @@ sealed class SettingsDestination(
         icon = KronoIcons.Settings.Info
     )
 
-    data object Support : SettingsDestination(
-        titleRes = R.string.settings_support,
-        icon = KronoIcons.Settings.Heart
-    )
-
     data object Changelog : SettingsDestination(
         titleRes = R.string.settings_changelog,
         icon = KronoIcons.Settings.History

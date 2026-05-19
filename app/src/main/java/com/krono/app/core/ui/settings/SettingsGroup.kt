@@ -3,6 +3,7 @@
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.border
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -28,8 +29,8 @@ fun SettingsGroup(
             fontWeight = FontWeight.Normal,
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.padding(
-                start = KronoTokens.Spacing.xs,
-                bottom = KronoTokens.Spacing.sm
+                top = KronoTokens.Settings.groupTitleTop,
+                bottom = KronoTokens.Settings.groupTitleBottom
             )
         )
 
@@ -37,11 +38,17 @@ fun SettingsGroup(
             modifier = Modifier.fillMaxWidth(),
             shape = KronoTokens.Shape.card,
             color = MaterialTheme.colorScheme.surface,
-            tonalElevation = 1.dp,
+            tonalElevation = 0.dp,
             shadowElevation = 0.dp
         ) {
             Column(
-                modifier = Modifier.padding(KronoTokens.Spacing.none)
+                modifier = Modifier
+                    .border(
+                        width = KronoTokens.Settings.dividerThickness,
+                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = KronoTokens.Settings.dividerAlpha),
+                        shape = KronoTokens.Shape.card
+                    )
+                    .padding(KronoTokens.Spacing.none)
             ) {
                 content()
             }

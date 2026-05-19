@@ -7,6 +7,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.border
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
@@ -24,6 +25,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.krono.app.R
+import com.krono.app.core.ui.components.SettingsDivider
 import com.krono.app.core.ui.theme.KronoIcons
 import com.krono.app.core.ui.theme.KronoTokens
 
@@ -35,7 +37,6 @@ private fun SettingsDestination.accentColor(): Color = when (this) {
     SettingsDestination.Countdown   -> Color(0xFF06B6D4)
     SettingsDestination.Pomodoro    -> Color(0xFFE11D48)
     SettingsDestination.About       -> Color(0xFF3B82F6)
-    SettingsDestination.Support     -> Color(0xFFEF4444)
     SettingsDestination.Changelog   -> Color(0xFFF97316)
     SettingsDestination.BugReport   -> Color(0xFFE11D48)
 }
@@ -66,7 +67,6 @@ private val menuSections = listOf(
         titleRes = R.string.settings_menu_section_project,
         destinations = listOf(
             SettingsDestination.About,
-            SettingsDestination.Support,
             SettingsDestination.Changelog,
             SettingsDestination.BugReport
         )
@@ -101,7 +101,7 @@ fun SettingsMenuPanel(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
     ) {
-        Spacer(Modifier.height(KronoTokens.Spacing.xxl))
+        Spacer(Modifier.height(KronoTokens.Settings.panelTopSpacing))
 
         // ── Search Bar ────────────────────────────────────────
         SettingsSearchBar(
@@ -109,10 +109,10 @@ fun SettingsMenuPanel(
             onQueryChange = { searchQuery = it },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = KronoTokens.Spacing.lg)
+                .padding(horizontal = KronoTokens.Settings.panelHorizontalInset)
         )
 
-        Spacer(Modifier.height(KronoTokens.Spacing.xl))
+        Spacer(Modifier.height(KronoTokens.Settings.panelSectionGap))
 
         if (filteredDestinations != null) {
             // ── Search Results ────────────────────────────────
@@ -144,7 +144,7 @@ fun SettingsMenuPanel(
                 SectionCard(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = KronoTokens.Spacing.lg)
+                        .padding(horizontal = KronoTokens.Settings.panelHorizontalInset)
                 ) {
                     filteredDestinations.forEachIndexed { index, dest ->
                         SettingsItem(
@@ -170,7 +170,7 @@ fun SettingsMenuPanel(
                 SectionCard(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = KronoTokens.Spacing.lg)
+                        .padding(horizontal = KronoTokens.Settings.panelHorizontalInset)
                 ) {
                     section.destinations.forEachIndexed { index, dest ->
                         SettingsItem(
@@ -188,11 +188,11 @@ fun SettingsMenuPanel(
                     }
                 }
 
-                Spacer(Modifier.height(KronoTokens.Spacing.lg))
+                Spacer(Modifier.height(KronoTokens.Settings.panelSectionGap))
             }
         }
 
-        Spacer(Modifier.height(KronoTokens.Spacing.xxl))
+        Spacer(Modifier.height(KronoTokens.Settings.panelBottomSpacing))
     }
 }
 
@@ -209,22 +209,22 @@ private fun SettingsSearchBar(
 
     Box(
         modifier = modifier
-            .height(48.dp)
-            .clip(RoundedCornerShape(16.dp))
+            .height(KronoTokens.Settings.searchHeight)
+            .clip(RoundedCornerShape(KronoTokens.Settings.searchCorner))
             .background(containerColor),
         contentAlignment = Alignment.CenterStart
     ) {
         Row(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = KronoTokens.Spacing.md),
+                .padding(horizontal = KronoTokens.Settings.searchInnerHorizontal),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(KronoTokens.Spacing.sm)
         ) {
             Icon(
                 imageVector = KronoIcons.Action.Search,
                 contentDescription = null,
-                modifier = Modifier.size(18.dp),
+                modifier = Modifier.size(KronoTokens.Settings.searchIcon),
                 tint = hintColor
             )
 
@@ -258,12 +258,12 @@ private fun SettingsSearchBar(
             ) {
                 IconButton(
                     onClick = { onQueryChange("") },
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(KronoTokens.Settings.searchClearButton)
                 ) {
                     Icon(
                         imageVector = KronoIcons.Navigation.Close,
                         contentDescription = stringResource(R.string.action_clear),
-                        modifier = Modifier.size(16.dp),
+                        modifier = Modifier.size(KronoTokens.Settings.searchClearIcon),
                         tint = hintColor
                     )
                 }
@@ -284,7 +284,7 @@ private fun SectionLabel(title: String) {
         fontWeight = FontWeight.Normal,
         color = MaterialTheme.colorScheme.primary,
         modifier = Modifier.padding(
-            start = KronoTokens.Spacing.lg,
+            start = KronoTokens.Settings.panelHorizontalInset,
             top = KronoTokens.Spacing.md,
             bottom = KronoTokens.Spacing.sm
         )
@@ -298,9 +298,15 @@ private fun SectionCard(
     content: @Composable ColumnScope.() -> Unit
 ) {
     Surface(
-        modifier = modifier.clip(KronoTokens.Shape.card),
+        modifier = modifier
+            .clip(KronoTokens.Shape.card)
+            .border(
+                width = KronoTokens.Settings.dividerThickness,
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = KronoTokens.Settings.dividerAlpha),
+                shape = KronoTokens.Shape.card
+            ),
         color = MaterialTheme.colorScheme.surface,
-        tonalElevation = 1.dp,
+        tonalElevation = 0.dp,
         shadowElevation = 0.dp,
         shape = KronoTokens.Shape.card
     ) {
@@ -311,11 +317,7 @@ private fun SectionCard(
 // ── Divider ───────────────────────────────────────────────────
 @Composable
 private fun ItemDivider() {
-    HorizontalDivider(
-        modifier = Modifier.padding(start = 68.dp, end = KronoTokens.Spacing.lg),
-        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),
-        thickness = 0.5.dp
-    )
+    SettingsDivider(withIconInset = true)
 }
 
 // ── Settings Item ─────────────────────────────────────────────
@@ -330,7 +332,7 @@ private fun SettingsItem(
     onClick: () -> Unit
 ) {
     val bgColor = if (selected)
-        MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.75f)
+        MaterialTheme.colorScheme.secondaryContainer.copy(alpha = KronoTokens.Settings.menuSelectedRowAlpha)
     else
         Color.Transparent
     val textColor = if (selected)
@@ -353,7 +355,7 @@ private fun SettingsItem(
         // Colored icon container
         Box(
             modifier = Modifier
-                .size(40.dp)
+                .size(KronoTokens.Size.iconBox)
                 .clip(KronoTokens.Shape.iconBox)
                 .background(
                     if (selected) accentColor.copy(alpha = 0.2f)
@@ -364,7 +366,7 @@ private fun SettingsItem(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                modifier = Modifier.size(20.dp),
+                modifier = Modifier.size(KronoTokens.Size.iconInner),
                 tint = accentColor.copy(if (selected) 0.9f else 0.75f)
             )
         }
@@ -376,9 +378,10 @@ private fun SettingsItem(
             Text(
                 text = title,
                 style = MaterialTheme.typography.bodyLarge.copy(
-                    fontSize = KronoTokens.Typography.bodyText
+                    fontSize = KronoTokens.Typography.bodyText,
+                    lineHeight = KronoTokens.Typography.titleRowLine
                 ),
-                fontWeight = if (selected) FontWeight.Normal else FontWeight.Medium,
+                fontWeight = FontWeight.Normal,
                 color = textColor,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
@@ -387,7 +390,8 @@ private fun SettingsItem(
                 Text(
                     text = subtitle,
                     style = MaterialTheme.typography.bodySmall.copy(
-                        fontSize = KronoTokens.Typography.statusLabel
+                        fontSize = KronoTokens.Typography.statusLabel,
+                        lineHeight = KronoTokens.Typography.statusLabelLine
                     ),
                     color = if (selected)
                         MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f)

@@ -3,9 +3,7 @@
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
@@ -132,7 +130,10 @@ private fun InfiniteWheelColumn(
     val listState = rememberLazyListState(initialFirstVisibleItemIndex = initialIndex.coerceAtLeast(0))
     val snap = rememberSnapFlingBehavior(listState)
 
-    val centeredIndex by remember { derivedStateOf { listState.firstVisibleItemIndex.coerceIn(0, wheelItemCount - 1) } }
+    val centeredIndex by remember {
+        // Com o item de padding no topo, o valor central coincide com o firstVisibleItemIndex.
+        derivedStateOf { listState.firstVisibleItemIndex.coerceIn(0, wheelItemCount - 1) }
+    }
 
     LaunchedEffect(listState) {
         snapshotFlow { centeredIndex }
@@ -204,32 +205,25 @@ private fun ColonAnchor(
     fontFamily: FontFamily,
     width: androidx.compose.ui.unit.Dp
 ) {
-    Column(
-        modifier = Modifier.height(itemHeight * 3),
-        horizontalAlignment = Alignment.CenterHorizontally
+    Box(
+        modifier = Modifier
+            .height(itemHeight * 3)
+            .width(width),
+        contentAlignment = Alignment.Center
     ) {
-        Spacer(Modifier.height(itemHeight))
-        Box(
-            modifier = Modifier
-                .height(itemHeight)
-                .width(width),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = ":",
-                fontSize = numberFontSize,
-                fontFamily = fontFamily,
-                fontWeight = FontWeight.Normal,
-                letterSpacing = 0.sp,
-                style = TextStyle(
-                    lineHeight = numberFontSize * 1.2f,
-                    platformStyle = PlatformTextStyle(includeFontPadding = false)
-                ),
-                color = MaterialTheme.colorScheme.onBackground,
-                textAlign = TextAlign.Center
-            )
-        }
-        Spacer(Modifier.height(itemHeight))
+        Text(
+            text = ":",
+            fontSize = numberFontSize,
+            fontFamily = fontFamily,
+            fontWeight = FontWeight.Normal,
+            letterSpacing = 0.sp,
+            style = TextStyle(
+                lineHeight = numberFontSize * 1.2f,
+                platformStyle = PlatformTextStyle(includeFontPadding = false)
+            ),
+            color = MaterialTheme.colorScheme.onBackground,
+            textAlign = TextAlign.Center
+        )
     }
 }
 
