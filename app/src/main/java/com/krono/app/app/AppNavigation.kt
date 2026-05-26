@@ -3,8 +3,11 @@
 import android.os.Build
 import android.provider.Settings
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -34,13 +37,12 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.krono.app.core.data.OverlayConfig
 import com.krono.app.core.data.OverlayDataStore
+import com.krono.app.core.audio.SoundTimingPolicy
 import com.krono.app.core.util.UpdateInfo
 import com.krono.app.feature.countdown.CountdownScreen
 import com.krono.app.feature.pomodoro.PomodoroScreen
 import com.krono.app.core.ui.settings.SettingsScreen
-import com.krono.app.core.util.KronoToolAudio
-import com.krono.app.core.util.playPomodoroPhaseBeep
-import com.krono.app.core.util.playPomodoroTick
+import com.krono.app.core.util.applyPomodoroDnd
 import com.krono.app.core.util.triggerPlayPauseFeedback
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.first
@@ -119,10 +121,12 @@ fun AppNavigation(
     val app = context.applicationContext as KronoApp
     val pomodoroViewModel = app.pomodoroViewModel
     val pomodoroState by pomodoroViewModel.state.collectAsState()
+    val countdowns by app.countdownViewModel.countdowns.collectAsState()
     val scope         = rememberCoroutineScope()
     val config        by dataStore.configFlow.collectAsState(initial = OverlayConfig())
 
     var showPermissionsDialog by remember { mutableStateOf(false) }
+    var permissionsDismissedThisSession by remember { mutableStateOf(false) }
 
     val hasOverlayPermission = remember(permissionsRefreshTrigger) { Settings.canDrawOverlays(context) }
     val hasNotificationPermission = remember(permissionsRefreshTrigger) {
@@ -134,12 +138,27 @@ fun AppNavigation(
     val hasInstallPermission = remember(permissionsRefreshTrigger) {
         context.packageManager.canRequestPackageInstalls()
     }
+    val missingEssentialPermissions = !hasOverlayPermission ||
+        (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !hasNotificationPermission)
 
     LaunchedEffect(Unit) {
         launch { navigationEvents.collect { route -> navController.navigate(route) { launchSingleTop = true } } }
-        launch { permissionsDialogEvents.collect { showPermissionsDialog = true } }
+        launch {
+            permissionsDialogEvents.collect {
+                permissionsDismissedThisSession = false
+                showPermissionsDialog = true
+            }
+        }
         val cfg = dataStore.configFlow.first()
         if (cfg.autoLaunch && !isTaskRoot) onTryStartService()
+    }
+    LaunchedEffect(missingEssentialPermissions) {
+        if (missingEssentialPermissions && !permissionsDismissedThisSession) {
+            showPermissionsDialog = true
+        } else if (!missingEssentialPermissions) {
+            showPermissionsDialog = false
+            permissionsDismissedThisSession = false
+        }
     }
 
     val currentRoute by navController.currentBackStackEntryAsState()
@@ -148,47 +167,18 @@ fun AppNavigation(
 
     val showBottomBar = currentDest == AppRoutes.TIMER || currentDest == AppRoutes.COUNTDOWN || currentDest == AppRoutes.POMODORO
 
-    var lastPomodoroTick by remember { mutableStateOf<Long?>(null) }
-    LaunchedEffect(pomodoroState.remainingSeconds, pomodoroState.isRunning, config.pomodoroTickingSound, config.tickVolume, config.pomodoroTickSoundType) {
-        if (pomodoroState.isRunning && config.pomodoroTickingSound) {
-            if (lastPomodoroTick != pomodoroState.remainingSeconds) {
-                playPomodoroTick(context, config.tickVolume, config.pomodoroTickSoundType)
-                lastPomodoroTick = pomodoroState.remainingSeconds
-            }
-        }
-    }
-    LaunchedEffect(
-        pomodoroState.phaseTransitionId,
-        pomodoroState.phaseLabel,
-        pomodoroState.phaseSoundType,
-        config.pomodoroFocusAlertEnabled,
-        config.pomodoroBreakAlertEnabled,
-        config.focusAlertVolume,
-        config.breakAlertVolume,
-        config.pomodoroFocusAlertSoundType,
-        config.pomodoroBreakAlertSoundType
-    ) {
-        if (pomodoroState.phaseTransitionId <= 0L) return@LaunchedEffect
-        val isFocus = pomodoroState.phaseSoundType.startsWith("FOCUS")
-        val enabled = if (isFocus) config.pomodoroFocusAlertEnabled else config.pomodoroBreakAlertEnabled
-        if (!enabled) return@LaunchedEffect
-        val phaseSound = pomodoroState.phaseSoundType.ifBlank {
-            if (isFocus) config.pomodoroFocusAlertSoundType else config.pomodoroBreakAlertSoundType
-        }
-        playPomodoroPhaseBeep(
+    LaunchedEffect(config.pomodoroDndDuringFocus, pomodoroState.isRunning, pomodoroState.isFocusPhase) {
+        applyPomodoroDnd(
             context = context,
-            isFocusPhase = isFocus,
-            volume = if (isFocus) config.focusAlertVolume else config.breakAlertVolume,
-            soundType = phaseSound
+            enable = config.pomodoroDndDuringFocus && pomodoroState.isRunning && pomodoroState.isFocusPhase
         )
     }
-
     LaunchedEffect(currentDest, config.activeToolId) {
         val route = currentDest ?: return@LaunchedEffect
         if (route == AppRoutes.TIMER || route == AppRoutes.COUNTDOWN || route == AppRoutes.POMODORO) {
             val activeId = routeToToolId(route)
             if (config.activeToolId != activeId) {
-                dataStore.updateConfig(config.copy(activeToolId = activeId))
+                dataStore.updateConfig { it.copy(activeToolId = activeId) }
             }
             if (!restoredLastTool && !startInSettings) {
                 restoredLastTool = true
@@ -206,7 +196,11 @@ fun AppNavigation(
 
     Scaffold(
         bottomBar = {
-            if (showBottomBar) {
+            AnimatedVisibility(
+                visible = showBottomBar,
+                enter = fadeIn(animationSpec = tween(KronoTokens.Animation.fadeDurationMs)),
+                exit = fadeOut(animationSpec = tween(KronoTokens.Animation.fadeDurationMs))
+            ) {
                 KronoBottomBar(
                     tabs         = BOTTOM_TABS,
                     currentRoute = currentDest,
@@ -218,7 +212,7 @@ fun AppNavigation(
                                 restoreState    = true
                             }
                             scope.launch {
-                                dataStore.updateConfig(config.copy(activeToolId = routeToToolId(route)))
+                                dataStore.updateConfig { it.copy(activeToolId = routeToToolId(route)) }
                             }
                         }
                     }
@@ -226,13 +220,22 @@ fun AppNavigation(
             }
         }
     ) { innerPadding ->
-
-        val isSettingsRoute = currentDest == AppRoutes.SETTINGS
-
         NavHost(
             navController    = navController,
             startDestination = if (startInSettings) AppRoutes.SETTINGS else AppRoutes.TIMER,
-            modifier         = if (showBottomBar) Modifier.padding(innerPadding) else Modifier
+            modifier         = Modifier.padding(innerPadding),
+            enterTransition = {
+                fadeIn(animationSpec = tween(KronoTokens.Animation.fadeDurationMs))
+            },
+            exitTransition = {
+                fadeOut(animationSpec = tween(KronoTokens.Animation.fadeDurationMs))
+            },
+            popEnterTransition = {
+                fadeIn(animationSpec = tween(KronoTokens.Animation.fadeDurationMs))
+            },
+            popExitTransition = {
+                fadeOut(animationSpec = tween(KronoTokens.Animation.fadeDurationMs))
+            }
         ) {
             composable(AppRoutes.TIMER) {
                 StopwatchScreen(
@@ -240,17 +243,26 @@ fun AppNavigation(
                     selectedFont   = config.overlayFontFamily,
                     timeFormat     = config.stopwatchFormat,
                     onStart        = {
-                        triggerPlayPauseFeedback(context, config.playPauseSoundEnabled, config.playPauseVibrationEnabled, config.playPauseVolume, KronoToolAudio.STOPWATCH)
+                        val profile = SoundTimingPolicy.profile(config.playPauseSoundType)
+                        triggerPlayPauseFeedback(context, config.allSoundsEnabled && config.playPauseSoundEnabled, config.playPauseVibrationEnabled, config.playPauseVolume, config.playPauseSoundType, profile.startDelayMs, profile.maxLifetimeMs)
                         stopwatchViewModel.start()
+                        if (config.openOverlayOnPlay) {
+                            scope.launch {
+                                dataStore.updateConfig { it.copy(activeToolId = "stopwatch") }
+                                onShowOverlay("stopwatch")
+                            }
+                        }
+                        if (config.focusModeEnabled) onStartFocusMode()
                     },
                     onPause        = {
-                        triggerPlayPauseFeedback(context, config.playPauseSoundEnabled, config.playPauseVibrationEnabled, config.playPauseVolume, KronoToolAudio.STOPWATCH)
                         stopwatchViewModel.pause()
+                        val profile = SoundTimingPolicy.profile(config.playPauseSoundType)
+                        triggerPlayPauseFeedback(context, config.allSoundsEnabled && config.playPauseSoundEnabled, config.playPauseVibrationEnabled, config.playPauseVolume, config.playPauseSoundType, profile.startDelayMs, profile.maxLifetimeMs)
                     },
                     onReset        = { stopwatchViewModel.reset() },
                     onOpenOverlay  = {
                         scope.launch {
-                            dataStore.updateConfig(config.copy(activeToolId = "stopwatch"))
+                            dataStore.updateConfig { it.copy(activeToolId = "stopwatch") }
                             onShowOverlay("stopwatch")
                         }
                     },
@@ -264,16 +276,22 @@ fun AppNavigation(
                     timeFormat     = config.countdownFormat,
                     selectedFont   = config.overlayFontFamily,
                     initialConfiguredSeconds = config.countdownScreenBaseSeconds,
+                    showHours = config.showHours,
+                    showMinutes = config.showMinutes,
+                    showSeconds = config.showSeconds,
+                    showMilliseconds = config.showMilliseconds,
                     onConfiguredTimeChange = { seconds ->
                         scope.launch {
-                            dataStore.updateConfig(
-                                config.copy(countdownScreenBaseSeconds = seconds.coerceAtLeast(0L))
-                            )
+                            dataStore.updateConfig { it.copy(countdownScreenBaseSeconds = seconds.coerceAtLeast(0L)) }
                         }
                     },
-                    playPauseBeepEnabled = config.playPauseSoundEnabled,
+                    playPauseBeepEnabled = config.allSoundsEnabled && config.playPauseSoundEnabled,
                     playPauseVibrationEnabled = config.playPauseVibrationEnabled,
                     playPauseVolume = config.playPauseVolume,
+                    playPauseSoundType = config.playPauseSoundType,
+                    openOverlayOnPlay = config.openOverlayOnPlay,
+                    focusModeEnabled = config.focusModeEnabled,
+                    onStartFocusMode = onStartFocusMode,
                     onOpenSettings = { navController.navigate(AppRoutes.SETTINGS) }
                 )
             }
@@ -291,6 +309,11 @@ fun AppNavigation(
                     dataStore         = dataStore,
                     pendingUpdateInfo  = pendingUpdateInfo,
                     isServiceRunning  = isServiceRunning,
+                    isAnyToolRunning  = {
+                        stopwatchState.isRunning ||
+                            pomodoroState.isRunning ||
+                            countdowns.any { it.isRunning }
+                    },
                     onStartFocusMode  = onStartFocusMode,
                     onShowOverlay     = { onShowOverlay(config.activeToolId) },
                     onBack            = navigateBack
@@ -302,29 +325,27 @@ fun AppNavigation(
                     onOpenSettings = { navController.navigate(AppRoutes.SETTINGS) },
                     selectedFont = config.overlayFontFamily,
                     timeFormat = config.pomodoroFormat,
+                    showHours = config.showHours,
+                    showMinutes = config.showMinutes,
+                    showSeconds = config.showSeconds,
+                    showMilliseconds = config.showMilliseconds,
                     selectedPreset = config.pomodoroPreset,
                     presetsSpec = config.pomodoroPresetsSpec,
                     customPresetPhasesSpec = config.pomodoroCustomPhasesSpec,
                     customFocusMinutes = config.pomodoroCustomFocusMinutes,
                     customBreakMinutes = config.pomodoroCustomBreakMinutes,
                     customCycles = config.pomodoroCustomCycles,
-                    playPauseBeepEnabled = config.playPauseSoundEnabled,
+                    playPauseBeepEnabled = config.allSoundsEnabled && config.playPauseSoundEnabled,
                     playPauseVibrationEnabled = config.playPauseVibrationEnabled,
                     playPauseVolume = config.playPauseVolume,
-                    phaseBeepEnabled = config.pomodoroFocusAlertEnabled || config.pomodoroBreakAlertEnabled,
-                    focusAlertEnabled = config.pomodoroFocusAlertEnabled,
-                    breakAlertEnabled = config.pomodoroBreakAlertEnabled,
-                    tickingSoundEnabled = config.pomodoroTickingSound,
-                    tickVolume = config.tickVolume,
-                    focusAlertVolume = config.focusAlertVolume,
-                    breakAlertVolume = config.breakAlertVolume,
-                    tickSoundType = config.pomodoroTickSoundType,
-                    focusAlertSoundType = config.pomodoroFocusAlertSoundType,
-                    breakAlertSoundType = config.pomodoroBreakAlertSoundType,
+                    playPauseSoundType = config.playPauseSoundType,
                     autoStartNextCycle = config.pomodoroAutoNextCycle,
+                    focusModeEnabled = config.focusModeEnabled,
+                    onStartFocusMode = onStartFocusMode,
+                    openOverlayOnPlay = config.openOverlayOnPlay,
                     onOpenOverlay = {
                         scope.launch {
-                            dataStore.updateConfig(config.copy(activeToolId = "pomodoro"))
+                            dataStore.updateConfig { it.copy(activeToolId = "pomodoro") }
                             onShowOverlay("pomodoro")
                         }
                     }
@@ -341,7 +362,10 @@ fun AppNavigation(
             onRequestNotification     = onRequestNotification,
             onRequestOverlay          = onRequestOverlay,
             onRequestInstall          = onRequestInstall,
-            onDismiss                 = { showPermissionsDialog = false }
+            onDismiss                 = {
+                showPermissionsDialog = false
+                permissionsDismissedThisSession = true
+            }
         )
     }
 }

@@ -6,6 +6,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
@@ -23,14 +24,16 @@ fun SettingsRow(
     iconTint: Color = MaterialTheme.colorScheme.onSurfaceVariant,
     iconContainerColor: Color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f),
     trailing: @Composable (() -> Unit)? = null,
-    onClick: (() -> Unit)? = null
+    onClick: (() -> Unit)? = null,
+    enabled: Boolean = true
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .alpha(if (enabled) 1f else KronoTokens.Alpha.disabled)
             .then(
-                if (onClick != null) {
-                    Modifier.clickable(onClick = onClick)
+                if (onClick != null && enabled) {
+                    Modifier.clickable(enabled = true, onClick = onClick)
                 } else {
                     Modifier
                 }
@@ -61,7 +64,10 @@ fun SettingsRow(
                         Text(
                             text = leadingTextIcon.orEmpty(),
                             color = iconTint,
-                            style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
+                            style = MaterialTheme.typography.labelLarge.copy(
+                                fontSize = KronoTokens.Typography.statusLabel,
+                                fontWeight = FontWeight.Normal
+                            ),
                             textAlign = TextAlign.Center
                         )
                     }

@@ -91,14 +91,45 @@ class OverlayManager(
                             PomodoroOverlay(
                                 state = pomodoroState,
                                 config = config,
-                                timeFormat = config.pomodoroFormat,
                                 onPlay = onStart,
                                 onPause = onPause,
                                 onReset = onReset,
                                 onNext = onNext,
                                 onClose = onClose,
+                                onNavigateToApp = onSettings,
+                                onToggleFocus = {
+                                    serviceScope.launch {
+                                        dataStore.updateConfig(config.copy(focusModeEnabled = !config.focusModeEnabled))
+                                    }
+                                },
+                                onToggleKeepScreenOn = {
+                                    serviceScope.launch {
+                                        dataStore.updateConfig(config.copy(keepScreenOn = !config.keepScreenOn))
+                                    }
+                                },
+                                onToggleAutoLaunch = {
+                                    serviceScope.launch {
+                                        val enabled = !config.autoLaunch
+                                        dataStore.updateConfig(
+                                            config.copy(
+                                                autoLaunch = enabled,
+                                                directLaunchToolId = if (enabled) toolId else config.directLaunchToolId
+                                            )
+                                        )
+                                    }
+                                },
+                                onToggleBeep = {
+                                    serviceScope.launch {
+                                        dataStore.updateConfig(
+                                            config.copy(
+                                                allSoundsEnabled = !config.allSoundsEnabled
+                                            )
+                                        )
+                                    }
+                                },
                                 onDrag = { dx, dy -> handleDrag(toolId, dx, dy) },
-                                onDragEnd = { saveOverlayPosition(toolId) }
+                                onDragEnd = { saveOverlayPosition(toolId) },
+                                onMenuVisibilityChange = { menuOpen -> setOverlayFocusable(toolId, menuOpen) }
                             )
                         }
                         "stopwatch" -> {
@@ -126,12 +157,22 @@ class OverlayManager(
                                 },
                                 onToggleAutoLaunch = {
                                     serviceScope.launch {
-                                        dataStore.updateConfig(config.copy(autoLaunch = !config.autoLaunch))
+                                        val enabled = !config.autoLaunch
+                                        dataStore.updateConfig(
+                                            config.copy(
+                                                autoLaunch = enabled,
+                                                directLaunchToolId = if (enabled) toolId else config.directLaunchToolId
+                                            )
+                                        )
                                     }
                                 },
                                 onToggleBeep = {
                                     serviceScope.launch {
-                                        dataStore.updateConfig(config.copy(playPauseSoundEnabled = !config.playPauseSoundEnabled))
+                                        dataStore.updateConfig(
+                                            config.copy(
+                                                allSoundsEnabled = !config.allSoundsEnabled
+                                            )
+                                        )
                                     }
                                 },
                                 onMenuVisibilityChange = { menuOpen -> setOverlayFocusable(toolId, menuOpen) }

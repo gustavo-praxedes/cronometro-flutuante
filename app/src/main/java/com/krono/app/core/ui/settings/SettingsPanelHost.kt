@@ -22,10 +22,9 @@ fun SettingsPanelHost(
     totalLifetimeMs: Long,
     pendingUpdateInfo: UpdateInfo?,
     isServiceRunning: () -> Boolean,
+    isAnyToolRunning: () -> Boolean,
     onStartFocusMode: () -> Unit,
     onSupportClick: () -> Unit,
-    onShowChangelog: (UpdateInfo) -> Unit,
-    onUpdateAvailable: (UpdateInfo) -> Unit,
     modifier: Modifier = Modifier
 ) {
     when (destination) {
@@ -33,24 +32,24 @@ fun SettingsPanelHost(
         SettingsDestination.Behavior -> BehaviorPanel(
             dataStore = dataStore,
             isServiceRunning = isServiceRunning,
+            isAnyToolRunning = isAnyToolRunning,
             onStartFocusMode = onStartFocusMode,
             modifier = modifier
         )
-        SettingsDestination.About -> AboutPanel(
-            totalLifetimeMs = totalLifetimeMs,
-            onDonate = onSupportClick,
-            modifier = modifier
-        )
-        SettingsDestination.Changelog -> {
+        SettingsDestination.About -> {
             val updateInfo = pendingUpdateInfo ?: UpdateInfo(
                 tagName = BuildConfig.VERSION_NAME,
                 changelog = stringResource(R.string.updates_current_version_fallback),
                 releaseUrl = "",
                 downloadUrl = null
             )
-            UpdatesPanel(updateInfo = updateInfo, modifier = modifier)
+            AboutPanel(
+                totalLifetimeMs = totalLifetimeMs,
+                updateInfo = updateInfo,
+                onDonate = onSupportClick,
+                modifier = modifier
+            )
         }
-        SettingsDestination.BugReport -> BugReportPanel(modifier = modifier)
         SettingsDestination.Stopwatch -> StopwatchSettings(dataStore = dataStore, modifier = modifier)
         SettingsDestination.Countdown -> CountdownSettings(dataStore = dataStore, modifier = modifier)
         SettingsDestination.Pomodoro -> PomodoroSettings(dataStore = dataStore, modifier = modifier)

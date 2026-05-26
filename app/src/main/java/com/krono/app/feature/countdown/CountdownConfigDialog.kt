@@ -45,6 +45,7 @@ fun CountdownConfigDialog(
     var showColorPicker by remember { mutableStateOf(false) }
 
     val isEditMode = initial != null
+    val dialogColor = MaterialTheme.colorScheme.surfaceColorAtElevation(KronoTokens.Elevation.dialog)
 
     // Preview ao vivo — dispara a cada mudança de totalSeconds
     LaunchedEffect(totalSeconds) {
@@ -63,8 +64,9 @@ fun CountdownConfigDialog(
                 .adaptiveDialogWidth()
                 .wrapContentHeight(),
             shape          = KronoTokens.Shape.dialog,
-            color          = MaterialTheme.colorScheme.surface,
-            tonalElevation = KronoTokens.Elevation.dialog
+            color          = dialogColor,
+            tonalElevation = 0.dp,
+            shadowElevation = KronoTokens.Elevation.dialog
         ) {
             Column(
                 modifier = Modifier
@@ -153,6 +155,7 @@ fun CountdownConfigDialog(
                 // ── Wheel Picker (Ocupando a largura total) ────────────────
                 TimeWheelPicker(
                     totalSeconds  = totalSeconds,
+                    fadeColor     = dialogColor,
                     onValueChange = { totalSeconds = it }
                 )
 

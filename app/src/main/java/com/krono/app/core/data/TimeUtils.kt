@@ -9,31 +9,45 @@ import java.util.Locale
 
 fun Long.toFormattedTime(
     showHours: Boolean = true,
+    showMinutes: Boolean = true,
     showSeconds: Boolean = true
 ): String {
-    val totalSeconds = this / 1000L
-    val hours        = totalSeconds / 3600L
-    val minutes      = (totalSeconds % 3600L) / 60L
-    val seconds      = totalSeconds % 60L
+    val totalSeconds = (this / 1000L).coerceAtLeast(0L)
+    val hours = totalSeconds / 3600L
+    val minutes = (totalSeconds % 3600L) / 60L
+    val totalMinutes = totalSeconds / 60L
+    val seconds = totalSeconds % 60L
+    val parts = buildList {
+        if (showHours) add(String.format(Locale.ROOT, "%02d", hours))
+        if (showMinutes) add(String.format(Locale.ROOT, "%02d", if (showHours) minutes else totalMinutes))
+        if (showSeconds) add(String.format(Locale.ROOT, "%02d", seconds))
+    }
+    return parts.ifEmpty { listOf("00") }.joinToString(":")
+}
 
-    return when {
-        showHours && showSeconds ->
-            String.format(Locale.ROOT, "%02d:%02d:%02d", hours, minutes, seconds)
-
-        !showHours && showSeconds -> {
-            val totalMinutes = totalSeconds / 60L
-            val secs         = totalSeconds % 60L
-            String.format(Locale.ROOT, "%02d:%02d", totalMinutes, secs)
-        }
-
-        showHours && !showSeconds ->
-            String.format(Locale.ROOT, "%02d:%02d", hours, minutes)
-
-        else -> {
-            val totalMinutes = totalSeconds / 60L
-            String.format(Locale.ROOT, "%02d", totalMinutes)
+fun Long.toOverlayFormattedTime(
+    showHours: Boolean = true,
+    showMinutes: Boolean = true,
+    showSeconds: Boolean = true,
+    showMilliseconds: Boolean = false
+): String {
+    val totalMs = coerceAtLeast(0L)
+    val millis = totalMs % 1000L
+    val hasBaseFields = showHours || showMinutes || showSeconds
+    if (!hasBaseFields) {
+        return if (showMilliseconds) {
+            String.format(Locale.ROOT, "%03d", millis)
+        } else {
+            "00"
         }
     }
+    val base = totalMs.toFormattedTime(
+        showHours = showHours,
+        showMinutes = showMinutes,
+        showSeconds = showSeconds
+    )
+    if (!showMilliseconds) return base
+    return String.format(Locale.ROOT, "%s.%03d", base, millis)
 }
 
 // Alias para facilitar o uso nos patches

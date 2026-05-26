@@ -1,5 +1,6 @@
 package com.krono.app.core.ui.settings
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -54,16 +55,24 @@ private sealed class InlineSubmitState {
 
 @Composable
 fun BugReportPanel(modifier: Modifier = Modifier) {
+    SettingsPanelLayout(modifier = modifier) {
+        BugReportPanelContent()
+    }
+}
+
+@Composable
+fun BugReportPanelContent(modifier: Modifier = Modifier) {
     val scope = rememberCoroutineScope()
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var message by remember { mutableStateOf("") }
+    var messageTouched by remember { mutableStateOf(false) }
     var submitState by remember { mutableStateOf<InlineSubmitState>(InlineSubmitState.Idle) }
 
     val emailError = email.isNotBlank() && !EMAIL_REGEX.matches(email)
     val canSubmit = message.isNotBlank() && !emailError && submitState !is InlineSubmitState.Loading
 
-    SettingsPanelLayout(modifier = modifier) {
+    Column(modifier = modifier) {
         SettingsGroup(title = stringResource(R.string.bug_report_title)) {
             SettingsRow(
                 title = stringResource(R.string.bug_report_title),
@@ -105,12 +114,20 @@ fun BugReportPanel(modifier: Modifier = Modifier) {
 
             OutlinedTextField(
                 value = message,
-                onValueChange = { if (it.length <= 250) message = it },
+                onValueChange = {
+                    messageTouched = true
+                    if (it.length <= 250) message = it
+                },
                 label = { Text(stringResource(R.string.bug_report_description_required)) },
                 minLines = 4,
                 maxLines = 8,
                 modifier = inputModifier,
-                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences)
+                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
+                supportingText = {
+                    if (messageTouched && message.isBlank()) {
+                        Text(stringResource(R.string.bug_report_description_helper))
+                    }
+                }
             )
             Spacer(Modifier.height(KronoTokens.Settings.panelSectionGap))
 

@@ -1,0 +1,402 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ============================================================================= -->
+    <!-- GERAL / APP / NAVEGAÇÃO -->
+    <!-- ============================================================================= -->
+    <string name="app_name">Krono Tools</string>
+    <string name="nav_stopwatch">Cronômetro</string>
+    <string name="nav_countdown">Timer</string>
+    <string name="nav_pomodoro">Pomodoro</string>
+
+    <!-- ============================================================================= -->
+    <!-- NOTIFICAÇÕES -->
+    <!-- ============================================================================= -->
+    <string name="notification_channel_name">Krono</string>
+    <string name="notification_channel_description">Mantém o cronômetro rodando em segundo plano</string>
+    <string name="notification_title">Krono Ativo</string>
+    <string name="notification_text_running">Krono em execução</string>
+    <string name="notification_text_paused">Krono pausado</string>
+    <string name="countdown_notification_title_default">Cronômetro regressivo</string>
+    <string name="countdown_notification_completed">Concluído!</string>
+
+    <!-- ============================================================================= -->
+    <!-- AÇÕES COMUNS -->
+    <!-- ============================================================================= -->
+    <string name="action_play">Iniciar</string>
+    <string name="action_pause">Pausar</string>
+    <string name="action_reset">Resetar</string>
+    <string name="action_next">Próximo</string>
+    <string name="action_stop_service">Fechar</string>
+    <string name="action_back">Voltar</string>
+    <string name="action_clear">Limpar</string>
+    <string name="action_close">Fechar</string>
+    <string name="action_done">Concluir</string>
+    <string name="action_confirm">Confirmar</string>
+    <string name="action_cancel">Cancelar</string>
+    <string name="action_save">Salvar</string>
+    <string name="action_create">Criar</string>
+    <string name="action_edit">Editar</string>
+    <string name="action_add">Adicionar</string>
+    <string name="action_delete">Excluir</string>
+    <string name="action_plus_one_minute">+1 min</string>
+    <string name="action_return_to_screen">Voltar</string>
+    <string name="action_lap">Volta</string>
+
+    <!-- ============================================================================= -->
+    <!-- PERMISSÕES -->
+    <!-- ============================================================================= -->
+    <string name="permissions_title">Permissões necessárias</string>
+    <string name="permissions_subtitle">Ative as permissões abaixo para usar todos os recursos do Krono.</string>
+    <string name="permissions_notifications_title">Notificações</string>
+    <string name="permissions_notifications_desc">Exibe o cronômetro na barra de status.</string>
+    <string name="permissions_overlay_title">Exibir sobre outros apps</string>
+    <string name="permissions_overlay_desc">Permite flutuar o widget sobre qualquer app.</string>
+    <string name="permissions_install_title">Instalar atualizações</string>
+    <string name="permissions_install_desc">Opcional. Permite instalar novas versões direto no app.</string>
+    <string name="permissions_optional">Opcional</string>
+
+    <!-- ============================================================================= -->
+    <!-- MENU DE CONFIGURAÇÕES -->
+    <!-- ============================================================================= -->
+    <string name="settings_title">Configurações</string>
+    <string name="settings_select_category">Selecione uma categoria para configurar</string>
+    <string name="settings_appearance">Aparência</string>
+    <string name="settings_behavior">Comportamento</string>
+    <string name="settings_overlay">Sobreposição</string>
+    <string name="settings_stopwatch">Cronômetro</string>
+    <string name="settings_countdown">Timer</string>
+    <string name="settings_pomodoro">Pomodoro</string>
+    <string name="settings_search_placeholder">Pesquise configurações...</string>
+    <string name="settings_search_no_results">Nenhum resultado</string>
+    <string name="settings_badge_alert">!</string>
+    <string name="tool_settings_empty_title">Sem configurações</string>
+    <string name="tool_settings_empty_subtitle">Sem ajustes específicos para esta ferramenta.</string>
+
+    <!-- ============================================================================= -->
+    <!-- CONFIGURAÇÕES - SEÇÕES E GRUPOS -->
+    <!-- ============================================================================= -->
+    <string name="section_appearance">APARÊNCIA</string>
+    <string name="settings_section_general">GERAL</string>
+    <string name="settings_section_tools">FERRAMENTAS</string>
+    <string name="settings_section_info">SOBRE</string>
+    <string name="settings_menu_section_general">Funções gerais</string>
+    <string name="settings_menu_section_tools">Ferramentas</string>
+    <string name="settings_menu_section_project">Projeto</string>
+    <string name="settings_group_theme">Tema</string>
+    <string name="settings_group_sounds_vibration">Sons e Vibração</string>
+    <string name="settings_group_colors">Cores</string>
+    <string name="settings_group_general">Geral</string>
+    <string name="settings_group_sounds">Sons</string>
+    <string name="settings_group_behavior">Comportamento</string>
+    <string name="settings_group_vibration">Vibração</string>
+    <string name="settings_subgroup_general">Geral</string>
+    <string name="settings_subgroup_format">Formato</string>
+    <string name="settings_subgroup_presets">Presets</string>
+    <string name="settings_widget_group">Widget de overlay</string>
+
+    <!-- ============================================================================= -->
+    <!-- CONFIGURAÇÕES - IDIOMA, FONTE E FORMATO -->
+    <!-- ============================================================================= -->
+    <string name="settings_language_label">Idioma do app</string>
+    <string name="settings_language_pt_br">Português (Brasil)</string>
+    <string name="settings_font_label">Fonte</string>
+    <string name="settings_overlay_font_label">Fonte do overlay</string>
+    <string name="settings_time_format_label">Formato</string>
+    <string name="settings_font_size_label">Tamanho da fonte no app</string>
+    <string name="settings_font_size_normal">Normal</string>
+    <string name="settings_font_size_large">Grande</string>
+
+    <!-- ============================================================================= -->
+    <!-- CONFIGURAÇÕES - SOBREPOSIÇÃO (OVERLAY) -->
+    <!-- ============================================================================= -->
+    <string name="label_auto_launch">Abrir Diretamente</string>
+    <string name="label_show_hours">Exibir Horas</string>
+    <string name="label_show_minutes">Exibir Minutos</string>
+    <string name="label_show_seconds">Exibir Segundos</string>
+    <string name="label_show_buttons">Exibir Botões</string>
+    <string name="label_wake_lock">Manter Tela Ligada</string>
+    <string name="label_focus_mode">Modo Foco</string>
+    <string name="label_beep_enabled">Bipe Ativo</string>
+    <string name="label_vibration_enabled">Vibração Ativa</string>
+    <string name="label_theme">Tema</string>
+    <string name="label_background_color">Cor de Fundo</string>
+    <string name="label_text_color">Cor do Texto</string>
+    <string name="label_scale">Escala do Widget</string>
+    <string name="label_corner_radius">Arredondamento</string>
+    <string name="label_about">Sobre o App</string>
+    <string name="label_hide_overlay_buttons">Ocultar botões</string>
+    <string name="overlay_hide_buttons_subtitle">Oculta botões no overlay.</string>
+    <string name="label_show_milliseconds">Exibir milissegundos</string>
+    <string name="overlay_show_milliseconds_subtitle">Mostra milissegundos no overlay.</string>
+    <string name="settings_overlay_custom_color">Cor do overlay</string>
+    <string name="settings_overlay_custom_color_none">Padrão do tema</string>
+    <string name="settings_overlay_custom_text_color">Cor da fonte</string>
+    <string name="settings_overlay_scale_min">0.5x</string>
+    <string name="settings_overlay_scale_max">1.5x</string>
+    <string name="settings_overlay_corner_min">0dp</string>
+    <string name="settings_overlay_corner_max">50dp</string>
+
+    <!-- ============================================================================= -->
+    <!-- CONFIGURAÇÕES - COMPORTAMENTO -->
+    <!-- ============================================================================= -->
+    <string name="behavior_auto_launch_label">Iniciar direto overlay de stopwatch</string>
+    <string name="behavior_auto_launch_subtitle">Abre o overlay automaticamente ao iniciar o serviço</string>
+    <string name="behavior_open_overlay_on_play_label">Abrir overlay no play</string>
+    <string name="behavior_open_overlay_on_play_subtitle">Mostra o overlay automaticamente ao tocar em iniciar na tela da ferramenta</string>
+    <string name="behavior_keep_screen_subtitle">Evita que a tela apague durante uso do cronômetro</string>
+    <string name="behavior_focus_mode_subtitle">Ativa modo foco quando iniciar com overlay ativo</string>
+    <string name="behavior_play_pause_sound_label">Som play/pause</string>
+    <string name="behavior_play_pause_sound_subtitle">Reproduz bipe ao iniciar e pausar ferramentas</string>
+    <string name="behavior_play_pause_vibration_label">Vibração play/pause</string>
+    <string name="behavior_play_pause_vibration_subtitle">Vibra ao iniciar e pausar ferramentas</string>
+    <string name="overlay_show_buttons_subtitle">Exibe controles de ação no overlay</string>
+    <string name="overlay_show_hours_subtitle">Mostra as horas no formato do tempo</string>
+    <string name="overlay_show_minutes_subtitle">Mostra os minutos no formato do tempo</string>
+    <string name="overlay_show_seconds_subtitle">Mostra os segundos no formato do tempo</string>
+    <string name="behavior_direct_launch_tool_label">Abrir diretamente</string>
+    <string name="settings_seconds_vibration_label">Vibração por segundo</string>
+    <string name="settings_seconds_vibration_subtitle">Vibra a cada segundo.</string>
+
+    <!-- ============================================================================= -->
+    <!-- TIMER / COUNTDOWN -->
+    <!-- ============================================================================= -->
+    <string name="countdown_overlay_desc">Overlay</string>
+    <string name="countdown_add_timer">Adicionar timer</string>
+    <string name="countdown_screen_overlay_desc">Overlay da tela</string>
+    <string name="countdown_action_reset">Reset</string>
+    <string name="countdown_action_pause">Pausar</string>
+    <string name="countdown_action_start">Iniciar</string>
+    <string name="countdown_edit_timer_title">Editar timer</string>
+    <string name="countdown_new_timer_title">Novo timer</string>
+    <string name="countdown_edit_timer_sheet_title">Editar cronômetro</string>
+    <string name="countdown_description_label">Descrição</string>
+    <string name="countdown_description_placeholder_dialog">Ex: Foco, Pausa, Trabalhar ...</string>
+    <string name="countdown_description_placeholder_sheet">Ex: Tempo de foco, Pausa...</string>
+    <string name="countdown_time_label">Tempo</string>
+    <string name="countdown_color_card_label">Cor do card</string>
+    <string name="countdown_choose_color_desc">Escolher cor</string>
+    <string name="countdown_color_card_title">Cor do Card</string>
+    <string name="countdown_selected_color_desc">Selecionado</string>
+    <string name="countdown_custom_color">Cor personalizada</string>
+    <string name="countdown_no_title">Sem título</string>
+    <string name="countdown_options_desc">Opções</string>
+
+    <!-- ============================================================================= -->
+    <!-- POMODORO -->
+    <!-- ============================================================================= -->
+    <string name="pomodoro_title">Pomodoro</string>
+    <string name="pomodoro_group_sounds">Sons</string>
+    <string name="pomodoro_preset_label">Preset</string>
+    <string name="pomodoro_preset_classic">Pomodoro Padrão</string>
+    <string name="pomodoro_preset_short">Pomodoro Curto</string>
+    <string name="pomodoro_preset_long">Pomodoro Longo</string>
+    <string name="pomodoro_preset_custom">Personalizado</string>
+    <string name="pomodoro_custom_focus_minutes">Foco (min)</string>
+    <string name="pomodoro_custom_break_minutes">Pausa (min)</string>
+    <string name="pomodoro_custom_cycles">Ciclos</string>
+    <string name="pomodoro_tick_sound_choice">Som do tic-tac</string>
+    <string name="pomodoro_focus_sound_choice">Som alerta de foco</string>
+    <string name="pomodoro_break_sound_choice">Som alerta de pausa</string>
+    <string name="pomodoro_custom_open_dialog">Configurar preset personalizado</string>
+    <string name="pomodoro_auto_next_cycle_label">Iniciar próximo ciclo automaticamente</string>
+    <string name="pomodoro_auto_next_cycle_subtitle">Ao finalizar uma etapa, inicia a próxima sem toque manual</string>
+    <string name="pomodoro_custom_dialog_title">Preset Personalizado</string>
+    <string name="pomodoro_custom_name_label">Descrição (nome do preset)</string>
+    <string name="pomodoro_custom_phase_minutes">Tempo da etapa (min)</string>
+    <string name="pomodoro_custom_phase_color">Cor da etapa</string>
+    <string name="pomodoro_custom_default_name">Preset Personalizado</string>
+    <string name="pomodoro_custom_default_phase">Etapa</string>
+    <string name="pomodoro_custom_phase_template">Etapa %1$d</string>
+    <string name="pomodoro_create_preset_label">Criar preset</string>
+    <string name="pomodoro_create_preset_subtitle">Abrir editor de preset personalizado</string>
+    <string name="pomodoro_focus_alert_toggle">Alerta de foco</string>
+    <string name="pomodoro_focus_alert_subtitle">Ativar alerta sonoro ao iniciar foco</string>
+    <string name="pomodoro_break_alert_toggle">Alerta de pausa</string>
+    <string name="pomodoro_break_alert_subtitle">Ativar alerta sonoro ao iniciar pausa</string>
+    <string name="pomodoro_auto_break_label">Iniciar pausa automaticamente</string>
+    <string name="pomodoro_auto_break_subtitle">Ao fim do foco, inicia a pausa sem toque manual</string>
+    <string name="pomodoro_auto_focus_label">Iniciar foco automaticamente</string>
+    <string name="pomodoro_auto_focus_subtitle">Ao fim da pausa, inicia foco sem toque manual</string>
+    <string name="pomodoro_beep_label">Bipe foco/pausa</string>
+    <string name="pomodoro_beep_subtitle">Toca alerta ao alternar entre foco e pausa</string>
+    <string name="pomodoro_tick_label">Tic-tac do relógio</string>
+    <string name="pomodoro_tick_subtitle">Emite tic-tac sincronizado com os segundos</string>
+    <string name="pomodoro_preset_dialog_title">Configurar preset</string>
+    <string name="pomodoro_preset_label_name">Label</string>
+    <string name="pomodoro_interval_default_label">Intervalo %1$d</string>
+    <string name="pomodoro_interval_add">Adicionar intervalo</string>
+    <string name="pomodoro_interval_edit_title">Editar intervalo</string>
+    <string name="pomodoro_card_add">Adicionar card</string>
+    <string name="pomodoro_group_add">Adicionar grupo</string>
+    <string name="pomodoro_group_default_label">Grupo %1$d</string>
+    <string name="pomodoro_group_name_label">Nome do grupo</string>
+    <string name="pomodoro_group_cycles_inline">%1$d ciclos do grupo</string>
+    <string name="pomodoro_group_expand">Expandir grupo</string>
+    <string name="pomodoro_group_collapse">Recolher grupo</string>
+    <string name="pomodoro_drag_handle">Arrastar</string>
+    <string name="pomodoro_preset_empty_error">Adicione pelo menos um card ou grupo para salvar.</string>
+    <string name="pomodoro_interval_alert_sound_label">Som de alerta/notificação</string>
+    <string name="pomodoro_dnd_label">Não perturbe</string>
+    <string name="pomodoro_dnd_subtitle">Ativa durante foco.</string>
+    <string name="pomodoro_daily_goal_label">Meta diária</string>
+    <string name="pomodoro_history_title">Histórico</string>
+    <string name="pomodoro_history_cycles">%1$d ciclos</string>
+    <string name="pomodoro_history_empty">Sem histórico</string>
+    <string name="pomodoro_history_empty_subtitle">Ainda não há sessões registradas.</string>
+    <string name="pomodoro_custom_cycles_inline">%1$d ciclos</string>
+
+    <!-- ============================================================================= -->
+    <!-- SONS & CONTROLE DE VOLUME -->
+    <!-- ============================================================================= -->
+    <string name="settings_all_sounds_label">Sons do app</string>
+    <string name="settings_all_sounds_subtitle">Ativa ou desativa todos os sons, bipes, notificações e alarmes.</string>
+    <string name="settings_sound_preview">Prévia</string>
+    <string name="settings_volume_play_pause">Volume play/pause</string>
+    <string name="settings_volume_tick">Volume tic-tac</string>
+    <string name="settings_volume_focus_alert">Volume alerta foco</string>
+    <string name="settings_volume_break_alert">Volume alerta pausa</string>
+    <string name="settings_volume_environment">Volume ambiente</string>
+    <string name="settings_volume_pomodoro">Volume Pomodoro</string>
+    <string name="settings_volume_min">0%</string>
+    <string name="settings_volume_max">100%</string>
+    <string name="settings_app_notification_sound_label">Som notificação</string>
+    <string name="settings_play_pause_sound_type">Som play/pause</string>
+    <string name="settings_environment_sound_label">Som ambiente</string>
+
+    <!-- ============================================================================= -->
+    <!-- SONS - PRESETS / VALORES -->
+    <!-- ============================================================================= -->
+    <string name="settings_value_one">1</string>
+    <string name="settings_value_twelve">12</string>
+    <string name="settings_value_one_twenty">120</string>
+    <string name="settings_value_twenty_four">24</string>
+
+    <!-- ============================================================================= -->
+    <!-- LISTA DE SONS - ALARMES & ALERTAS -->
+    <!-- ============================================================================= -->
+    <string name="sound_none">Nenhum</string>
+    <string name="sound_tip_01">Som 01</string>
+    <string name="sound_tip_02">Som 02</string>
+    <string name="sound_alarm_01">Bipe de alarme</string>
+    <string name="sound_alarm_02">Bipes rápidos</string>
+    <string name="sound_alarm_03">Sino 1</string>
+    <string name="sound_alarm_04">Sino 2</string>
+    <string name="sound_alarm_05">Campainha de bicicleta</string>
+    <string name="sound_alarm_06">Canto de pássaro</string>
+    <string name="sound_alarm_07">Buzina de carro</string>
+    <string name="sound_alarm_08">Buzina divertida</string>
+    <string name="sound_alarm_09">Canto do galo</string>
+    <string name="sound_alarm_10">Cuco</string>
+    <string name="sound_alarm_11">Prato de bateria</string>
+    <string name="sound_alarm_12">Fanfarra</string>
+    <string name="sound_alarm_13">Melodia 1</string>
+    <string name="sound_alarm_14">Melodia 2</string>
+    <string name="sound_alarm_15">Melodia 3</string>
+    <string name="sound_alarm_16">Corneta de festa</string>
+    <string name="sound_alarm_17">Percussão</string>
+    <string name="sound_alarm_18">Piano</string>
+    <string name="sound_alarm_19">Toque de chamada</string>
+    <string name="sound_alarm_20">Satélite</string>
+    <string name="sound_alarm_21">Sino escolar</string>
+    <string name="sound_alarm_22">Timer</string>
+    <string name="sound_alarm_23">Buzina de brinquedo</string>
+    <string name="sound_alarm_24">Vitória</string>
+    <string name="sound_alarm_25">Apito</string>
+    <string name="sound_alarm_26">Sinos de vento</string>
+    <string name="sound_alarm_27">Corda mecânica</string>
+
+    <!-- ============================================================================= -->
+    <!-- LISTA DE SONS - SONS AMBIENTE -->
+    <!-- ============================================================================= -->
+    <string name="sound_environment_01">Ruído Marrom</string>
+    <string name="sound_environment_02">Sala de Aula</string>
+    <string name="sound_environment_03">Cafeteria</string>
+    <string name="sound_environment_04">Contador</string>
+    <string name="sound_environment_05">Lareira</string>
+    <string name="sound_environment_06">Sapos à noite</string>
+    <string name="sound_environment_07">Livraria</string>
+    <string name="sound_environment_08">Metrônomo</string>
+    <string name="sound_environment_09">Grilos ao vento</string>
+    <string name="sound_environment_10">Beira da praia</string>
+    <string name="sound_environment_11">Chuva</string>
+    <string name="sound_environment_12">Riacho</string>
+    <string name="sound_environment_13">Tic-tac</string>
+    <string name="sound_environment_14">Selva</string>
+    <string name="sound_environment_15">Vento</string>
+    <string name="sound_notification_01">Notificação 01</string>
+
+    <!-- ============================================================================= -->
+    <!-- BUG REPORT -->
+    <!-- ============================================================================= -->
+    <string name="settings_bug_report">Relatar Bug</string>
+    <string name="bug_report_title">Relatar bug</string>
+    <string name="bug_report_name_optional">Nome (opcional)</string>
+    <string name="bug_report_email_optional">Email (opcional)</string>
+    <string name="bug_report_email_invalid">Email inválido</string>
+    <string name="bug_report_description_required">Descrição do problema *</string>
+    <string name="bug_report_success">Relatório enviado com sucesso.</string>
+    <string name="bug_report_error">Falha ao enviar. Tente novamente.</string>
+    <string name="bug_report_sending">Enviando...</string>
+    <string name="bug_report_send_button">Enviar relatório</string>
+    <string name="bug_report_dialog_subtitle">Descreva o problema encontrado. Nome e email são opcionais.</string>
+    <string name="bug_report_dialog_success">Relatório enviado. Obrigado!</string>
+    <string name="bug_report_dialog_error">Falha ao enviar. Verifique sua conexão.</string>
+    <string name="bug_report_description_helper">Descreva o problema com detalhes.</string>
+
+    <!-- ============================================================================= -->
+    <!-- APOIO / SUPORTE -->
+    <!-- ============================================================================= -->
+    <string name="support_title">Apoio</string>
+    <string name="support_card_title">Apoie o projeto</string>
+    <string name="support_used_prefix">Você já usou o Krono por </string>
+    <string name="support_used_suffix">. Projeto independente — seu apoio mantém tudo gratuito e sem anúncios.</string>
+    <string name="support_project_subtitle">Projeto independente, gratuito e sem anúncios.</string>
+    <string name="support_message_with_time">Incrível, você já usou o Krono Tools por %1$s. Este projeto é independente e não exibimos anúncios. Apoie o projeto para mantermos a melhor experiência possível para você.</string>
+    <string name="support_button">Pagar um café</string>
+
+    <!-- ============================================================================= -->
+    <!-- ATUALIZAÇÕES / CHANGELOG -->
+    <!-- ============================================================================= -->
+    <string name="settings_changelog">Atualizações</string>
+    <string name="changelog_title">Novidades da Versão</string>
+    <string name="version_prefix">v%1$s</string>
+    <string name="updates_no_changes">Sem mudanças registradas.</string>
+    <string name="updates_pill_new_version">Nova Versão • %1$s</string>
+    <string name="updates_pill_current_version">Versão Atual • %1$s</string>
+    <string name="updates_whats_new_title">O QUE HÁ DE NOVO</string>
+    <string name="updates_action_checking">Verificando...</string>
+    <string name="updates_action_downloading">Baixando...</string>
+    <string name="updates_action_install">Instalar</string>
+    <string name="updates_action_updated">App atualizado</string>
+    <string name="updates_action_download">Baixar</string>
+    <string name="updates_action_check">Verificar atualizações</string>
+    <string name="updates_action_search">Procurar atualizações</string>
+    <string name="updates_current_version_fallback">Versão atual instalada. Sem atualização pendente.</string>
+
+    <!-- ============================================================================= -->
+    <!-- SOBRE O PROJETO & CRIADOR -->
+    <!-- ============================================================================= -->
+    <string name="settings_about">Sobre</string>
+    <string name="about_version">Versão %1$s</string>
+    <string name="about_description">Widget flutuante de cronômetro. Gratuito, sem anúncios e código aberto.</string>
+    <string name="about_project_group_title">Projeto</string>
+    <string name="about_source_title">Código Fonte</string>
+    <string name="about_source_subtitle">GitHub · Contribua com o projeto</string>
+    <string name="about_share_title">Compartilhar o Krono</string>
+    <string name="about_share_subtitle">Envie o link do projeto para outras pessoas</string>
+    <string name="about_share_chooser">Compartilhar Krono</string>
+    <string name="about_creator_title">Criador</string>
+    <string name="about_creator_subtitle">Desenvolvido por Gustavo Praxedes</string>
+    <string name="about_description_title">Descrição</string>
+
+    <!-- ============================================================================= -->
+    <!-- OUTRAS STRINGS -->
+    <!-- ============================================================================= -->
+    <string name="color_picker_opacity">Opacidade</string>
+    <string name="color_picker_s">S</string>
+    <string name="color_picker_g">G</string>
+    <string name="color_picker_h">H</string>
+    <string name="color_picker_r">R</string>
+    <string name="color_picker_b">B</string>
+    <string name="color_picker_hex">HEX</string>
+</resources>

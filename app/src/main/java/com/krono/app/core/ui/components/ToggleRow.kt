@@ -14,7 +14,8 @@ fun ToggleRow(
     subtitle: String? = null,
     leadingIcon: ImageVector? = null,
     leadingTextIcon: String? = null,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true
 ) {
     SettingsRow(
         title = label,
@@ -22,11 +23,13 @@ fun ToggleRow(
         leadingIcon = leadingIcon,
         leadingTextIcon = leadingTextIcon,
         modifier = modifier,
+        enabled = enabled,
         onClick = { onChange(!checked) },
         trailing = {
             KronoToggle(
                 checked = checked,
                 onCheckedChange = onChange,
+                enabled = enabled,
                 colors = SwitchDefaults.colors(
                     checkedThumbColor = MaterialTheme.colorScheme.primary,
                     checkedTrackColor = MaterialTheme.colorScheme.primaryContainer,

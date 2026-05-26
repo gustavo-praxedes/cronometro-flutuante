@@ -17,8 +17,7 @@ import com.krono.app.R
 import com.krono.app.core.ui.theme.KronoIcons
 import com.krono.app.core.ui.theme.KronoTokens
 import com.krono.app.feature.countdown.overlayTextColor
-import com.krono.app.core.data.TimerDisplayFormat
-import com.krono.app.core.data.formatSecondsByPattern
+import com.krono.app.core.data.toOverlayFormattedTime
 import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
 
@@ -26,6 +25,10 @@ import kotlin.math.roundToInt
 fun CountdownCard(
     state           : CountdownState,
     timeFormat      : String,
+    showHours       : Boolean,
+    showMinutes     : Boolean,
+    showSeconds     : Boolean,
+    showMilliseconds: Boolean,
     onEdit          : () -> Unit,
     onDelete        : () -> Unit,
     onPlay          : () -> Unit,
@@ -37,7 +40,6 @@ fun CountdownCard(
     var menuExpanded by remember { mutableStateOf(false) }
     val bgColor = Color(state.config.backgroundColor)
     val textColor = overlayTextColor(bgColor)
-    val format = TimerDisplayFormat.fromKey(timeFormat)
     var flashOn by remember(state.config.id) { mutableStateOf(false) }
     var completionHandled by remember(state.config.id) { mutableStateOf(false) }
     LaunchedEffect(state.isCompleted) {
@@ -136,7 +138,12 @@ fun CountdownCard(
             ) {
                 // Time Display
                 Text(
-                    text          = formatSecondsByPattern(state.remainingSeconds, format),
+                    text          = state.remainingMs.toOverlayFormattedTime(
+                        showHours = showHours,
+                        showMinutes = showMinutes,
+                        showSeconds = showSeconds,
+                        showMilliseconds = showMilliseconds
+                    ),
                     fontSize      = KronoTokens.Typography.timerCard,
                     fontWeight    = FontWeight.Normal,
                     color         = textColor,

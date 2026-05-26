@@ -20,6 +20,7 @@ import com.krono.app.core.data.OverlayConfig
 import com.krono.app.core.data.OverlayDataStore
 import com.krono.app.core.service.MainService
 import com.krono.app.core.ui.theme.KronoTheme
+import com.krono.app.core.util.PermissionUtils
 import com.krono.app.core.util.UpdateInfo
 import com.krono.app.feature.stopwatch.StopwatchViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -55,12 +56,7 @@ class MainActivity : ComponentActivity() {
         super.onResume()
         permissionsRefreshTrigger.value++
 
-        val lacksOverlay      = !Settings.canDrawOverlays(this)
-        val lacksNotification = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
-                checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) !=
-                android.content.pm.PackageManager.PERMISSION_GRANTED
-
-        if (lacksOverlay || lacksNotification) {
+        if (!PermissionUtils.hasEssentialPermissions(this)) {
             lifecycleScope.launch { permissionsDialogEvents.emit(Unit) }
         }
     }
@@ -70,6 +66,15 @@ class MainActivity : ComponentActivity() {
         setIntent(intent)
         if (intent.getBooleanExtra("open_settings", false)) {
             navigationEvents.tryEmit(AppRoutes.SETTINGS)
+        }
+        intent.getStringExtra("open_tool")?.let { toolId ->
+            navigationEvents.tryEmit(
+                when (toolId) {
+                    "countdown" -> AppRoutes.COUNTDOWN
+                    "pomodoro" -> AppRoutes.POMODORO
+                    else -> AppRoutes.TIMER
+                }
+            )
         }
     }
 
@@ -97,11 +102,32 @@ class MainActivity : ComponentActivity() {
 
             KronoTheme(selectedTheme = config.selectedTheme, appFontSize = config.appFontSize) {
                 val surfaceColor = MaterialTheme.colorScheme.background
+                DisposableEffect(config.keepScreenOn) {
+                    if (config.keepScreenOn) {
+                        window.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                    } else {
+                        window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                    }
+                    onDispose {
+                        window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                    }
+                }
                 
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color    = surfaceColor
                 ) {
+                    LaunchedEffect(Unit) {
+                        intent?.getStringExtra("open_tool")?.let { toolId ->
+                            navigationEvents.emit(
+                                when (toolId) {
+                                    "countdown" -> AppRoutes.COUNTDOWN
+                                    "pomodoro" -> AppRoutes.POMODORO
+                                    else -> AppRoutes.TIMER
+                                }
+                            )
+                        }
+                    }
                     AppNavigation(
                         dataStore                 = dataStore,
                         stopwatchViewModel            = stopwatchViewModel,
@@ -126,7 +152,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun tryStartService() {
-        if (!Settings.canDrawOverlays(this)) {
+        if (!PermissionUtils.hasEssentialPermissions(this)) {
             lifecycleScope.launch { permissionsDialogEvents.emit(Unit) }
             return
         }
@@ -138,7 +164,7 @@ class MainActivity : ComponentActivity() {
             val config = dataStore.configFlow.first()
             val intent = Intent(this@MainActivity, MainService::class.java).apply {
                 action = if (config.focusModeEnabled) ACTION_START_FOCUS else ACTION_SHOW_OVERLAY
-                putExtra(EXTRA_TOOL_ID, config.activeToolId)
+                putExtra(EXTRA_TOOL_ID, config.directLaunchToolId.ifBlank { config.activeToolId })
             }
             startForegroundService(intent)
         }
@@ -171,6 +197,10 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun startFocusMode() {
+        if (!PermissionUtils.hasEssentialPermissions(this)) {
+            lifecycleScope.launch { permissionsDialogEvents.emit(Unit) }
+            return
+        }
         lifecycleScope.launch {
             val config = dataStore.configFlow.first()
             startForegroundService(
@@ -183,6 +213,10 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun showOverlay(toolId: String? = null) {
+        if (!PermissionUtils.hasEssentialPermissions(this)) {
+            lifecycleScope.launch { permissionsDialogEvents.emit(Unit) }
+            return
+        }
         startForegroundService(
             Intent(this, MainService::class.java).apply {
                 action = ACTION_SHOW_OVERLAY

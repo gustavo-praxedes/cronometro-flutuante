@@ -1,11 +1,17 @@
-package com.krono.app.feature.pomodoro
+﻿package com.krono.app.feature.pomodoro
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.krono.app.core.audio.SoundTimingPolicy
 import com.krono.app.core.data.OverlayDataStore
+import com.krono.app.core.data.OverlayConfig
 import com.krono.app.core.tool.ToolState
 import com.krono.app.core.tool.ToolViewModel
+import com.krono.app.core.util.normalizeNotificationSound
+import com.krono.app.core.util.playPomodoroPhaseBeep
+import com.krono.app.core.util.stopActiveTimerSounds
+import com.krono.app.core.util.triggerSecondFeedback
 import android.os.SystemClock
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -34,6 +40,11 @@ class PomodoroViewModel(application: Application) : AndroidViewModel(application
     private var customPhases: List<PhaseDef> = defaultPhases()
     private var currentPhaseIndex = 0
     private var phaseDeadlineElapsedMs: Long? = null
+    private var lastSecondFeedback: Long? = null
+    private var latestConfig: OverlayConfig = OverlayConfig()
+
+    private fun secondsToMs(seconds: Long): Long = seconds.coerceAtLeast(0L) * 1000L
+    private fun msToRemainingSeconds(ms: Long): Long = ((ms.coerceAtLeast(0L) + 999L) / 1000L)
 
     private data class PhaseDef(
         val label: String,
@@ -43,8 +54,8 @@ class PomodoroViewModel(application: Application) : AndroidViewModel(application
     )
 
     private fun defaultPhases() = listOf(
-        PhaseDef("Foco", focusSeconds, 0xFFEF4444.toInt(), "FOCUS_A"),
-        PhaseDef("Pausa", breakSeconds, 0xFF22C55E.toInt(), "BREAK_A")
+        PhaseDef("Foco", focusSeconds, 0xFFEF4444.toInt(), "krono_alm_alarmbeep"),
+        PhaseDef("Pausa", breakSeconds, 0xFF22C55E.toInt(), "krono_alm_beeps")
     )
 
     private fun parseCustomPhases(spec: String): List<PhaseDef> {
@@ -55,30 +66,57 @@ class PomodoroViewModel(application: Application) : AndroidViewModel(application
                 val label = p[0].ifBlank { "Etapa" }
                 val minutes = p[1].toLongOrNull()?.coerceAtLeast(1L) ?: 1L
                 val color = p[2].toLongOrNull()?.toInt() ?: 0xFFEF4444.toInt()
-                val sound = p[3].ifBlank { "FOCUS_A" }
+                val sound = normalizeNotificationSound(p[3])
                 PhaseDef(label, minutes * 60L, color, sound)
             }
-            .ifEmpty { listOf(PhaseDef("Etapa 1", 25 * 60L, 0xFFEF4444.toInt(), "FOCUS_A")) }
+            .ifEmpty { listOf(PhaseDef("Etapa 1", 25 * 60L, 0xFFEF4444.toInt(), "krono_alm_alarmbeep")) }
+    }
+
+    init {
+        viewModelScope.launch {
+            overlayDataStore.configFlow.collect { latestConfig = it }
+        }
     }
 
     override fun start() {
         if (_state.value.isRunning) return
         _state.value = _state.value.copy(isRunning = true)
-        phaseDeadlineElapsedMs = SystemClock.elapsedRealtime() + (_state.value.remainingSeconds * 1000L)
+        lastSecondFeedback = null
+        phaseDeadlineElapsedMs = SystemClock.elapsedRealtime() + _state.value.remainingMs
         tickerJob?.cancel()
         tickerJob = viewModelScope.launch {
             while (_state.value.isRunning) {
-                delay(250L)
-                val deadline = phaseDeadlineElapsedMs ?: (SystemClock.elapsedRealtime() + (_state.value.remainingSeconds * 1000L))
+                val deadline = phaseDeadlineElapsedMs ?: (SystemClock.elapsedRealtime() + _state.value.remainingMs)
                 val now = SystemClock.elapsedRealtime()
-                val next = ((deadline - now) / 1000L).coerceAtLeast(0L)
-                if (next == 0L) {
+                val nextRemainingMs = (deadline - now).coerceAtLeast(0L)
+                val nextRemainingSeconds = msToRemainingSeconds(nextRemainingMs)
+                if (nextRemainingMs == 0L) {
                     val completedPhase = customPhases[currentPhaseIndex]
                     overlayDataStore.accumulateTime(completedPhase.seconds.coerceAtLeast(0L) * 1000L)
                     val nextIndex = (currentPhaseIndex + 1) % customPhases.size
                     val wrapped = nextIndex == 0
+                    if (wrapped && _state.value.cycle >= maxCycles) {
+                        viewModelScope.launch {
+                            overlayDataStore.recordPomodoroSession(currentPresetKey, maxCycles)
+                        }
+                        currentPhaseIndex = 0
+                        val firstPhase = customPhases.first()
+                        phaseDeadlineElapsedMs = null
+                        _state.value = _state.value.copy(
+                            remainingSeconds = firstPhase.seconds,
+                            remainingMs = secondsToMs(firstPhase.seconds),
+                            phaseLabel = firstPhase.label,
+                            phaseColor = firstPhase.color,
+                            phaseSoundType = firstPhase.soundType,
+                            isFocusPhase = true,
+                            isRunning = false
+                        )
+                        stopActiveTimerSounds("pomodoro complete")
+                        tickerJob?.cancel()
+                        break
+                    }
                     if (wrapped) {
-                        val nextCycle = (_state.value.cycle % maxCycles) + 1
+                        val nextCycle = (_state.value.cycle + 1).coerceAtMost(maxCycles)
                         _state.value = _state.value.copy(cycle = nextCycle)
                     }
                     currentPhaseIndex = nextIndex
@@ -89,45 +127,67 @@ class PomodoroViewModel(application: Application) : AndroidViewModel(application
                     } else null
                     _state.value = _state.value.copy(
                         remainingSeconds = phase.seconds,
+                        remainingMs = secondsToMs(phase.seconds),
                         phaseLabel = phase.label,
                         phaseColor = phase.color,
                         phaseSoundType = phase.soundType,
+                        isFocusPhase = currentPhaseIndex % 2 == 0,
                         phaseTransitionId = _state.value.phaseTransitionId + 1,
                         isRunning = shouldAutoStart
                     )
+                    playPhaseAlertIfEnabled(phase, currentPhaseIndex % 2 == 0)
                     if (!shouldAutoStart) {
+                        stopActiveTimerSounds("pomodoro auto stop")
                         tickerJob?.cancel()
                         break
                     }
                 } else {
-                    _state.value = _state.value.copy(remainingSeconds = next)
+                    if (nextRemainingSeconds != _state.value.remainingSeconds) {
+                        triggerSecondFeedbackIfEnabled(nextRemainingSeconds)
+                    }
+                    _state.value = _state.value.copy(
+                        remainingSeconds = nextRemainingSeconds,
+                        remainingMs = nextRemainingMs
+                    )
+                    val delayToNextSecond = delayUntilNextSecondBoundary(nextRemainingMs)
+                    val delayToNextFrame = if (latestConfig.showMilliseconds) 50L else delayToNextSecond
+                    delay(minOf(delayToNextSecond, delayToNextFrame).coerceAtLeast(1L))
                 }
             }
         }
     }
 
     override fun pause() {
+        stopActiveTimerSounds("pomodoro pause")
         val deadline = phaseDeadlineElapsedMs
         if (deadline != null) {
             val now = SystemClock.elapsedRealtime()
-            val remaining = ((deadline - now) / 1000L).coerceAtLeast(0L)
-            _state.value = _state.value.copy(remainingSeconds = remaining)
+            val remainingMs = (deadline - now).coerceAtLeast(0L)
+            _state.value = _state.value.copy(
+                remainingSeconds = msToRemainingSeconds(remainingMs),
+                remainingMs = remainingMs
+            )
         }
         phaseDeadlineElapsedMs = null
+        lastSecondFeedback = null
         _state.value = _state.value.copy(isRunning = false)
         tickerJob?.cancel()
     }
 
     override fun reset() {
+        stopActiveTimerSounds("pomodoro reset")
         currentPhaseIndex = 0
-        val phase = customPhases.firstOrNull() ?: PhaseDef("Foco", focusSeconds, 0xFFEF4444.toInt(), "FOCUS_A")
+        val phase = customPhases.firstOrNull() ?: PhaseDef("Foco", focusSeconds, 0xFFEF4444.toInt(), "krono_alm_alarmbeep")
         _state.value = PomodoroState(
             remainingSeconds = phase.seconds,
+            remainingMs = secondsToMs(phase.seconds),
             phaseLabel = phase.label,
             phaseColor = phase.color,
-            phaseSoundType = phase.soundType
+            phaseSoundType = phase.soundType,
+            isFocusPhase = true
         )
         phaseDeadlineElapsedMs = null
+        lastSecondFeedback = null
         tickerJob?.cancel()
     }
 
@@ -137,15 +197,19 @@ class PomodoroViewModel(application: Application) : AndroidViewModel(application
         val phase = customPhases[currentPhaseIndex]
         _state.value = _state.value.copy(
             remainingSeconds = phase.seconds,
+            remainingMs = secondsToMs(phase.seconds),
             phaseLabel = phase.label,
             phaseColor = phase.color,
             phaseSoundType = phase.soundType,
+            isFocusPhase = currentPhaseIndex % 2 == 0,
             cycle = if (wrapped) (_state.value.cycle % maxCycles) + 1 else _state.value.cycle,
             phaseTransitionId = _state.value.phaseTransitionId + 1
         )
         if (_state.value.isRunning) {
+            lastSecondFeedback = null
             phaseDeadlineElapsedMs = SystemClock.elapsedRealtime() + (phase.seconds * 1000L)
         }
+        playPhaseAlertIfEnabled(phase, currentPhaseIndex % 2 == 0)
     }
 
     fun applyPreset(
@@ -177,35 +241,35 @@ class PomodoroViewModel(application: Application) : AndroidViewModel(application
         ) return
 
         customPhases = if (selectedPreset != null) {
-            selectedPreset.phases.map { phase ->
+            selectedPreset.executionPhases().map { phase ->
                 PhaseDef(
                     label = phase.label,
                     seconds = phase.totalSeconds.coerceAtLeast(1L),
                     color = phase.color,
                     soundType = phase.soundType
                 )
-            }
+            }.ifEmpty { defaultPhases() }
         } else {
             when (presetKey) {
                 "CURTO" -> listOf(
-                    PhaseDef("Foco", 15 * 60L, 0xFFEF4444.toInt(), "FOCUS_A"),
-                    PhaseDef("Pausa", 5 * 60L, 0xFF22C55E.toInt(), "BREAK_A")
+                    PhaseDef("Foco", 15 * 60L, 0xFFEF4444.toInt(), "krono_alm_alarmbeep"),
+                    PhaseDef("Pausa", 5 * 60L, 0xFF22C55E.toInt(), "krono_alm_beeps")
                 )
                 "LONGO" -> listOf(
-                    PhaseDef("Foco", 50 * 60L, 0xFFEF4444.toInt(), "FOCUS_A"),
-                    PhaseDef("Pausa", 10 * 60L, 0xFF22C55E.toInt(), "BREAK_A")
+                    PhaseDef("Foco", 50 * 60L, 0xFFEF4444.toInt(), "krono_alm_alarmbeep"),
+                    PhaseDef("Pausa", 10 * 60L, 0xFF22C55E.toInt(), "krono_alm_beeps")
                 )
                 "CUSTOM" -> if (customPhasesSpec.isNotBlank()) parseCustomPhases(customPhasesSpec) else listOf(
-                    PhaseDef("Foco", normalizedFocus.toLong() * 60L, 0xFFEF4444.toInt(), "FOCUS_A"),
-                    PhaseDef("Pausa", normalizedBreak.toLong() * 60L, 0xFF22C55E.toInt(), "BREAK_A")
+                    PhaseDef("Foco", normalizedFocus.toLong() * 60L, 0xFFEF4444.toInt(), "krono_alm_alarmbeep"),
+                    PhaseDef("Pausa", normalizedBreak.toLong() * 60L, 0xFF22C55E.toInt(), "krono_alm_beeps")
                 )
                 else -> listOf(
-                    PhaseDef("Foco", FOCUS_SECONDS, 0xFFEF4444.toInt(), "FOCUS_A"),
-                    PhaseDef("Pausa", BREAK_SECONDS, 0xFF22C55E.toInt(), "BREAK_A")
+                    PhaseDef("Foco", FOCUS_SECONDS, 0xFFEF4444.toInt(), "krono_alm_alarmbeep"),
+                    PhaseDef("Pausa", BREAK_SECONDS, 0xFF22C55E.toInt(), "krono_alm_beeps")
                 )
             }
         }
-        maxCycles = selectedPreset?.cycles?.coerceAtLeast(1) ?: normalizedCycles
+        maxCycles = selectedPreset?.cycles?.coerceIn(1, 12) ?: normalizedCycles
         currentPresetKey = presetKey
         currentPresetsSpecRaw = presetsSpec
         if (_state.value.isRunning) return
@@ -215,16 +279,59 @@ class PomodoroViewModel(application: Application) : AndroidViewModel(application
         breakSeconds = customPhases.getOrNull(1)?.seconds ?: phase.seconds
         _state.value = _state.value.copy(
             remainingSeconds = phase.seconds,
+            remainingMs = secondsToMs(phase.seconds),
             phaseLabel = phase.label,
             phaseColor = phase.color,
             phaseSoundType = phase.soundType,
+            isFocusPhase = true,
             isRunning = false
         )
         phaseDeadlineElapsedMs = null
+        lastSecondFeedback = null
         tickerJob?.cancel()
     }
 
     fun setAutoAdvance(autoNextCycle: Boolean) {
         autoStartNextCycle = autoNextCycle
+    }
+
+    private fun playPhaseAlertIfEnabled(phase: PhaseDef, isFocusPhase: Boolean) {
+        viewModelScope.launch {
+            val config = latestConfig
+            if (!config.allSoundsEnabled) return@launch
+            if (isFocusPhase && !config.pomodoroFocusAlertEnabled) return@launch
+            if (!isFocusPhase && !config.pomodoroBreakAlertEnabled) return@launch
+            playPomodoroPhaseBeep(
+                context = getApplication(),
+                isFocusPhase = isFocusPhase,
+                volume = if (isFocusPhase) config.focusAlertVolume else config.breakAlertVolume,
+                soundType = phase.soundType,
+                startDelayMs = SoundTimingPolicy.profile(phase.soundType).startDelayMs,
+                maxLifetimeMs = SoundTimingPolicy.profile(phase.soundType).maxLifetimeMs
+            )
+        }
+    }
+
+    private suspend fun triggerSecondFeedbackIfEnabled(secondMarker: Long) {
+        if (lastSecondFeedback == secondMarker) return
+        lastSecondFeedback = secondMarker
+        val config = latestConfig
+        val profile = SoundTimingPolicy.profile(config.environmentSoundType)
+        triggerSecondFeedback(
+            context = getApplication(),
+            vibrationEnabled = config.secondsVibrationEnabled,
+            tickSoundEnabled = config.allSoundsEnabled && config.tickSoundEnabled,
+            tickVolume = config.tickVolume,
+            environmentSoundType = config.environmentSoundType,
+            startDelayMs = profile.startDelayMs,
+            staleAfterMs = profile.staleAfterMs
+        )
+    }
+
+    private fun delayUntilNextSecondBoundary(remainingMs: Long): Long {
+        val safeRemainingMs = remainingMs.coerceAtLeast(0L)
+        if (safeRemainingMs <= 0L) return 1L
+        val remainder = safeRemainingMs % 1000L
+        return if (remainder == 0L) 1000L else remainder
     }
 }

@@ -19,6 +19,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
@@ -31,7 +33,8 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 fun TimeWheelPicker(
     totalSeconds: Long,
     onValueChange: (Long) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    fadeColor: Color = MaterialTheme.colorScheme.background
 ) {
     val initH = (totalSeconds / 3600).toInt().coerceIn(0, 99)
     val initM = ((totalSeconds % 3600) / 60).toInt()
@@ -89,11 +92,11 @@ fun TimeWheelPicker(
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                WheelColumn(range = 0..99, initial = initH, onSelected = { h.intValue = it; emit() })
+                WheelColumn(range = 0..99, initial = initH, fadeColor = fadeColor, onSelected = { h.intValue = it; emit() })
                 Separator()
-                WheelColumn(range = 0..59, initial = initM, onSelected = { m.intValue = it; emit() })
+                WheelColumn(range = 0..59, initial = initM, fadeColor = fadeColor, onSelected = { m.intValue = it; emit() })
                 Separator()
-                WheelColumn(range = 0..59, initial = initS, onSelected = { s.intValue = it; emit() })
+                WheelColumn(range = 0..59, initial = initS, fadeColor = fadeColor, onSelected = { s.intValue = it; emit() })
             }
         }
     }
@@ -117,6 +120,7 @@ private fun WheelColumn(
     range: IntRange,
     initial: Int,
     onSelected: (Int) -> Unit,
+    fadeColor: Color,
     itemH: Dp = KronoTokens.Wheel.itemHeight,
     visible: Int = 3
 ) {
@@ -207,6 +211,19 @@ private fun WheelColumn(
 
             item { Box(Modifier.height(itemH)) }
         }
+        Box(
+            modifier = Modifier
+                .width(KronoTokens.Wheel.columnInnerWidth)
+                .height(containerH)
+                .background(
+                    Brush.verticalGradient(
+                        0f to fadeColor,
+                        0.34f to Color.Transparent,
+                        0.66f to Color.Transparent,
+                        1f to fadeColor
+                    )
+                )
+        )
     }
 }
 

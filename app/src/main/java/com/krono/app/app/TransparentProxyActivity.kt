@@ -21,6 +21,7 @@ import com.krono.app.core.data.OverlayDataStore
 import com.krono.app.core.service.MainService
 import com.krono.app.core.ui.theme.KronoTheme
 import com.krono.app.core.ui.dialogs.PermissionsDialog
+import com.krono.app.core.util.PermissionUtils
 import com.krono.app.core.util.UpdateInfo
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -91,8 +92,13 @@ class TransparentProxyActivity : ComponentActivity() {
     private fun handleLauncherLogic() {
         val config = runBlocking { dataStore.configFlow.first() }
         
-        if (config.autoLaunch && Settings.canDrawOverlays(this)) {
-            startForegroundService(Intent(this, MainService::class.java))
+        if (config.autoLaunch && PermissionUtils.hasEssentialPermissions(this)) {
+            startForegroundService(
+                Intent(this, MainService::class.java).apply {
+                    action = ACTION_SHOW_OVERLAY
+                    putExtra(EXTRA_TOOL_ID, config.directLaunchToolId.ifBlank { config.activeToolId })
+                }
+            )
         } else {
             startActivity(Intent(this, MainActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP

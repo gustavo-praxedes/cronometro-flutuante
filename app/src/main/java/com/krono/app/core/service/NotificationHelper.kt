@@ -29,6 +29,7 @@ class NotificationHelper(private val context: Context) {
     fun buildNotification(
         StopwatchState: StopwatchState,
         showHours: Boolean,
+        showMinutes: Boolean,
         showSeconds: Boolean
     ): Notification {
 
@@ -84,6 +85,7 @@ class NotificationHelper(private val context: Context) {
         } else {
             val frozenTime = StopwatchState.elapsedMs.toFormattedTime(
                 showHours   = showHours,
+                showMinutes = showMinutes,
                 showSeconds = showSeconds
             )
             builder

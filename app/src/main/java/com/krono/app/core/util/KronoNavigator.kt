@@ -21,6 +21,14 @@ object KronoNavigator {
         context.startActivity(intent)
     }
 
+    fun openTool(context: Context, toolId: String) {
+        val intent = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            putExtra("open_tool", toolId)
+        }
+        context.startActivity(intent)
+    }
+
     fun showDonation(context: Context) {
         TransparentProxyActivity.start(
             context, 

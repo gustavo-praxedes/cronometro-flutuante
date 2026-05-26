@@ -25,7 +25,6 @@ import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -50,12 +49,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.krono.app.core.data.TimerDisplayFormat
 import com.krono.app.core.data.formatSecondsByPattern
+import com.krono.app.core.data.toOverlayFormattedTime
+import com.krono.app.core.audio.SoundTimingPolicy
 import com.krono.app.core.service.MainService
 import com.krono.app.R
 import com.krono.app.core.ui.theme.KronoIcons
 import com.krono.app.core.ui.theme.KronoTokens
 import com.krono.app.core.ui.theme.timerFontFamily
-import com.krono.app.core.util.KronoToolAudio
 import com.krono.app.core.util.triggerPlayPauseFeedback
 
 private val SCREEN_OVERLAY_ID = CountdownViewModel.SCREEN_OVERLAY_ID
@@ -67,10 +67,18 @@ fun CountdownScreen(
     timeFormat: String,
     selectedFont: String,
     initialConfiguredSeconds: Long = 0L,
+    showHours: Boolean = true,
+    showMinutes: Boolean = true,
+    showSeconds: Boolean = true,
+    showMilliseconds: Boolean = false,
     onConfiguredTimeChange: (Long) -> Unit = {},
     playPauseBeepEnabled: Boolean = false,
-    playPauseVibrationEnabled: Boolean = false,
+    playPauseVibrationEnabled: Boolean = true,
     playPauseVolume: Float = 0.8f,
+    playPauseSoundType: String = "krono_tip_complete",
+    openOverlayOnPlay: Boolean = false,
+    focusModeEnabled: Boolean = false,
+    onStartFocusMode: () -> Unit = {},
     onOpenSettings: () -> Unit
 ) {
     val context = LocalContext.current
@@ -85,13 +93,18 @@ fun CountdownScreen(
     var lastSavedConfiguredSeconds by remember { mutableLongStateOf(hydratedInitial) }
     var wheelResetToken by remember { mutableIntStateOf(0) }
     var dialogOpen by remember { mutableStateOf(false) }
+    var editingCountdown by remember { mutableStateOf<CountdownConfig?>(null) }
 
     val visibleCountdowns = remember(countdowns) { countdowns.filterNot { it.config.id == SCREEN_OVERLAY_ID } }
     val screenOverlayState = remember(countdowns) { countdowns.firstOrNull { it.config.id == SCREEN_OVERLAY_ID } }
-    val currentRemainingSeconds = screenOverlayState?.remainingSeconds ?: baseSeconds
+    val currentRemainingMs = screenOverlayState?.remainingMs ?: (baseSeconds * 1000L)
+    val currentRemainingSeconds = ((currentRemainingMs + 999L) / 1000L).coerceAtLeast(0L)
     val isRunning = screenOverlayState?.isRunning == true
     val hasCards = visibleCountdowns.isNotEmpty()
     val screenCardBgColor = MaterialTheme.colorScheme.primaryContainer.toArgb()
+    val soundProfile = SoundTimingPolicy.profile(playPauseSoundType)
+    val soundStartDelayMs = soundProfile.startDelayMs
+    val soundMaxLifetimeMs = soundProfile.maxLifetimeMs
     val topSectionWeight by animateFloatAsState(
         targetValue = if (hasCards) 0.56f else 1f,
         animationSpec = tween(350),
@@ -105,6 +118,30 @@ fun CountdownScreen(
                 putExtra(CountdownViewModel.EXTRA_COUNTDOWN_ID, id)
             }
         )
+    }
+
+    fun setScreenCountdown(seconds: Long, resetWheel: Boolean = false) {
+        val safe = seconds.coerceIn(0L, maxSeconds)
+        if (safe != baseSeconds) userConfiguredTime = true
+        draftSeconds = safe
+        baseSeconds = safe
+        if (resetWheel) wheelResetToken += 1
+        viewModel.upsertTransientCountdown(
+            config = CountdownConfig(
+                id = SCREEN_OVERLAY_ID,
+                description = "",
+                totalSeconds = safe,
+                backgroundColor = screenCardBgColor
+            ),
+            remainingSeconds = safe,
+            isRunning = false
+        )
+        viewModel.previewRemaining(SCREEN_OVERLAY_ID, safe)
+        syncOverlay(SCREEN_OVERLAY_ID)
+        if (safe != lastSavedConfiguredSeconds) {
+            lastSavedConfiguredSeconds = safe
+            onConfiguredTimeChange(safe)
+        }
     }
 
     LaunchedEffect(screenOverlayState?.config?.id) {
@@ -137,6 +174,12 @@ fun CountdownScreen(
     LaunchedEffect(isRunning) {
         if (isRunning) {
             hasStartedSession = true
+        }
+    }
+    LaunchedEffect(screenOverlayState?.isCompleted) {
+        if (screenOverlayState?.isCompleted == true) {
+            hasStartedSession = false
+            draftSeconds = baseSeconds
         }
     }
 
@@ -193,39 +236,23 @@ fun CountdownScreen(
                 ) {
                     Spacer(Modifier.weight(1f))
 
-                    if (!isRunning && !hasStartedSession) {
+                    if (!isRunning && (!hasStartedSession || screenOverlayState?.isCompleted == true)) {
                         key(wheelResetToken) {
                             CountdownScreenWheelPicker(
                                 totalSeconds = currentRemainingSeconds,
                                 numberFontSize = 76.sp,
                                 fontFamily = timerFontFamily(selectedFont),
-                                onValueChange = { seconds ->
-                                    val safe = seconds.coerceIn(0L, maxSeconds)
-                                    if (safe != baseSeconds) userConfiguredTime = true
-                                    draftSeconds = safe
-                                    baseSeconds = safe
-                                    viewModel.upsertTransientCountdown(
-                                        config = CountdownConfig(
-                                            id = SCREEN_OVERLAY_ID,
-                                            description = "",
-                                            totalSeconds = safe,
-                                            backgroundColor = screenCardBgColor
-                                        ),
-                                        remainingSeconds = safe,
-                                        isRunning = false
-                                    )
-                                    viewModel.previewRemaining(SCREEN_OVERLAY_ID, safe)
-                                    syncOverlay(SCREEN_OVERLAY_ID)
-                                    if (safe != lastSavedConfiguredSeconds) {
-                                        lastSavedConfiguredSeconds = safe
-                                        onConfiguredTimeChange(safe)
-                                    }
-                                }
+                                onValueChange = ::setScreenCountdown
                             )
                         }
                     } else {
                         Text(
-                            text = formatSecondsByPattern(currentRemainingSeconds, TimerDisplayFormat.fromKey(timeFormat)),
+                            text = currentRemainingMs.toOverlayFormattedTime(
+                                showHours = showHours,
+                                showMinutes = showMinutes,
+                                showSeconds = showSeconds,
+                                showMilliseconds = showMilliseconds
+                            ),
                             fontSize = 76.sp,
                             fontWeight = FontWeight.Normal,
                             fontFamily = timerFontFamily(selectedFont),
@@ -266,16 +293,20 @@ fun CountdownScreen(
                         FilledIconButton(
                             onClick = {
                                 if (isRunning) {
-                                    triggerPlayPauseFeedback(context, playPauseBeepEnabled, playPauseVibrationEnabled, playPauseVolume, KronoToolAudio.COUNTDOWN)
-                                    viewModel.pause(context, SCREEN_OVERLAY_ID)
+                                    viewModel.pause(context, SCREEN_OVERLAY_ID, feedbackAlreadyHandled = true)
+                                    triggerPlayPauseFeedback(context, playPauseBeepEnabled, playPauseVibrationEnabled, playPauseVolume, playPauseSoundType, soundStartDelayMs, soundMaxLifetimeMs)
                                 } else {
                                     if (currentRemainingSeconds <= 0L && baseSeconds <= 0L) return@FilledIconButton
                                     if (currentRemainingSeconds <= 0L) {
                                         viewModel.setRemainingSeconds(SCREEN_OVERLAY_ID, baseSeconds, clearCompleted = true)
                                     }
                                     hasStartedSession = true
-                                    triggerPlayPauseFeedback(context, playPauseBeepEnabled, playPauseVibrationEnabled, playPauseVolume, KronoToolAudio.COUNTDOWN)
-                                    viewModel.play(context, SCREEN_OVERLAY_ID)
+                                    triggerPlayPauseFeedback(context, playPauseBeepEnabled, playPauseVibrationEnabled, playPauseVolume, playPauseSoundType, soundStartDelayMs, soundMaxLifetimeMs)
+                                    viewModel.play(context, SCREEN_OVERLAY_ID, feedbackAlreadyHandled = true)
+                                    if (openOverlayOnPlay && screenOverlayState?.isOverlayVisible != true) {
+                                        viewModel.toggleOverlay(context, SCREEN_OVERLAY_ID)
+                                    }
+                                    if (focusModeEnabled) onStartFocusMode()
                                 }
                             },
                             shape = androidx.compose.foundation.shape.CircleShape,
@@ -340,14 +371,22 @@ fun CountdownScreen(
                         CountdownCard(
                             state = state,
                             timeFormat = timeFormat,
-                            onEdit = {},
+                            showHours = showHours,
+                            showMinutes = showMinutes,
+                            showSeconds = showSeconds,
+                            showMilliseconds = showMilliseconds,
+                            onEdit = { editingCountdown = state.config },
                             onPlay = {
-                                triggerPlayPauseFeedback(context, playPauseBeepEnabled, playPauseVibrationEnabled, playPauseVolume, KronoToolAudio.COUNTDOWN)
-                                viewModel.play(context, state.config.id)
+                                triggerPlayPauseFeedback(context, playPauseBeepEnabled, playPauseVibrationEnabled, playPauseVolume, playPauseSoundType, soundStartDelayMs, soundMaxLifetimeMs)
+                                viewModel.play(context, state.config.id, feedbackAlreadyHandled = true)
+                                if (openOverlayOnPlay && !state.isOverlayVisible) {
+                                    viewModel.toggleOverlay(context, state.config.id)
+                                }
+                                if (focusModeEnabled) onStartFocusMode()
                             },
                             onPause = {
-                                triggerPlayPauseFeedback(context, playPauseBeepEnabled, playPauseVibrationEnabled, playPauseVolume, KronoToolAudio.COUNTDOWN)
-                                viewModel.pause(context, state.config.id)
+                                viewModel.pause(context, state.config.id, feedbackAlreadyHandled = true)
+                                triggerPlayPauseFeedback(context, playPauseBeepEnabled, playPauseVibrationEnabled, playPauseVolume, playPauseSoundType, soundStartDelayMs, soundMaxLifetimeMs)
                             },
                             onReset = { viewModel.reset(context, state.config.id) },
                             onToggleOverlay = { viewModel.toggleOverlay(context, state.config.id) },
@@ -371,6 +410,23 @@ fun CountdownScreen(
                 dialogOpen = false
             },
             onPreview = null
+        )
+    }
+
+    editingCountdown?.let { configToEdit ->
+        CountdownConfigDialog(
+            initial = configToEdit,
+            onDismiss = { editingCountdown = null },
+            onConfirm = { updated ->
+                viewModel.updateConfig(updated)
+                viewModel.setRemainingAndSync(context, updated.id, updated.totalSeconds, clearCompleted = true)
+                syncOverlay(updated.id)
+                editingCountdown = null
+            },
+            onPreview = { seconds ->
+                viewModel.previewRemaining(configToEdit.id, seconds)
+                syncOverlay(configToEdit.id)
+            }
         )
     }
 

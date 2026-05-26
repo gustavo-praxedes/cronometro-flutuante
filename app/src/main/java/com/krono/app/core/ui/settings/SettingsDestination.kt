@@ -6,7 +6,7 @@ import com.krono.app.R
 import com.krono.app.core.ui.theme.KronoIcons
 
 sealed class SettingsDestination(
-    @StringRes val titleRes: Int,
+    @param:StringRes val titleRes: Int,
     val icon: ImageVector
 ) {
     data object Appearance : SettingsDestination(
@@ -36,15 +36,5 @@ sealed class SettingsDestination(
     data object About : SettingsDestination(
         titleRes = R.string.settings_about,
         icon = KronoIcons.Settings.Info
-    )
-
-    data object Changelog : SettingsDestination(
-        titleRes = R.string.settings_changelog,
-        icon = KronoIcons.Settings.History
-    )
-
-    data object BugReport : SettingsDestination(
-        titleRes = R.string.settings_bug_report,
-        icon = KronoIcons.Status.Bug
     )
 }

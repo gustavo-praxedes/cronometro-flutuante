@@ -1,5 +1,6 @@
 ﻿package com.krono.app.feature.countdown
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,6 +21,8 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
@@ -37,7 +40,8 @@ fun CountdownScreenWheelPicker(
     numberFontSize: TextUnit,
     fontFamily: FontFamily,
     onValueChange: (Long) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    fadeColor: Color = MaterialTheme.colorScheme.background
 ) {
     val itemHeight = 100.dp
     val visibleItems = 3
@@ -56,54 +60,72 @@ fun CountdownScreenWheelPicker(
 
     fun emit() = latestOnValueChange(h.intValue * 3600L + m.intValue * 60L + s.intValue)
 
-    Row(
+    Box(
         modifier = modifier
             .fillMaxWidth()
             .height(wheelHeight),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
+        contentAlignment = Alignment.Center
     ) {
-        InfiniteWheelColumn(
-            rangeStart = 0,
-            rangeSize = 100,
-            initial = initH,
-            columnWidth = groupWidth,
-            itemHeight = itemHeight,
-            numberFontSize = numberFontSize,
-            fontFamily = fontFamily,
-            onSelected = { h.intValue = it; emit() }
-        )
-        ColonAnchor(
-            itemHeight = itemHeight,
-            numberFontSize = numberFontSize,
-            fontFamily = fontFamily,
-            width = colonWidth
-        )
-        InfiniteWheelColumn(
-            rangeStart = 0,
-            rangeSize = 60,
-            initial = initM,
-            columnWidth = groupWidth,
-            itemHeight = itemHeight,
-            numberFontSize = numberFontSize,
-            fontFamily = fontFamily,
-            onSelected = { m.intValue = it; emit() }
-        )
-        ColonAnchor(
-            itemHeight = itemHeight,
-            numberFontSize = numberFontSize,
-            fontFamily = fontFamily,
-            width = colonWidth
-        )
-        InfiniteWheelColumn(
-            rangeStart = 0,
-            rangeSize = 60,
-            initial = initS,
-            columnWidth = groupWidth,
-            itemHeight = itemHeight,
-            numberFontSize = numberFontSize,
-            fontFamily = fontFamily,
-            onSelected = { s.intValue = it; emit() }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            InfiniteWheelColumn(
+                rangeStart = 0,
+                rangeSize = 100,
+                initial = initH,
+                columnWidth = groupWidth,
+                itemHeight = itemHeight,
+                numberFontSize = numberFontSize,
+                fontFamily = fontFamily,
+                onSelected = { h.intValue = it; emit() }
+            )
+            ColonAnchor(
+                itemHeight = itemHeight,
+                numberFontSize = numberFontSize,
+                fontFamily = fontFamily,
+                width = colonWidth
+            )
+            InfiniteWheelColumn(
+                rangeStart = 0,
+                rangeSize = 60,
+                initial = initM,
+                columnWidth = groupWidth,
+                itemHeight = itemHeight,
+                numberFontSize = numberFontSize,
+                fontFamily = fontFamily,
+                onSelected = { m.intValue = it; emit() }
+            )
+            ColonAnchor(
+                itemHeight = itemHeight,
+                numberFontSize = numberFontSize,
+                fontFamily = fontFamily,
+                width = colonWidth
+            )
+            InfiniteWheelColumn(
+                rangeStart = 0,
+                rangeSize = 60,
+                initial = initS,
+                columnWidth = groupWidth,
+                itemHeight = itemHeight,
+                numberFontSize = numberFontSize,
+                fontFamily = fontFamily,
+                onSelected = { s.intValue = it; emit() }
+            )
+        }
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(wheelHeight)
+                .background(
+                    Brush.verticalGradient(
+                        0f to fadeColor,
+                        0.22f to Color.Transparent,
+                        0.78f to Color.Transparent,
+                        1f to fadeColor
+                    )
+                )
         )
     }
 }

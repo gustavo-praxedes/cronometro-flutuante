@@ -3,6 +3,7 @@
 import android.content.Context
 import android.graphics.PixelFormat
 import android.graphics.Rect
+import android.util.Log
 import android.view.Gravity
 import android.view.WindowManager
 import androidx.compose.runtime.collectAsState
@@ -24,6 +25,11 @@ import com.krono.app.feature.countdown.CountdownState
 import com.krono.app.core.data.OverlayConfig
 import com.krono.app.core.data.OverlayDataStore
 import com.krono.app.core.ui.theme.KronoTheme
+import com.krono.app.core.util.KronoNavigator
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
@@ -53,6 +59,8 @@ class CountdownOverlayManager(
     // ── State ──────────────────────────────────────────────────────────────
     private var composeView: ComposeView? = null
     private val overlayState = mutableStateOf<CountdownState?>(null)
+    private val overlayDataStore = OverlayDataStore(context)
+    private val overlayScope = CoroutineScope(SupervisorJob())
 
     var posX: Int = 0; private set
     var posY: Int = 0; private set
@@ -121,6 +129,16 @@ class CountdownOverlayManager(
     fun onDragEnd() {
         snapToEdge()
         applyMagnetism()
+    }
+
+    private fun setOverlayFocusable(focusable: Boolean) {
+        val p = params ?: return
+        p.flags = if (focusable) {
+            p.flags and WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE.inv()
+        } else {
+            p.flags or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+        }
+        composeView?.let { view -> runCatching { windowManager.updateViewLayout(view, p) } }
     }
 
     // ── Snap to nearest screen edge ────────────────────────────────────────
@@ -200,31 +218,60 @@ class CountdownOverlayManager(
             setViewTreeSavedStateRegistryOwner(this@CountdownOverlayManager)
 
             setContent {
-                val overlayConfig by OverlayDataStore(context).configFlow.collectAsState(initial = OverlayConfig())
+                val overlayConfig by overlayDataStore.configFlow.collectAsState(initial = OverlayConfig())
                 KronoTheme(selectedTheme = overlayConfig.selectedTheme, appFontSize = overlayConfig.appFontSize) {
                     overlayState.value?.let { s ->
                         val showPlusOne = this@CountdownOverlayManager.id == SCREEN_OVERLAY_ID
                         CountdownOverlayUi(
                             state = s,
+                            config = overlayConfig,
+                            useToolColor = showPlusOne,
+                            showPlusOne = showPlusOne,
                             onPlay = onPlay,
                             onPause = onPause,
                             onReset = onReset,
-                            onBottomExtraAction = if (showPlusOne) onPlusOne else null,
-                            bottomExtraIcon = if (showPlusOne) com.krono.app.core.ui.theme.KronoIcons.Action.PlusOne else null,
-                            bottomExtraDescription = if (showPlusOne) "+1 min" else "",
-                            timeFormat = overlayConfig.countdownFormat,
-                            showButtons = overlayConfig.countdownOverlayShowButtons,
-                            showHours = overlayConfig.countdownOverlayShowHours,
-                            showSeconds = overlayConfig.countdownOverlayShowSeconds,
-                            selectedFont = overlayConfig.overlayFontFamily,
-                            overlayScale = overlayConfig.countdownOverlayScale,
-                            overlayCornerRadius = overlayConfig.countdownOverlayCornerRadius,
-                            overlayCustomColor = overlayConfig.countdownOverlayCustomColor,
-                            overlayCustomTextColor = overlayConfig.countdownOverlayCustomTextColor,
-                            overlayWidthScale = 0.96f,
+                            onPlusOne = onPlusOne,
                             onClose = onClose,
+                            onNavigateToApp = {
+                                KronoNavigator.openTool(context, "countdown")
+                            },
+                            onToggleFocus = {
+                                overlayScope.launch {
+                                    overlayDataStore.updateConfig(
+                                        overlayConfig.copy(focusModeEnabled = !overlayConfig.focusModeEnabled)
+                                    )
+                                }
+                            },
+                            onToggleKeepScreenOn = {
+                                overlayScope.launch {
+                                    overlayDataStore.updateConfig(
+                                        overlayConfig.copy(keepScreenOn = !overlayConfig.keepScreenOn)
+                                    )
+                                }
+                            },
+                            onToggleAutoLaunch = {
+                                overlayScope.launch {
+                                    val enabled = !overlayConfig.autoLaunch
+                                    overlayDataStore.updateConfig(
+                                        overlayConfig.copy(
+                                            autoLaunch = enabled,
+                                            directLaunchToolId = if (enabled) "countdown" else overlayConfig.directLaunchToolId
+                                        )
+                                    )
+                                }
+                            },
+                            onToggleBeep = {
+                                overlayScope.launch {
+                                    overlayDataStore.updateConfig(
+                                        overlayConfig.copy(
+                                            allSoundsEnabled = !overlayConfig.allSoundsEnabled
+                                        )
+                                    )
+                                }
+                            },
                             onDrag = { dx, dy -> onDrag(dx, dy) },
-                            onDragEnd = { onDragEnd() }
+                            onDragEnd = { onDragEnd() },
+                            onMenuVisibilityChange = ::setOverlayFocusable
                         )
                     }
                 }
@@ -236,8 +283,14 @@ class CountdownOverlayManager(
             }
         }
 
-        windowManager.addView(composeView, lp)
-        lifecycleRegistry.currentState = Lifecycle.State.RESUMED
+        runCatching {
+            windowManager.addView(composeView, lp)
+        }.onSuccess {
+            lifecycleRegistry.currentState = Lifecycle.State.RESUMED
+        }.onFailure { error ->
+            Log.e("CountdownOverlayManager", "Error adding countdown overlay $id", error)
+            onClose()
+        }
     }
 
     fun update(state: CountdownState) {
@@ -250,7 +303,18 @@ class CountdownOverlayManager(
         if (lifecycleRegistry.currentState != Lifecycle.State.DESTROYED) {
             lifecycleRegistry.currentState = Lifecycle.State.DESTROYED
         }
+        overlayScope.cancel()
         _vmStore.clear()
+    }
+
+    fun applyKeepScreenOn(enable: Boolean) {
+        val p = params ?: return
+        p.flags = if (enable) {
+            p.flags or WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+        } else {
+            p.flags and WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON.inv()
+        }
+        composeView?.let { view -> runCatching { windowManager.updateViewLayout(view, p) } }
     }
 
     fun getBounds(): Rect = Rect(posX, posY, posX + overlayW, posY + overlayH)

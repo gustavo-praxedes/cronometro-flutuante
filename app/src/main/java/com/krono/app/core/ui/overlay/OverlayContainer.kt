@@ -45,11 +45,11 @@ fun OverlayContainer(
     onDragEnd: () -> Unit,
     modifier: Modifier = Modifier,
     showHours: Boolean = true,
+    showMinutes: Boolean = true,
     showSeconds: Boolean = true,
+    showMilliseconds: Boolean = false,
     showButtons: Boolean = true,
     widthScale: Float = 1f,
-    bottomExtraButtonScale: Float = 1f,
-    bottomExtraIconScale: Float = 1f,
     content: @Composable ColumnScope.(currentScale: Float, txtColor: Color, dimensions: OverlayDimensions) -> Unit
 ) {
     val scaleState = rememberOverlayScaleState()
@@ -58,11 +58,11 @@ fun OverlayContainer(
         currentScale = scaleState.currentScale,
         cornerRadius = cornerRadius,
         showHours = showHours,
+        showMinutes = showMinutes,
         showSeconds = showSeconds,
+        showMilliseconds = showMilliseconds,
         showButtons = showButtons,
-        widthScale = widthScale,
-        bottomExtraButtonScale = bottomExtraButtonScale,
-        bottomExtraIconScale = bottomExtraIconScale
+        widthScale = widthScale
     )
     val shape = RoundedCornerShape(dimensions.cornerRadius)
     val borderColor = overlayBorderColor(isRunning = isRunning, textColor = textColor)

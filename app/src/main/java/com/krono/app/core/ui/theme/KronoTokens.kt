@@ -138,6 +138,7 @@ object KronoTokens {
         val divider      = 1.dp
         val cardBorder   = 1.dp
         val overlayBorder = 0.86.dp
+        val overlayButtonBorder = 0.38.dp
     }
 
     // ── Animações ────────────────────────────────────────────
@@ -231,21 +232,63 @@ object KronoTokens {
 
     // ── Overlay (Widget Flutuante) ──────────────────────────
     object Overlay {
+        // Estrutura do card
         const val maxCornerRadiusFloat = 80f
-        val defaultCornerRadius = 24.dp
-        val minWidth       = 172.dp
-        val maxWidth       = 270.dp
-        val paddingH       = 16.dp
-        val paddingV       = 16.dp
-        val btnSpacing     = 10.dp
-        val btnTopPadding  = 8.dp
+        val defaultCornerRadius = 32.dp
+        val minWidth       = 110.dp
+        val maxWidth       = 280.dp
+        val paddingH       = 8.dp
+        val paddingV       = 0.dp
+
+        // Espaçamentos verticais
+        val labelTopInset = 8.dp
+        val labelBottomGap = 0.dp
+        val noLabelTopInset = 8.dp
+        val timeButtonGap  = 4.dp
+        val buttonMenuGap  = 0.dp
+        val menuDividerButtonGap = 8.dp
+        val handleTopGap = 7.dp
+        val handleBottomGap = 7.dp
         val menuPaddingV   = 8.dp
-        val timerFontSize  = 40.sp
-        val iconSize       = 28.dp
-        val buttonSize     = 28.dp
-        val quickBtnSize   = 34.dp
-        val quickIconSize  = 26.dp
+
+        // Tipografia do tempo
+        val timerVisualOffsetX = (0).dp
+        val timerFontSize  = 34.sp
+        val timerLineHeight = 34.sp
+        val timerLetterSpacing = (0).sp
+
+        // Larguras por formato exibido
+        val timerWidthFull = 168.dp
+        val timerWidthMedium = 106.dp
+        val timerWidthCompact = 54.dp
+        val timerWidthMillisecondsFull = 248.dp
+        val timerWidthMillisecondsNoHours = 186.dp
+        val timerWidthMillisecondsCompact = 146.dp
+
+        // Grid e controles
+        val controlRowMinWidth = 150.dp
+        val btnSpacing     = 8.dp
+        val iconSize       = 18.dp
+        val quickIconSize  = 18.dp
+        val buttonTouchSize = 30.dp
+        val buttonVisualSize = 30.dp
+        val buttonSize     = buttonVisualSize
+        val buttonCorner   = 8.dp
+
+        // Estados visuais dos botões
+        const val buttonContainerAlpha = 0.02f
+        const val buttonContainerActiveAlpha = 0.18f
+        const val buttonBorderAlpha = 0.18f
+        const val buttonBorderActiveAlpha = 0.42f
+
+        // Menu expandido
+        const val dividerAlpha = 0.18f
         val menuTimeoutMs  = 5000L
+
+        // Handle inferior
+        val handleTouchHeight = 8.dp
+        val handlePillWidth = 30.dp
+        val handlePillHeight = 2.dp
     }
 
     // ── Bottom Bar (Navegação) ──────────────────────────────

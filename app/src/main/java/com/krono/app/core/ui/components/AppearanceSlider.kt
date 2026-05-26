@@ -5,6 +5,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.krono.app.core.ui.theme.KronoTokens
@@ -18,9 +19,10 @@ internal fun AppearanceSlider(
     range   : ClosedFloatingPointRange<Float>,
     display : String,
     onChange: (Float) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true
 ) {
-    Column(modifier = modifier.fillMaxWidth()) {
+    Column(modifier = modifier.fillMaxWidth().alpha(if (enabled) 1f else KronoTokens.Alpha.disabled)) {
         Row(
             modifier              = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -48,7 +50,8 @@ internal fun AppearanceSlider(
                 value         = value,
                 onValueChange = onChange,
                 valueRange    = range,
-                modifier      = Modifier.weight(1f)
+                modifier      = Modifier.weight(1f),
+                enabled       = enabled
             )
             Text(
                 text     = maxLabel,

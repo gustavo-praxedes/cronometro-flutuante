@@ -6,7 +6,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import com.krono.app.core.data.toFormattedTime
+import com.krono.app.core.data.toOverlayFormattedTime
 import com.krono.app.core.ui.theme.KronoTokens
 import com.krono.app.core.ui.theme.timerFontFamily
 
@@ -14,7 +14,9 @@ import com.krono.app.core.ui.theme.timerFontFamily
 fun KronoTimerDisplay(
     elapsedMs: Long,
     showHours: Boolean,
+    showMinutes: Boolean,
     showSeconds: Boolean,
+    showMilliseconds: Boolean,
     selectedFont: String,
     scale: Float,
     currentScale: Float,
@@ -24,9 +26,11 @@ fun KronoTimerDisplay(
     val timeFontSize = (KronoTokens.Overlay.timerFontSize.value * scale * currentScale).sp
 
     Text(
-        text = elapsedMs.toFormattedTime(
+        text = elapsedMs.toOverlayFormattedTime(
             showHours = showHours,
-            showSeconds = showSeconds
+            showMinutes = showMinutes,
+            showSeconds = showSeconds,
+            showMilliseconds = showMilliseconds
         ),
         color = textColor,
         fontSize = timeFontSize,

@@ -41,3 +41,6 @@
 - refactor: migrate TimerViewModel to StopwatchViewModel
 - refactor: migrate TimerViewModel to StopwatchViewModel
 - refactor: move shared data files to core/data
+
+# 📝 Documentação
+- docs: planos fase 8.7 e 8.8 adicionados

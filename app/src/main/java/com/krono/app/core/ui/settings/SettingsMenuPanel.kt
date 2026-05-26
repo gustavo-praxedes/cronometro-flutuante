@@ -25,21 +25,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.krono.app.R
+import com.krono.app.core.ui.components.ScrollFadeContainer
 import com.krono.app.core.ui.components.SettingsDivider
 import com.krono.app.core.ui.theme.KronoIcons
 import com.krono.app.core.ui.theme.KronoTokens
-
-// ── Icon accent colors per destination ───────────────────────
-private fun SettingsDestination.accentColor(): Color = when (this) {
-    SettingsDestination.Appearance  -> Color(0xFF6B7FD4)
-    SettingsDestination.Behavior    -> Color(0xFFF59E0B)
-    SettingsDestination.Stopwatch   -> Color(0xFF10B981)
-    SettingsDestination.Countdown   -> Color(0xFF06B6D4)
-    SettingsDestination.Pomodoro    -> Color(0xFFE11D48)
-    SettingsDestination.About       -> Color(0xFF3B82F6)
-    SettingsDestination.Changelog   -> Color(0xFFF97316)
-    SettingsDestination.BugReport   -> Color(0xFFE11D48)
-}
 
 // ── Section data ──────────────────────────────────────────────
 private data class MenuSection(
@@ -66,9 +55,7 @@ private val menuSections = listOf(
     MenuSection(
         titleRes = R.string.settings_menu_section_project,
         destinations = listOf(
-            SettingsDestination.About,
-            SettingsDestination.Changelog,
-            SettingsDestination.BugReport
+            SettingsDestination.About
         )
     )
 )
@@ -78,7 +65,8 @@ fun SettingsMenuPanel(
     selectedDestination: SettingsDestination?,
     onDestinationSelected: (SettingsDestination) -> Unit,
     hasPendingUpdate: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    compactItems: Boolean = false
 ) {
     var searchQuery by remember { mutableStateOf("") }
 
@@ -96,11 +84,16 @@ fun SettingsMenuPanel(
         }
     }
 
-    Column(
+    val scrollState = rememberScrollState()
+    ScrollFadeContainer(
+        canScrollForward = scrollState.canScrollForward,
         modifier = modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
     ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(scrollState)
+        ) {
         Spacer(Modifier.height(KronoTokens.Settings.panelTopSpacing))
 
         // ── Search Bar ────────────────────────────────────────
@@ -151,9 +144,10 @@ fun SettingsMenuPanel(
                             title = titleMap[dest] ?: "",
                             subtitle = null,
                             icon = dest.icon,
-                            accentColor = dest.accentColor(),
                             selected = selectedDestination == dest,
-                            showBadge = dest is SettingsDestination.Changelog && hasPendingUpdate,
+                            showBadge = dest is SettingsDestination.About && hasPendingUpdate,
+                            showChevron = dest.showMenuChevron(),
+                            compact = compactItems,
                             onClick = { onDestinationSelected(dest) }
                         )
                         if (index < filteredDestinations.lastIndex) {
@@ -177,9 +171,10 @@ fun SettingsMenuPanel(
                             title = titleMap[dest] ?: "",
                             subtitle = null,
                             icon = dest.icon,
-                            accentColor = dest.accentColor(),
                             selected = selectedDestination == dest,
-                            showBadge = dest is SettingsDestination.Changelog && hasPendingUpdate,
+                            showBadge = dest is SettingsDestination.About && hasPendingUpdate,
+                            showChevron = dest.showMenuChevron(),
+                            compact = compactItems,
                             onClick = { onDestinationSelected(dest) }
                         )
                         if (index < section.destinations.lastIndex) {
@@ -192,7 +187,8 @@ fun SettingsMenuPanel(
             }
         }
 
-        Spacer(Modifier.height(KronoTokens.Settings.panelBottomSpacing))
+            Spacer(Modifier.height(KronoTokens.Settings.panelBottomSpacing))
+        }
     }
 }
 
@@ -326,11 +322,13 @@ private fun SettingsItem(
     title: String,
     subtitle: String?,
     icon: ImageVector,
-    accentColor: Color,
     selected: Boolean,
     showBadge: Boolean,
+    showChevron: Boolean,
+    compact: Boolean,
     onClick: () -> Unit
 ) {
+    val accentColor = MaterialTheme.colorScheme.primary
     val bgColor = if (selected)
         MaterialTheme.colorScheme.secondaryContainer.copy(alpha = KronoTokens.Settings.menuSelectedRowAlpha)
     else
@@ -378,7 +376,7 @@ private fun SettingsItem(
             Text(
                 text = title,
                 style = MaterialTheme.typography.bodyLarge.copy(
-                    fontSize = KronoTokens.Typography.bodyText,
+                    fontSize = if (compact) 13.sp else KronoTokens.Typography.bodyText,
                     lineHeight = KronoTokens.Typography.titleRowLine
                 ),
                 fontWeight = FontWeight.Normal,
@@ -416,17 +414,24 @@ private fun SettingsItem(
             }
         }
 
-        // Chevron (sempre visível no menu lateral)
-        Icon(
-            imageVector = KronoIcons.Navigation.ChevronRight,
-            contentDescription = null,
-            modifier = Modifier.size(KronoTokens.Icon.small),
-            tint = if (selected)
-                MaterialTheme.colorScheme.onSecondaryContainer
-            else
-                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-        )
+        if (showChevron) {
+            Icon(
+                imageVector = KronoIcons.Navigation.ChevronRight,
+                contentDescription = null,
+                modifier = Modifier.size(KronoTokens.Icon.small),
+                tint = if (selected)
+                    MaterialTheme.colorScheme.onSecondaryContainer
+                else
+                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+            )
+        }
     }
+}
+
+private fun SettingsDestination.showMenuChevron(): Boolean = when (this) {
+    SettingsDestination.Stopwatch,
+    SettingsDestination.Countdown -> false
+    else -> true
 }
 
 

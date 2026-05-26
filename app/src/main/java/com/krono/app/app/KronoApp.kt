@@ -15,6 +15,7 @@ import com.krono.app.feature.pomodoro.PomodoroTool
 import com.krono.app.feature.pomodoro.PomodoroViewModel
 import com.krono.app.core.tool.ToolRegistry
 import com.krono.app.core.data.OverlayDataStore
+import com.krono.app.core.audio.KronoSoundPool
 
 const val NOTIFICATION_ID         = 1
 const val CHANNEL_ID              = "timer_channel"
@@ -52,6 +53,7 @@ class KronoApp : Application() {
         }
 
         createNotificationChannel()
+        KronoSoundPool.init(this)
 
         ToolRegistry.register(StopwatchTool(OverlayDataStore(this), stopwatchViewModel))
         ToolRegistry.register(CountdownTool(countdownViewModel))
@@ -73,5 +75,9 @@ class KronoApp : Application() {
             manager.createNotificationChannel(channel)
         }
     }
-}
 
+    override fun onLowMemory() {
+        super.onLowMemory()
+        KronoSoundPool.release()
+    }
+}

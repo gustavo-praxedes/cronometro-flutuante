@@ -112,15 +112,15 @@ class MainService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStateRe
             ACTION_PLAY -> {
                 if (!checkPermissions()) return START_STICKY
                 viewModelForTarget(targetToolId)?.start()
-                feedbackManager.triggerFeedback(currentConfig)
+                triggerFeedbackFromLatestConfig()
             }
             ACTION_PAUSE -> {
                 handlePause(targetToolId)
-                feedbackManager.triggerFeedback(currentConfig)
+                triggerFeedbackFromLatestConfig()
             }
             ACTION_RESET -> handleReset(targetToolId)
             ACTION_STOP_SERVICE -> closeAndStop()
-            ACTION_SHOW_OVERLAY -> showOverlay(targetToolId)
+            ACTION_SHOW_OVERLAY -> if (checkPermissions()) showOverlay(targetToolId)
             ACTION_HIDE_OVERLAY -> hideOverlay(targetToolId)
             ACTION_START_FOCUS -> if (checkPermissions()) {
                 val focusToolId = targetToolId ?: currentConfig.activeToolId
@@ -128,8 +128,19 @@ class MainService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStateRe
                 KronoNavigator.startFocusMode(this)
             }
             
-            CountdownViewModel.ACTION_COUNTDOWN_PLAY         -> id?.let { countdownManager.play(it) }
-            CountdownViewModel.ACTION_COUNTDOWN_PAUSE        -> id?.let { countdownManager.pause(it) }
+            CountdownViewModel.ACTION_COUNTDOWN_PLAY         -> id?.let {
+                countdownManager.play(it)
+                if (intent.getBooleanExtra(CountdownViewModel.EXTRA_FEEDBACK_HANDLED, false).not()) {
+                    triggerFeedbackFromLatestConfig()
+                }
+                if (currentConfig.focusModeEnabled) KronoNavigator.startFocusMode(this)
+            }
+            CountdownViewModel.ACTION_COUNTDOWN_PAUSE        -> id?.let {
+                countdownManager.pause(it)
+                if (intent.getBooleanExtra(CountdownViewModel.EXTRA_FEEDBACK_HANDLED, false).not()) {
+                    triggerFeedbackFromLatestConfig()
+                }
+            }
             CountdownViewModel.ACTION_COUNTDOWN_RESET        -> id?.let {
                 val alreadyAccumulated = intent.getBooleanExtra(CountdownViewModel.EXTRA_COUNTDOWN_ACCUMULATED, false)
                 if (!alreadyAccumulated) {
@@ -137,7 +148,9 @@ class MainService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStateRe
                 }
                 countdownManager.reset(it)
             }
-            CountdownViewModel.ACTION_COUNTDOWN_OVERLAY_SHOW -> id?.let { countdownManager.showOverlay(it) }
+            CountdownViewModel.ACTION_COUNTDOWN_OVERLAY_SHOW -> if (checkPermissions()) {
+                id?.let { countdownManager.showOverlay(it) }
+            }
             CountdownViewModel.ACTION_COUNTDOWN_OVERLAY_HIDE -> id?.let { countdownManager.hideOverlay(it) }
             CountdownViewModel.ACTION_COUNTDOWN_SYNC         -> id?.let { countdownManager.syncOverlay(it) }
             CountdownViewModel.ACTION_COUNTDOWN_PLUS_ONE     -> id?.let { countdownManager.addOneMinute(it) }
@@ -185,6 +198,7 @@ class MainService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStateRe
     }
 
     private fun showOverlay(toolId: String? = null) {
+        if (!checkPermissions()) return
         serviceScope.launch(Dispatchers.Main.immediate) {
             runCatching {
                 if (activeTool == null) {
@@ -218,17 +232,17 @@ class MainService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStateRe
                     onStart = { 
                         if (checkPermissions()) {
                             overlayViewModel.start()
-                            feedbackManager.triggerFeedback(currentConfig)
+                            triggerFeedbackFromLatestConfig()
                         }
                     },
                     onPause = {
                         overlayViewModel.pause()
-                        feedbackManager.triggerFeedback(currentConfig)
+                        triggerFeedbackFromLatestConfig()
                     },
                     onReset = { overlayViewModel.reset() },
                     onNext = { (overlayViewModel as? com.krono.app.feature.pomodoro.PomodoroViewModel)?.skipPhase() },
                     onClose = { hideOverlay(overlayTool.id) },
-                    onSettings = { KronoNavigator.openSettings(this@MainService) },
+                    onSettings = { KronoNavigator.openTool(this@MainService, overlayTool.id) },
                     onFocusModeStarted = { KronoNavigator.startFocusMode(this@MainService) }
                 )
             }
@@ -241,6 +255,14 @@ class MainService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStateRe
 
     private fun handleReset(toolId: String? = null) {
         viewModelForTarget(toolId)?.reset()
+    }
+
+    private fun triggerFeedbackFromLatestConfig() {
+        serviceScope.launch(Dispatchers.Main.immediate) {
+            val latest = dataStore.configFlow.first()
+            currentConfig = latest
+            feedbackManager.triggerFeedback(latest)
+        }
     }
 
     private fun viewModelForTarget(toolId: String?): ToolViewModel? {
@@ -299,7 +321,7 @@ class MainService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStateRe
         val state = activeViewModel?.toolState?.value as? com.krono.app.feature.stopwatch.StopwatchState 
             ?: com.krono.app.feature.stopwatch.StopwatchState()
             
-        val notification = notificationHelper.buildNotification(state, currentConfig.showHours, currentConfig.showSeconds)
+        val notification = notificationHelper.buildNotification(state, currentConfig.showHours, currentConfig.showMinutes, currentConfig.showSeconds)
         val type = if (Build.VERSION.SDK_INT >= 34) android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE else 0
         
         if (type != 0) startForeground(NOTIFICATION_ID, notification, type)
@@ -318,7 +340,7 @@ class MainService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStateRe
                 if (swState != null && lastSwState != null) {
                     val isReset = !swState.isRunning && swState.elapsedMs == 0L
                     if (swState.isRunning != lastSwState.isRunning || swState.isAtLimit != lastSwState.isAtLimit || isReset) {
-                        val n = notificationHelper.buildNotification(swState, currentConfig.showHours, currentConfig.showSeconds)
+                        val n = notificationHelper.buildNotification(swState, currentConfig.showHours, currentConfig.showMinutes, currentConfig.showSeconds)
                         (getSystemService(NOTIFICATION_SERVICE) as android.app.NotificationManager).notify(NOTIFICATION_ID, n)
                     }
                 }
@@ -334,7 +356,7 @@ class MainService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStateRe
                 currentConfig = config
                 if (!config.focusModeEnabled) {
                     sendBroadcast(Intent(ACTION_FOCUS_DISMISSED).apply { `package` = packageName })
-                } else if (focusTrigger && (activeViewModel?.toolState?.value?.isRunning == true) && overlayManager.overlayVisible) {
+                } else if (focusTrigger && isAnyToolRunning()) {
                     KronoNavigator.startFocusMode(this@MainService)
                 }
             }
@@ -346,6 +368,7 @@ class MainService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStateRe
             dataStore.configFlow.collect { config ->
                 wakeLockManager.applyWakeLock(config.keepScreenOn)
                 overlayManager.applyKeepScreenOn(config.keepScreenOn)
+                countdownManager.applyKeepScreenOn(config.keepScreenOn)
             }
         }
     }
@@ -356,12 +379,17 @@ class MainService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStateRe
             activeViewModel?.toolState?.collect { state ->
                 val started = !wasRunning && state.isRunning
                 wasRunning = state.isRunning
-                if (started && currentConfig.focusModeEnabled && overlayManager.overlayVisible) {
+                if (started && currentConfig.focusModeEnabled) {
                     KronoNavigator.startFocusMode(this@MainService)
                 }
             }
         }
     }
+
+    private fun isAnyToolRunning(): Boolean =
+        ToolRegistry.getAllTools().any { tool ->
+            tool.id != "countdown" && tool.viewModel.toolState.value.isRunning
+        } || countdownManager.hasRunningTimer()
 
     private fun observeTimerLimit() {
         serviceScope.launch { activeViewModel?.toolState?.collect { if (it.isAtLimit) hideOverlay() } }

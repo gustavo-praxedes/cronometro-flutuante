@@ -44,6 +44,22 @@ fun UpdatesPanel(
     updateInfo: UpdateInfo,
     modifier: Modifier = Modifier
 ) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = KronoTokens.Settings.panelHorizontalInset)
+    ) {
+        Spacer(Modifier.height(KronoTokens.Settings.panelTopSpacing))
+        UpdatesPanelContent(updateInfo = updateInfo)
+        Spacer(Modifier.weight(1f))
+    }
+}
+
+@Composable
+fun UpdatesPanelContent(
+    updateInfo: UpdateInfo,
+    modifier: Modifier = Modifier
+) {
     val context = androidx.compose.ui.platform.LocalContext.current
     val scope = rememberCoroutineScope()
 
@@ -76,13 +92,7 @@ fun UpdatesPanel(
         }
     }
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(horizontal = KronoTokens.Settings.panelHorizontalInset)
-    ) {
-        Spacer(Modifier.height(KronoTokens.Settings.panelTopSpacing))
-
+    Column(modifier = modifier.fillMaxWidth()) {
         Surface(
             shape = KronoTokens.Shape.progressBar,
             color = if (hasNewVersion) {
@@ -120,9 +130,6 @@ fun UpdatesPanel(
                 }
             }
         }
-
-        Spacer(Modifier.weight(1f))
-
         Button(
             onClick = {
                 when {

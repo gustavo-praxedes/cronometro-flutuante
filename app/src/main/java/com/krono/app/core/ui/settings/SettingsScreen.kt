@@ -1,23 +1,31 @@
 ﻿package com.krono.app.core.ui.settings
 
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.ui.zIndex
+import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.*
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.material3.*
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.sp
 import com.krono.app.R
 import com.krono.app.core.data.OverlayConfig
@@ -27,32 +35,37 @@ import com.krono.app.core.ui.theme.KronoTokens
 import com.krono.app.core.util.UpdateInfo
 
 private val SettingsHeaderControlSize = 48.dp
+private val SettingsHeaderIconSize = 24.dp
 private val SettingsHeaderGap = 8.dp
+private const val SettingsPanelSlideDurationMs = 100
+private const val SettingsPanelFadeDurationMs = 250
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
 fun SettingsScreen(
     dataStore         : OverlayDataStore,
     pendingUpdateInfo : UpdateInfo?,
     isServiceRunning  : () -> Boolean,
+    isAnyToolRunning  : () -> Boolean,
     onStartFocusMode  : () -> Unit,
     onShowOverlay     : () -> Unit,
     onBack            : () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val config      = dataStore.configFlow.collectAsState(initial = OverlayConfig()).value
+    val config = dataStore.configFlow.collectAsState<OverlayConfig, OverlayConfig?>(initial = null).value ?: return
     val scope       = rememberCoroutineScope()
 
     var selectedDestination by remember { mutableStateOf<SettingsDestination?>(null) }
     var updateInfo by remember { mutableStateOf<UpdateInfo?>(pendingUpdateInfo) }
 
     val configuration = LocalConfiguration.current
-    val isWideScreen = configuration.screenWidthDp >= 600
-
-    LaunchedEffect(isWideScreen) {
-        if (isWideScreen && selectedDestination == null) {
-            selectedDestination = SettingsDestination.Appearance
-        }
+    val activity = LocalContext.current.findActivity()
+    val widthClass = activity?.let { calculateWindowSizeClass(it).widthSizeClass }
+    val isWideScreen = when (widthClass) {
+        WindowWidthSizeClass.Expanded,
+        WindowWidthSizeClass.Medium -> true
+        WindowWidthSizeClass.Compact -> false
+        else -> configuration.screenWidthDp >= 600
     }
 
     LaunchedEffect(pendingUpdateInfo) {
@@ -68,6 +81,7 @@ fun SettingsScreen(
             onDestinationSelected = { selectedDestination = it },
             updateInfo = updateInfo,
             isServiceRunning = isServiceRunning,
+            isAnyToolRunning = isAnyToolRunning,
             onStartFocusMode = onStartFocusMode,
             onBack = onBack,
             modifier = modifier
@@ -82,13 +96,14 @@ fun SettingsScreen(
             onBack = onBack,
             updateInfo = updateInfo,
             isServiceRunning = isServiceRunning,
+            isAnyToolRunning = isAnyToolRunning,
             onStartFocusMode = onStartFocusMode,
             modifier = modifier
         )
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
 private fun WideScreenLayout(
     config: OverlayConfig,
@@ -98,6 +113,7 @@ private fun WideScreenLayout(
     onDestinationSelected: (SettingsDestination?) -> Unit,
     updateInfo: UpdateInfo?,
     isServiceRunning: () -> Boolean,
+    isAnyToolRunning: () -> Boolean,
     onStartFocusMode: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier
@@ -111,7 +127,7 @@ private fun WideScreenLayout(
             // Menu rail
             Surface(
                 modifier = Modifier
-                    .weight(0.35f)
+                    .weight(0.40f)
                     .fillMaxHeight(),
                 color = MaterialTheme.colorScheme.surface,
                 tonalElevation = 0.dp
@@ -124,7 +140,7 @@ private fun WideScreenLayout(
                             .fillMaxWidth()
                             .height(SettingsHeaderControlSize)
                             .padding(
-                                start = KronoTokens.Settings.panelHorizontalInset,
+                                start = KronoTokens.Settings.panelHorizontalInset - ((SettingsHeaderControlSize - SettingsHeaderIconSize) / 2),
                                 end = KronoTokens.Settings.panelHorizontalInset
                             ),
                         verticalAlignment = Alignment.CenterVertically
@@ -139,7 +155,8 @@ private fun WideScreenLayout(
                             ) {
                                 Icon(
                                     imageVector = KronoIcons.Navigation.Back,
-                                    contentDescription = stringResource(R.string.action_back)
+                                    contentDescription = stringResource(R.string.action_back),
+                                    modifier = Modifier.size(SettingsHeaderIconSize)
                                 )
                             }
                         }
@@ -160,6 +177,7 @@ private fun WideScreenLayout(
                         selectedDestination = selectedDestination,
                         onDestinationSelected = { onDestinationSelected(it) },
                         hasPendingUpdate = updateInfo != null,
+                        compactItems = true,
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxWidth()
@@ -176,92 +194,83 @@ private fun WideScreenLayout(
             // Detail panel
             Column(
                 modifier = Modifier
-                    .weight(0.65f)
+                    .weight(0.60f)
                     .fillMaxHeight()
             ) {
-                // Sticky header - mesma baseline vertical do painel esquerdo
-                if (selectedDestination != null) {
-                    Spacer(Modifier.height(KronoTokens.Settings.stickyHeaderTop))
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(SettingsHeaderControlSize)
-                            .padding(
-                                start = KronoTokens.Settings.panelHorizontalInset,
-                                end = KronoTokens.Settings.panelHorizontalInset
-                            ),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = stringResource(selectedDestination.titleRes),
-                            style = MaterialTheme.typography.titleLarge.copy(
-                                fontSize = KronoTokens.Typography.dialogTitle
-                            ),
-                            fontWeight = FontWeight.Normal,
-                            color = MaterialTheme.colorScheme.onSurface,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    }
-                }
-
-                if (selectedDestination == null) {
-                    // Empty state
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally
+                AnimatedContent(
+                    targetState = selectedDestination,
+                    transitionSpec = {
+                        settingsPanelContentTransition(forward = targetState != null)
+                    },
+                    label = "panel-transition",
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clipToBounds()
+                ) { destination ->
+                    if (destination == null) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
                         ) {
-                            Icon(
-                                imageVector = KronoIcons.Action.Settings,
-                                contentDescription = null,
-                                modifier = Modifier.size(KronoTokens.StateIcon.emptyLarge),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = KronoTokens.Settings.emptyStateIconAlpha)
-                            )
-                            Spacer(modifier = Modifier.height(KronoTokens.Spacing.lg))
-                            Text(
-                                text = stringResource(R.string.settings_select_category),
-                                style = MaterialTheme.typography.bodyLarge.copy(
-                                    fontSize = KronoTokens.Typography.bodyText
-                                ),
-                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = KronoTokens.Settings.emptyStateTextAlpha)
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Icon(
+                                    imageVector = KronoIcons.Action.Settings,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(KronoTokens.StateIcon.emptyLarge),
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = KronoTokens.Settings.emptyStateIconAlpha)
+                                )
+                                Spacer(modifier = Modifier.height(KronoTokens.Spacing.lg))
+                                Text(
+                                    text = stringResource(R.string.settings_select_category),
+                                    style = MaterialTheme.typography.bodyLarge.copy(
+                                        fontSize = KronoTokens.Typography.bodyText
+                                    ),
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = KronoTokens.Settings.emptyStateTextAlpha)
+                                )
+                            }
+                        }
+                    } else {
+                        Column(Modifier.fillMaxSize()) {
+                            Spacer(Modifier.height(KronoTokens.Settings.stickyHeaderTop))
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(SettingsHeaderControlSize)
+                                    .padding(
+                                        start = KronoTokens.Settings.panelHorizontalInset,
+                                        end = KronoTokens.Settings.panelHorizontalInset
+                                    ),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = stringResource(destination.titleRes),
+                                    style = MaterialTheme.typography.titleLarge.copy(
+                                        fontSize = KronoTokens.Typography.dialogTitle
+                                    ),
+                                    fontWeight = FontWeight.Normal,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
+                            SettingsPanelHost(
+                                destination = destination,
+                                config = config,
+                                dataStore = dataStore,
+                                scope = scope,
+                                totalLifetimeMs = config.totalLifetimeMs,
+                                pendingUpdateInfo = updateInfo,
+                                isServiceRunning = isServiceRunning,
+                                isAnyToolRunning = isAnyToolRunning,
+                                onStartFocusMode = onStartFocusMode,
+                                onSupportClick = {},
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxWidth()
                             )
                         }
-                    }
-                } else {
-                    AnimatedContent(
-                        targetState = selectedDestination,
-                        transitionSpec = {
-                            (slideInHorizontally(
-                                animationSpec = tween(KronoTokens.Animation.slideDurationMs),
-                                initialOffsetX = { it / 2 }
-                            ) + fadeIn(animationSpec = tween(KronoTokens.Animation.fadeDurationMs)))
-                                .togetherWith(
-                                    slideOutHorizontally(
-                                        animationSpec = tween(KronoTokens.Animation.slideDurationMs),
-                                        targetOffsetX = { -it / 2 }
-                                    ) + fadeOut(animationSpec = tween(KronoTokens.Animation.fadeDurationMs))
-                                )
-                        },
-                        label = "panel-transition",
-                        modifier = Modifier.fillMaxSize()
-                    ) { destination ->
-                        SettingsPanelHost(
-                            destination = destination,
-                            config = config,
-                            dataStore = dataStore,
-                            scope = scope,
-                            totalLifetimeMs = config.totalLifetimeMs,
-                            pendingUpdateInfo = updateInfo,
-                            isServiceRunning = isServiceRunning,
-                            onStartFocusMode = onStartFocusMode,
-                            onSupportClick = {},
-                            onShowChangelog = { onDestinationSelected(SettingsDestination.Changelog) },
-                            onUpdateAvailable = { onDestinationSelected(SettingsDestination.Changelog) },
-                            modifier = Modifier.fillMaxSize()
-                        )
                     }
                 }
             }
@@ -269,7 +278,7 @@ private fun WideScreenLayout(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
 private fun NarrowScreenLayout(
     config: OverlayConfig,
@@ -280,6 +289,7 @@ private fun NarrowScreenLayout(
     onBack: () -> Unit,
     updateInfo: UpdateInfo?,
     isServiceRunning: () -> Boolean,
+    isAnyToolRunning: () -> Boolean,
     onStartFocusMode: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -304,14 +314,18 @@ private fun NarrowScreenLayout(
                             } else {
                                 onBack()
                             }
-                        }
+                        },
+                        modifier = Modifier.padding(
+                            start = KronoTokens.Settings.panelHorizontalInset - ((SettingsHeaderControlSize - SettingsHeaderIconSize) / 2)
+                        )
                     ) {
                         Icon(
                             imageVector = if (selectedDestination != null)
                                 KronoIcons.Navigation.Back
                             else
                                 KronoIcons.Navigation.Back,
-                            contentDescription = stringResource(R.string.action_back)
+                            contentDescription = stringResource(R.string.action_back),
+                            modifier = Modifier.size(SettingsHeaderIconSize)
                         )
                     }
                 },
@@ -325,34 +339,13 @@ private fun NarrowScreenLayout(
         AnimatedContent(
             targetState = selectedDestination,
             transitionSpec = {
-                if (targetState != null) {
-                    (slideInHorizontally(
-                        animationSpec = tween(KronoTokens.Animation.slideDurationMs),
-                        initialOffsetX = { it }
-                    ) + fadeIn(animationSpec = tween(KronoTokens.Animation.fadeDurationMs)))
-                        .togetherWith(
-                            slideOutHorizontally(
-                                animationSpec = tween(KronoTokens.Animation.slideDurationMs),
-                                targetOffsetX = { -it }
-                            ) + fadeOut(animationSpec = tween(KronoTokens.Animation.fadeDurationMs))
-                        )
-                } else {
-                    (slideInHorizontally(
-                        animationSpec = tween(KronoTokens.Animation.slideDurationMs),
-                        initialOffsetX = { -it }
-                    ) + fadeIn(animationSpec = tween(KronoTokens.Animation.fadeDurationMs)))
-                        .togetherWith(
-                            slideOutHorizontally(
-                                animationSpec = tween(KronoTokens.Animation.slideDurationMs),
-                                targetOffsetX = { it }
-                            ) + fadeOut(animationSpec = tween(KronoTokens.Animation.fadeDurationMs))
-                        )
-                }
+                settingsPanelContentTransition(forward = targetState != null)
             },
             label = "menu-panel-transition",
             modifier = modifier
                 .fillMaxSize()
                 .padding(paddingValues)
+                .clipToBounds()
         ) { destination ->
             if (destination != null) {
                 SettingsPanelHost(
@@ -363,10 +356,9 @@ private fun NarrowScreenLayout(
                     totalLifetimeMs = config.totalLifetimeMs,
                     pendingUpdateInfo = updateInfo,
                     isServiceRunning = isServiceRunning,
+                    isAnyToolRunning = isAnyToolRunning,
                     onStartFocusMode = onStartFocusMode,
                     onSupportClick = {},
-                    onShowChangelog = { onDestinationSelected(SettingsDestination.Changelog) },
-                    onUpdateAvailable = { onDestinationSelected(SettingsDestination.Changelog) },
                     modifier = Modifier.fillMaxSize()
                 )
             } else {
@@ -381,4 +373,45 @@ private fun NarrowScreenLayout(
     }
 }
 
+private fun settingsPanelContentTransition(forward: Boolean): ContentTransform {
+    val slideSpec = tween<IntOffset>(SettingsPanelSlideDurationMs)
+    val fadeInSpec = tween<Float>(SettingsPanelFadeDurationMs)
+    val fadeOutSpec = tween<Float>(SettingsPanelFadeDurationMs)
+    val enter = if (forward) {
+        slideInHorizontally(
+            animationSpec = slideSpec,
+            initialOffsetX = { -it }
+        )
+    } else {
+        slideInHorizontally(
+            animationSpec = slideSpec,
+            initialOffsetX = { it }
+        )
+    }
+    val exit = if (forward) {
+        slideOutHorizontally(
+            animationSpec = slideSpec,
+            targetOffsetX = { it }
+        )
+    } else {
+        slideOutHorizontally(
+            animationSpec = slideSpec,
+            targetOffsetX = { -it }
+        )
+    }
+    return ContentTransform(
+        targetContentEnter = enter + fadeIn(animationSpec = fadeInSpec),
+        initialContentExit = exit + fadeOut(animationSpec = fadeOutSpec),
+        targetContentZIndex = 1f,
+        sizeTransform = null
+    )
+}
+
+
+
+private tailrec fun Context.findActivity(): Activity? = when (this) {
+    is Activity -> this
+    is ContextWrapper -> baseContext.findActivity()
+    else -> null
+}
 

@@ -25,7 +25,7 @@ import com.krono.app.core.ui.theme.timerFontFamily
 import com.krono.app.core.data.TimerDisplayFormat
 import com.krono.app.core.data.formatSecondsByPattern
 import androidx.compose.ui.platform.LocalContext
-import com.krono.app.core.util.KronoToolAudio
+import com.krono.app.core.audio.SoundTimingPolicy
 import com.krono.app.core.util.triggerPlayPauseFeedback
 import kotlinx.coroutines.delay
 
@@ -42,20 +42,18 @@ fun PomodoroScreen(
     customFocusMinutes: Int = 25,
     customBreakMinutes: Int = 5,
     customCycles: Int = 4,
+    showHours: Boolean = true,
+    showMinutes: Boolean = true,
+    showSeconds: Boolean = true,
+    showMilliseconds: Boolean = false,
     playPauseBeepEnabled: Boolean = false,
-    playPauseVibrationEnabled: Boolean = false,
+    playPauseVibrationEnabled: Boolean = true,
     playPauseVolume: Float = 0.8f,
-    phaseBeepEnabled: Boolean = false,
-    focusAlertEnabled: Boolean = true,
-    breakAlertEnabled: Boolean = true,
-    tickingSoundEnabled: Boolean = false,
-    tickVolume: Float = 0.35f,
-    focusAlertVolume: Float = 0.9f,
-    breakAlertVolume: Float = 0.9f,
-    tickSoundType: String = "TICK_A",
-    focusAlertSoundType: String = "FOCUS_A",
-    breakAlertSoundType: String = "BREAK_A",
+    playPauseSoundType: String = "krono_tip_complete",
     autoStartNextCycle: Boolean = true,
+    focusModeEnabled: Boolean = false,
+    onStartFocusMode: () -> Unit = {},
+    openOverlayOnPlay: Boolean = false,
     onOpenOverlay: () -> Unit
 ) {
     val context = LocalContext.current
@@ -63,6 +61,9 @@ fun PomodoroScreen(
     val isRunning = state.isRunning
     val format = TimerDisplayFormat.fromKey(timeFormat)
     val phaseLabel = state.phaseLabel
+    val soundProfile = SoundTimingPolicy.profile(playPauseSoundType)
+    val soundStartDelayMs = soundProfile.startDelayMs
+    val soundMaxLifetimeMs = soundProfile.maxLifetimeMs
     var flashColor by remember { mutableStateOf<Color?>(null) }
     val displayBg by animateColorAsState(
         targetValue = flashColor ?: Color.Transparent,
@@ -158,14 +159,31 @@ fun PomodoroScreen(
 
                 FilledIconButton(
                     onClick = {
-                        triggerPlayPauseFeedback(
-                            context,
-                            playPauseBeepEnabled,
-                            playPauseVibrationEnabled,
-                            playPauseVolume,
-                            KronoToolAudio.POMODORO
-                        )
-                        if (isRunning) viewModel.pause() else viewModel.start()
+                        if (isRunning) {
+                            viewModel.pause()
+                            triggerPlayPauseFeedback(
+                                context,
+                                playPauseBeepEnabled,
+                                playPauseVibrationEnabled,
+                                playPauseVolume,
+                                playPauseSoundType,
+                                soundStartDelayMs,
+                                soundMaxLifetimeMs
+                            )
+                        } else {
+                            triggerPlayPauseFeedback(
+                                context,
+                                playPauseBeepEnabled,
+                                playPauseVibrationEnabled,
+                                playPauseVolume,
+                                playPauseSoundType,
+                                soundStartDelayMs,
+                                soundMaxLifetimeMs
+                            )
+                            viewModel.start()
+                            if (openOverlayOnPlay) onOpenOverlay()
+                            if (focusModeEnabled) onStartFocusMode()
+                        }
                     },
                     shape = CircleShape,
                     modifier = Modifier.size(80.dp),
