@@ -17,8 +17,6 @@ internal fun upsertPreset(
     return mapped.sortedBy {
         when (it.id) {
             PomodoroPresetCatalog.DEFAULT_ID -> 0
-            PomodoroPresetCatalog.LONG_ID -> 1
-            PomodoroPresetCatalog.SHORT_ID -> 2
             else -> 100
         }
     }

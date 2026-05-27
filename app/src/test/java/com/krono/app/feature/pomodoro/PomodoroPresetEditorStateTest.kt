@@ -16,7 +16,7 @@ class PomodoroPresetEditorStateTest {
 
         state.addGroup()
 
-        assertTrue(state.canSave)
+        assertFalse(state.canSave)
     }
 
     @Test
@@ -36,7 +36,7 @@ class PomodoroPresetEditorStateTest {
                 name = "Mover",
                 cycles = 1,
                 items = listOf(
-                    PomodoroPresetCatalog.defaultCard(1),
+                    validCard("p1"),
                     PomodoroPresetItem.Group("g1", "Grupo", 1, emptyList())
                 )
             )
@@ -60,7 +60,7 @@ class PomodoroPresetEditorStateTest {
                         id = "g1",
                         label = "Grupo",
                         cycles = 1,
-                        phases = listOf(PomodoroPresetCatalog.defaultCard(1).phase)
+                        phases = listOf(validCard("p1").phase)
                     )
                 )
             )
@@ -84,7 +84,7 @@ class PomodoroPresetEditorStateTest {
                         id = "g1",
                         label = "Grupo",
                         cycles = 1,
-                        phases = listOf(PomodoroPresetCatalog.defaultCard(1).phase)
+                        phases = listOf(validCard("p1").phase)
                     )
                 )
             )
@@ -95,15 +95,131 @@ class PomodoroPresetEditorStateTest {
         assertEquals(listOf("p1"), (state.items.first() as PomodoroPresetItem.Group).phases.map { it.id })
     }
 
+    @Test
+    fun `save keeps root card only`() {
+        val state = PomodoroPresetEditorState(
+            PomodoroPresetConfig(
+                id = "USR_1",
+                name = "Card",
+                cycles = 1,
+                items = listOf(validCard("p1"))
+            )
+        )
+
+        val saved = state.toPresetConfig(
+            PomodoroPresetConfig(id = "USR_1", name = "Card", cycles = 1, items = emptyList())
+        )
+
+        assertTrue(state.canSave)
+        assertEquals(1, saved.items.size)
+        assertTrue(saved.items.first() is PomodoroPresetItem.Card)
+    }
+
+    @Test
+    fun `new cards start invalid and unsavable until configured`() {
+        val state = PomodoroPresetEditorState(
+            PomodoroPresetConfig(id = "USR_1", name = "Novo", cycles = 1, items = emptyList())
+        )
+
+        state.addCard(PomodoroPresetCatalog.DEFAULT_NEW_CARD_COLOR)
+
+        val card = state.items.first() as PomodoroPresetItem.Card
+        assertEquals(PomodoroPresetCatalog.NEW_CARD_LABEL, card.phase.label)
+        assertEquals(0L, card.phase.totalSeconds)
+        assertFalse(state.canSave)
+    }
+
+    @Test
+    fun `save drops empty group and blocks group only preset`() {
+        val state = PomodoroPresetEditorState(
+            PomodoroPresetConfig(
+                id = "USR_1",
+                name = "Grupo",
+                cycles = 1,
+                items = listOf(PomodoroPresetItem.Group("g1", "Grupo", 1, emptyList()))
+            )
+        )
+
+        val saved = state.toPresetConfig(
+            PomodoroPresetConfig(id = "USR_1", name = "Grupo", cycles = 1, items = emptyList())
+        )
+
+        assertFalse(state.canSave)
+        assertTrue(saved.items.isEmpty())
+    }
+
+    @Test
+    fun `save drops empty group and keeps external card`() {
+        val state = PomodoroPresetEditorState(
+            PomodoroPresetConfig(
+                id = "USR_1",
+                name = "Misturado",
+                cycles = 1,
+                items = listOf(
+                    PomodoroPresetItem.Group("g1", "Grupo", 1, emptyList()),
+                    validCard("p1")
+                )
+            )
+        )
+
+        val saved = state.toPresetConfig(
+            PomodoroPresetConfig(id = "USR_1", name = "Misturado", cycles = 1, items = emptyList())
+        )
+
+        assertTrue(state.canSave)
+        assertEquals(listOf("p1"), saved.items.map { it.id })
+    }
+
+    @Test
+    fun `save keeps group with internal card`() {
+        val state = PomodoroPresetEditorState(
+            PomodoroPresetConfig(
+                id = "USR_1",
+                name = "Grupo",
+                cycles = 1,
+                items = listOf(
+                    PomodoroPresetItem.Group(
+                        id = "g1",
+                        label = "Grupo",
+                        cycles = 1,
+                        phases = listOf(validCard("p1").phase)
+                    )
+                )
+            )
+        )
+
+        val saved = state.toPresetConfig(
+            PomodoroPresetConfig(id = "USR_1", name = "Grupo", cycles = 1, items = emptyList())
+        )
+
+        assertTrue(state.canSave)
+        assertEquals(listOf("g1"), saved.items.map { it.id })
+    }
+
     private fun presetWithCards(): PomodoroPresetConfig =
         PomodoroPresetConfig(
             id = "USR_1",
             name = "Cards",
             cycles = 1,
             items = listOf(
-                PomodoroPresetCatalog.defaultCard(1),
-                PomodoroPresetCatalog.defaultCard(2, isFocus = false),
-                PomodoroPresetCatalog.defaultCard(3)
+                validCard("p1", label = "Foco 1"),
+                validCard("p2", label = "Pausa 1"),
+                validCard("p3", label = "Foco 2")
             )
         )
+
+    private fun validCard(
+        id: String,
+        label: String = "Card",
+        totalSeconds: Long = 60L,
+        color: Int = 0xFF6B7FD4.toInt()
+    ): PomodoroPresetItem.Card = PomodoroPresetItem.Card(
+        PomodoroPhaseConfig(
+            id = id,
+            label = label,
+            totalSeconds = totalSeconds,
+            color = color,
+            soundType = "krono_alm_alarmbeep"
+        )
+    )
 }

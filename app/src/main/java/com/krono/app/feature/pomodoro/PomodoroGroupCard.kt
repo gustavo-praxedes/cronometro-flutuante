@@ -1,6 +1,5 @@
 package com.krono.app.feature.pomodoro
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -81,6 +80,19 @@ internal fun PomodoroGroupCard(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(KronoTokens.Spacing.xs)
             ) {
+                IconButton(
+                    onClick = { expanded = !expanded },
+                    modifier = Modifier.size(KronoTokens.Size.iconBox)
+                ) {
+                    Icon(
+                        imageVector = if (expanded) KronoIcons.Action.ExpandLess else KronoIcons.Action.ExpandMore,
+                        contentDescription = if (expanded) {
+                            stringResource(R.string.pomodoro_group_collapse)
+                        } else {
+                            stringResource(R.string.pomodoro_group_expand)
+                        }
+                    )
+                }
                 if (rootDragDropState != null) {
                     IconButton(
                         onClick = {},
@@ -99,40 +111,59 @@ internal fun PomodoroGroupCard(
                         )
                     }
                 }
-                Text(
-                    text = group.label.ifBlank { stringResource(R.string.pomodoro_group_default_label, rootIndex + 1) },
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.weight(1f)
-                )
+                if (expanded) {
+                    OutlinedTextField(
+                        value = group.label,
+                        onValueChange = { value -> onUpdateGroup(group.copy(label = value.take(50))) },
+                        label = { Text(stringResource(R.string.pomodoro_group_name_label)) },
+                        modifier = Modifier.weight(1f)
+                    )
+                } else {
+                    Text(
+                        text = group.label.ifBlank { stringResource(R.string.pomodoro_group_default_label, rootIndex + 1) },
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
                 IconButton(onClick = onDeleteGroup, modifier = Modifier.size(KronoTokens.Size.iconBox)) {
                     Icon(
                         imageVector = KronoIcons.Action.Delete,
                         contentDescription = stringResource(R.string.action_delete)
                     )
                 }
-                IconButton(onClick = { expanded = !expanded }, modifier = Modifier.size(KronoTokens.Size.iconBox)) {
-                    Icon(
-                        imageVector = if (expanded) KronoIcons.Action.ExpandLess else KronoIcons.Action.ExpandMore,
-                        contentDescription = if (expanded) {
-                            stringResource(R.string.pomodoro_group_collapse)
-                        } else {
-                            stringResource(R.string.pomodoro_group_expand)
-                        }
-                    )
-                }
             }
 
-            AnimatedVisibility(visible = expanded) {
+            if (expanded) {
                 Column(
                     modifier = Modifier.padding(horizontal = KronoTokens.Spacing.sm),
                     verticalArrangement = Arrangement.spacedBy(KronoTokens.Spacing.xs)
                 ) {
-                    OutlinedTextField(
-                        value = group.label,
-                        onValueChange = { value -> onUpdateGroup(group.copy(label = value.take(50))) },
-                        label = { Text(stringResource(R.string.pomodoro_group_name_label)) },
-                        modifier = Modifier.fillMaxWidth()
+                    group.phases.forEachIndexed { index, phase ->
+                        PomodoroPhaseCard(
+                            phase = phase,
+                            index = index,
+                            showDelete = true,
+                            dragDropState = childDragDropState,
+                            onEdit = { onEditPhase(phase) },
+                            onDelete = { onDeletePhase(phase.id) },
+                            modifier = Modifier.padding(horizontal = KronoTokens.Spacing.sm)
+                        )
+                    }
+                    OutlinedButton(
+                        onClick = onAddPhase,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = KronoTokens.Spacing.xs)
+                    ) {
+                        Icon(imageVector = KronoIcons.Action.AddCircle, contentDescription = null)
+                        Text(stringResource(R.string.pomodoro_card_add))
+                    }
+                    Text(
+                        text = stringResource(R.string.pomodoro_section_group_cycles),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(horizontal = KronoTokens.Settings.panelHorizontalInset)
                     )
                     AppearanceSlider(
                         label = stringResource(R.string.pomodoro_group_cycles_inline, group.cycles),
@@ -143,27 +174,6 @@ internal fun PomodoroGroupCard(
                         display = group.cycles.toString(),
                         onChange = { onUpdateGroup(group.copy(cycles = it.toInt().coerceIn(1, 12))) }
                     )
-                    group.phases.forEachIndexed { index, phase ->
-                        SettingsDivider()
-                        PomodoroPhaseCard(
-                            phase = phase,
-                            index = index,
-                            showDelete = true,
-                            dragDropState = childDragDropState,
-                            onEdit = { onEditPhase(phase) },
-                            onDelete = { onDeletePhase(phase.id) },
-                            modifier = Modifier.padding(start = KronoTokens.Spacing.sm)
-                        )
-                    }
-                    OutlinedButton(
-                        onClick = onAddPhase,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 4.dp)
-                    ) {
-                        Icon(imageVector = KronoIcons.Action.AddCircle, contentDescription = null)
-                        Text(stringResource(R.string.pomodoro_card_add))
-                    }
                 }
             }
         }

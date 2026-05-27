@@ -1,7 +1,9 @@
 package com.krono.app.core.ui.settings
 
+import android.content.Context
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.krono.app.R
 import com.krono.app.core.ui.theme.KronoIcons
 
 enum class ItemType(val icon: ImageVector, val iconTint: Color) {
@@ -27,11 +29,11 @@ fun parseChangelog(changelog: String): List<ChangelogItem> {
 
         if (trimmed.startsWith("#")) {
             sectionType = when {
-                trimmed.contains("Novidades", true) || trimmed.contains("✨") -> ItemType.FEAT
-                trimmed.contains("Correções", true) || trimmed.contains("🐛") -> ItemType.FIX
-                trimmed.contains("Performance", true) || trimmed.contains("⚡") -> ItemType.PERF
-                trimmed.contains("Documentação", true) || trimmed.contains("📝") -> ItemType.DOCS
-                trimmed.contains("Manutenção", true) || trimmed.contains("🔧") -> ItemType.CHORE
+                trimmed.contains("Novidades", true) -> ItemType.FEAT
+                trimmed.contains("Correções", true) -> ItemType.FIX
+                trimmed.contains("Performance", true) -> ItemType.PERF
+                trimmed.contains("Documentação", true) -> ItemType.DOCS
+                trimmed.contains("Manutenção", true) -> ItemType.CHORE
                 else -> sectionType
             }
             return@forEach
@@ -63,4 +65,29 @@ fun parseChangelog(changelog: String): List<ChangelogItem> {
         }
     }
     return items
+}
+
+fun readCurrentVersionChangelog(context: Context, versionName: String): String {
+    val raw = runCatching {
+        context.resources.openRawResource(R.raw.changelog)
+            .bufferedReader(Charsets.UTF_8)
+            .use { it.readText() }
+    }.getOrDefault("")
+    return raw.extractVersionSection(versionName.removePrefix("v"))
+}
+
+private fun String.extractVersionSection(versionName: String): String {
+    if (isBlank()) return ""
+    val versionHeading = Regex("^#{1,3}\\s*v?${Regex.escape(versionName)}\\b.*$", RegexOption.IGNORE_CASE)
+    val anyVersionHeading = Regex("^#{1,3}\\s*v?\\d+(?:\\.\\d+){1,3}\\b.*$", RegexOption.IGNORE_CASE)
+    val lines = lines()
+    val start = lines.indexOfFirst { versionHeading.containsMatchIn(it.trim()) }
+    if (start < 0) return this
+
+    val endOffset = lines.drop(start + 1).indexOfFirst { anyVersionHeading.containsMatchIn(it.trim()) }
+    return if (endOffset < 0) {
+        lines.drop(start + 1).joinToString("\n")
+    } else {
+        lines.subList(start + 1, start + 1 + endOffset).joinToString("\n")
+    }
 }

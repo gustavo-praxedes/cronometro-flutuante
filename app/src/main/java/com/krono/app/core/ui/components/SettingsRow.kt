@@ -21,6 +21,7 @@ fun SettingsRow(
     subtitle: String? = null,
     leadingIcon: ImageVector? = null,
     leadingTextIcon: String? = null,
+    leading: @Composable (() -> Unit)? = null,
     iconTint: Color = MaterialTheme.colorScheme.onSurfaceVariant,
     iconContainerColor: Color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f),
     trailing: @Composable (() -> Unit)? = null,
@@ -46,7 +47,9 @@ fun SettingsRow(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(KronoTokens.Spacing.rowInner)
     ) {
-        if (leadingIcon != null || !leadingTextIcon.isNullOrBlank()) {
+        if (leading != null) {
+            leading()
+        } else if (leadingIcon != null || !leadingTextIcon.isNullOrBlank()) {
             Surface(
                 shape = KronoTokens.Shape.iconBox,
                 color = iconContainerColor,

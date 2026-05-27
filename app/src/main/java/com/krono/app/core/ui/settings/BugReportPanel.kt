@@ -18,6 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -25,6 +26,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.krono.app.BuildConfig
 import com.krono.app.R
+import com.krono.app.core.ui.components.SettingsDivider
 import com.krono.app.core.ui.components.SettingsRow
 import com.krono.app.core.ui.theme.KronoIcons
 import com.krono.app.core.ui.theme.KronoTokens
@@ -62,31 +64,45 @@ fun BugReportPanel(modifier: Modifier = Modifier) {
 
 @Composable
 fun BugReportPanelContent(modifier: Modifier = Modifier) {
+    BugReportPanelContent(modifier = modifier, expandable = false)
+}
+
+@Composable
+fun BugReportPanelContent(
+    modifier: Modifier = Modifier,
+    expandable: Boolean
+) {
     val scope = rememberCoroutineScope()
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var message by remember { mutableStateOf("") }
     var messageTouched by remember { mutableStateOf(false) }
     var submitState by remember { mutableStateOf<InlineSubmitState>(InlineSubmitState.Idle) }
+    var hasInputFocus by remember { mutableStateOf(false) }
 
     val emailError = email.isNotBlank() && !EMAIL_REGEX.matches(email)
     val canSubmit = message.isNotBlank() && !emailError && submitState !is InlineSubmitState.Loading
 
-    Column(modifier = modifier) {
-        SettingsGroup(title = stringResource(R.string.bug_report_title)) {
+    val content: @Composable (markInteraction: () -> Unit) -> Unit = { markInteraction ->
+        Column {
             SettingsRow(
                 title = stringResource(R.string.bug_report_title),
                 subtitle = stringResource(R.string.bug_report_dialog_subtitle),
                 leadingIcon = KronoIcons.Status.Bug
             )
+            SettingsDivider()
 
             val inputModifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = KronoTokens.Settings.panelHorizontalInset)
+                .onFocusChanged { hasInputFocus = it.hasFocus }
 
             OutlinedTextField(
                 value = name,
-                onValueChange = { if (it.length <= 50) name = it },
+                onValueChange = {
+                    markInteraction()
+                    if (it.length <= 50) name = it
+                },
                 label = { Text(stringResource(R.string.bug_report_name_optional)) },
                 singleLine = true,
                 modifier = inputModifier,
@@ -96,7 +112,10 @@ fun BugReportPanelContent(modifier: Modifier = Modifier) {
 
             OutlinedTextField(
                 value = email,
-                onValueChange = { if (it.length <= 50) email = it },
+                onValueChange = {
+                    markInteraction()
+                    if (it.length <= 50) email = it
+                },
                 label = { Text(stringResource(R.string.bug_report_email_optional)) },
                 singleLine = true,
                 isError = emailError,
@@ -115,6 +134,7 @@ fun BugReportPanelContent(modifier: Modifier = Modifier) {
             OutlinedTextField(
                 value = message,
                 onValueChange = {
+                    markInteraction()
                     messageTouched = true
                     if (it.length <= 250) message = it
                 },
@@ -142,40 +162,64 @@ fun BugReportPanelContent(modifier: Modifier = Modifier) {
                 )
                 else -> Unit
             }
-        }
 
-        Button(
-            onClick = {
-                scope.launch {
-                    submitState = InlineSubmitState.Loading
-                    val date = SimpleDateFormat("yyyyMMddHHmmss", Locale.US).format(Date())
-                    submitState = submitBugReport(
-                        name = name.trim(),
-                        email = email.trim(),
-                        message = message.trim(),
-                        version = BuildConfig.VERSION_NAME,
-                        date = date
+            Button(
+                onClick = {
+                    markInteraction()
+                    scope.launch {
+                        submitState = InlineSubmitState.Loading
+                        val date = SimpleDateFormat("yyyyMMddHHmmss", Locale.US).format(Date())
+                        submitState = submitBugReport(
+                            name = name.trim(),
+                            email = email.trim(),
+                            message = message.trim(),
+                            version = BuildConfig.VERSION_NAME,
+                            date = date
+                        )
+                    }
+                },
+                enabled = canSubmit,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = KronoTokens.Settings.panelHorizontalInset)
+                    .height(KronoTokens.Button.height),
+                shape = KronoTokens.Shape.button
+            ) {
+                if (submitState is InlineSubmitState.Loading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.height(KronoTokens.Component.buttonSpinner),
+                        strokeWidth = 2.dp,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                    Text(stringResource(R.string.bug_report_sending))
+                } else {
+                    Text(
+                        text = stringResource(R.string.bug_report_send_button),
+                        textAlign = TextAlign.Center
                     )
                 }
+            }
+            Spacer(Modifier.height(KronoTokens.Settings.panelSectionGap))
+        }
+    }
+
+    if (expandable) {
+        ExpandableSettingsGroup(
+            title = stringResource(R.string.bug_report_title),
+            keepExpanded = hasInputFocus || submitState is InlineSubmitState.Loading,
+            collapsedContent = {
+                SettingsRow(
+                    title = stringResource(R.string.bug_report_title),
+                    subtitle = stringResource(R.string.bug_report_dialog_subtitle),
+                    leadingIcon = KronoIcons.Status.Bug
+                )
             },
-            enabled = canSubmit,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(KronoTokens.Button.height),
-            shape = KronoTokens.Shape.button
-        ) {
-            if (submitState is InlineSubmitState.Loading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.height(KronoTokens.Component.buttonSpinner),
-                    strokeWidth = 2.dp,
-                    color = MaterialTheme.colorScheme.onPrimary
-                )
-                Text(stringResource(R.string.bug_report_sending))
-            } else {
-                Text(
-                    text = stringResource(R.string.bug_report_send_button),
-                    textAlign = TextAlign.Center
-                )
+            expandedContent = content
+        )
+    } else {
+        Column(modifier = modifier) {
+            SettingsGroup(title = stringResource(R.string.bug_report_title)) {
+                content {}
             }
         }
     }

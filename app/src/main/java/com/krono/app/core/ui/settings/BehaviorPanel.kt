@@ -1,5 +1,6 @@
 ﻿package com.krono.app.core.ui.settings
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
@@ -37,14 +38,14 @@ fun BehaviorPanel(
                 subtitle = stringResource(R.string.behavior_auto_launch_subtitle),
                 checked = config.autoLaunch,
                 leadingIcon = KronoIcons.Feature.Timer,
-                onChange = {
+                onChange = { enabled ->
                     scope.launch {
-                        dataStore.updateConfig(
-                            config.copy(
-                                autoLaunch = it,
-                                directLaunchToolId = config.directLaunchToolId.ifBlank { config.activeToolId }
+                        dataStore.updateConfig { current ->
+                            current.copy(
+                                autoLaunch = enabled,
+                                directLaunchToolId = current.directLaunchToolId.ifBlank { current.activeToolId }
                             )
-                        )
+                        }
                     }
                 }
             )
@@ -53,11 +54,12 @@ fun BehaviorPanel(
                 KronoDropdown(
                     value = config.directLaunchToolId,
                     onValueChange = { toolId ->
-                        scope.launch { dataStore.updateConfig(config.copy(directLaunchToolId = toolId)) }
+                        scope.launch { dataStore.updateConfig { it.copy(directLaunchToolId = toolId) } }
                     },
                     options = listOf("stopwatch", "countdown", "pomodoro"),
                     label = stringResource(R.string.behavior_direct_launch_tool_label),
                     leadingIcon = KronoIcons.Feature.Overlay,
+                    modifier = Modifier.padding(start = KronoTokens.Spacing.xl),
                     textMapping = { toolId ->
                         when (toolId) {
                             "countdown" -> countdownLabel
@@ -74,7 +76,7 @@ fun BehaviorPanel(
                 checked = config.openOverlayOnPlay,
                 leadingIcon = KronoIcons.Feature.Overlay,
                 onChange = { enabled ->
-                    scope.launch { dataStore.updateConfig(config.copy(openOverlayOnPlay = enabled)) }
+                    scope.launch { dataStore.updateConfig { it.copy(openOverlayOnPlay = enabled) } }
                 }
             )
             SettingsDivider()
@@ -84,7 +86,7 @@ fun BehaviorPanel(
                 checked = config.allSoundsEnabled,
                 leadingIcon = if (config.allSoundsEnabled) KronoIcons.Action.Notification else KronoIcons.Action.NotificationOff,
                 onChange = { enabled ->
-                    scope.launch { dataStore.updateConfig(config.copy(allSoundsEnabled = enabled)) }
+                    scope.launch { dataStore.updateConfig { it.copy(allSoundsEnabled = enabled) } }
                 }
             )
             SettingsDivider()
@@ -93,8 +95,8 @@ fun BehaviorPanel(
                 subtitle = stringResource(R.string.behavior_keep_screen_subtitle),
                 checked = config.keepScreenOn,
                 leadingIcon = KronoIcons.Action.Light,
-                onChange = {
-                    scope.launch { dataStore.updateConfig(config.copy(keepScreenOn = it)) }
+                onChange = { enabled ->
+                    scope.launch { dataStore.updateConfig { it.copy(keepScreenOn = enabled) } }
                 }
             )
 
@@ -106,10 +108,23 @@ fun BehaviorPanel(
                 checked = config.focusModeEnabled,
                 leadingIcon = KronoIcons.Action.Focus,
                 onChange = { isEnabled ->
-                    scope.launch { dataStore.updateConfig(config.copy(focusModeEnabled = isEnabled)) }
+                    scope.launch { dataStore.updateConfig { it.copy(focusModeEnabled = isEnabled) } }
                     if (isEnabled && isAnyToolRunning()) onStartFocusMode()
                 }
             )
+            if (config.focusModeEnabled) {
+                SettingsDivider()
+                ToggleRow(
+                    label = stringResource(R.string.pomodoro_dnd_label),
+                    subtitle = stringResource(R.string.pomodoro_dnd_subtitle),
+                    checked = config.pomodoroDndDuringFocus,
+                    leadingIcon = KronoIcons.Action.Focus,
+                    modifier = Modifier.padding(start = KronoTokens.Spacing.xl),
+                    onChange = { enabled ->
+                        scope.launch { dataStore.updateConfig { it.copy(pomodoroDndDuringFocus = enabled) } }
+                    }
+                )
+            }
         }
     }
 }

@@ -12,10 +12,10 @@ class PomodoroPresetEditorState(initialPreset: PomodoroPresetConfig) {
     val items = mutableStateListOf<PomodoroPresetItem>().apply { addAll(initialPreset.items) }
 
     val canSave: Boolean
-        get() = items.isNotEmpty()
+        get() = sanitizedItemsForSave().isNotEmpty()
 
-    fun addCard() {
-        items.add(PomodoroPresetCatalog.defaultCard(nextPhaseIndex()).withPhaseId(nextPhaseId()))
+    fun addCard(defaultColor: Int) {
+        items.add(PomodoroPresetCatalog.defaultCard(nextPhaseIndex(), defaultColor).withPhaseId(nextPhaseId()))
     }
 
     fun addGroup() {
@@ -32,9 +32,13 @@ class PomodoroPresetEditorState(initialPreset: PomodoroPresetConfig) {
         items.add(toIndex.coerceIn(0, items.size), item)
     }
 
-    fun addPhaseToGroup(groupId: String) {
+    fun addPhaseToGroup(groupId: String, defaultColor: Int) {
         updateGroupById(groupId) { group ->
-            group.copy(phases = group.phases + PomodoroPresetCatalog.defaultCard(nextPhaseIndex()).phase.copy(id = nextPhaseId()))
+            group.copy(
+                phases = group.phases + PomodoroPresetCatalog.defaultCard(nextPhaseIndex(), defaultColor)
+                    .phase
+                    .copy(id = nextPhaseId())
+            )
         }
     }
 
@@ -96,8 +100,19 @@ class PomodoroPresetEditorState(initialPreset: PomodoroPresetConfig) {
         original.copy(
             name = name.trim().ifBlank { original.name }.take(50),
             cycles = cycles.coerceIn(1, 12),
-            items = items.toList()
+            items = sanitizedItemsForSave()
         )
+
+    private fun sanitizedItemsForSave(): List<PomodoroPresetItem> =
+        items.mapNotNull { item ->
+            when (item) {
+                is PomodoroPresetItem.Card -> item.takeIf { it.phase.totalSeconds > 0L }
+                is PomodoroPresetItem.Group -> {
+                    item.copy(phases = item.phases.filter { it.totalSeconds > 0L })
+                        .takeIf { it.phases.isNotEmpty() }
+                }
+            }
+        }
 
     private fun updateGroupById(groupId: String, transform: (PomodoroPresetItem.Group) -> PomodoroPresetItem.Group) {
         val index = items.indexOfFirst { it is PomodoroPresetItem.Group && it.id == groupId }

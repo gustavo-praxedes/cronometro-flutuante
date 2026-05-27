@@ -24,6 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.krono.app.BuildConfig
 import com.krono.app.R
 import com.krono.app.core.ui.components.ScrollFadeContainer
 import com.krono.app.core.ui.components.SettingsDivider
@@ -85,16 +86,19 @@ fun SettingsMenuPanel(
     }
 
     val scrollState = rememberScrollState()
-    ScrollFadeContainer(
-        canScrollForward = scrollState.canScrollForward,
-        modifier = modifier
-    ) {
-        Column(
+    Column(modifier = modifier.fillMaxSize()) {
+        ScrollFadeContainer(
+            canScrollForward = scrollState.canScrollForward,
             modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(scrollState)
+                .weight(1f)
+                .fillMaxWidth()
         ) {
-        Spacer(Modifier.height(KronoTokens.Settings.panelTopSpacing))
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(scrollState)
+            ) {
+            Spacer(Modifier.height(KronoTokens.Settings.panelTopSpacing))
 
         // ── Search Bar ────────────────────────────────────────
         SettingsSearchBar(
@@ -187,8 +191,21 @@ fun SettingsMenuPanel(
             }
         }
 
-            Spacer(Modifier.height(KronoTokens.Settings.panelBottomSpacing))
+                Spacer(Modifier.height(KronoTokens.Settings.panelBottomSpacing))
+            }
         }
+
+        Text(
+            text = stringResource(R.string.settings_version_footer, BuildConfig.VERSION_NAME.removePrefix("v")),
+            style = MaterialTheme.typography.labelSmall.copy(fontSize = KronoTokens.Typography.statusLabel),
+            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = KronoTokens.Alpha.medium),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    horizontal = KronoTokens.Settings.panelHorizontalInset,
+                    vertical = KronoTokens.Spacing.sm
+                )
+        )
     }
 }
 

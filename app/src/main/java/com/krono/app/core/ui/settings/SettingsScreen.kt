@@ -208,53 +208,53 @@ private fun WideScreenLayout(
                         .clipToBounds()
                 ) { destination ->
                     if (destination == null) {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Icon(
-                                    imageVector = KronoIcons.Action.Settings,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(KronoTokens.StateIcon.emptyLarge),
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = KronoTokens.Settings.emptyStateIconAlpha)
-                                )
-                                Spacer(modifier = Modifier.height(KronoTokens.Spacing.lg))
-                                Text(
-                                    text = stringResource(R.string.settings_select_category),
-                                    style = MaterialTheme.typography.bodyLarge.copy(
-                                        fontSize = KronoTokens.Typography.bodyText
-                                    ),
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = KronoTokens.Settings.emptyStateTextAlpha)
-                                )
-                            }
-                        }
+                        SettingsWatermarkPanel(
+                            icon = KronoIcons.Action.Settings,
+                            title = stringResource(R.string.settings_select_category),
+                            modifier = Modifier.fillMaxSize()
+                        )
                     } else {
-                        Column(Modifier.fillMaxSize()) {
-                            Spacer(Modifier.height(KronoTokens.Settings.stickyHeaderTop))
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(SettingsHeaderControlSize)
-                                    .padding(
-                                        start = KronoTokens.Settings.panelHorizontalInset,
-                                        end = KronoTokens.Settings.panelHorizontalInset
-                                    ),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = stringResource(destination.titleRes),
-                                    style = MaterialTheme.typography.titleLarge.copy(
-                                        fontSize = KronoTokens.Typography.dialogTitle
-                                    ),
-                                    fontWeight = FontWeight.Normal,
-                                    color = MaterialTheme.colorScheme.onSurface,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
+                        if (destination.showsDetailHeader()) {
+                            Column(Modifier.fillMaxSize()) {
+                                Spacer(Modifier.height(KronoTokens.Settings.stickyHeaderTop))
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(SettingsHeaderControlSize)
+                                        .padding(
+                                            start = KronoTokens.Settings.panelHorizontalInset,
+                                            end = KronoTokens.Settings.panelHorizontalInset
+                                        ),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = stringResource(destination.titleRes),
+                                        style = MaterialTheme.typography.titleLarge.copy(
+                                            fontSize = KronoTokens.Typography.dialogTitle
+                                        ),
+                                        fontWeight = FontWeight.Normal,
+                                        color = MaterialTheme.colorScheme.onSurface,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                }
+                                SettingsPanelHost(
+                                    destination = destination,
+                                    config = config,
+                                    dataStore = dataStore,
+                                    scope = scope,
+                                    totalLifetimeMs = config.totalLifetimeMs,
+                                    pendingUpdateInfo = updateInfo,
+                                    isServiceRunning = isServiceRunning,
+                                    isAnyToolRunning = isAnyToolRunning,
+                                    onStartFocusMode = onStartFocusMode,
+                                    onSupportClick = {},
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .fillMaxWidth()
                                 )
                             }
+                        } else {
                             SettingsPanelHost(
                                 destination = destination,
                                 config = config,
@@ -266,9 +266,7 @@ private fun WideScreenLayout(
                                 isAnyToolRunning = isAnyToolRunning,
                                 onStartFocusMode = onStartFocusMode,
                                 onSupportClick = {},
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .fillMaxWidth()
+                                modifier = Modifier.fillMaxSize()
                             )
                         }
                     }
@@ -414,4 +412,3 @@ private tailrec fun Context.findActivity(): Activity? = when (this) {
     is ContextWrapper -> baseContext.findActivity()
     else -> null
 }
-

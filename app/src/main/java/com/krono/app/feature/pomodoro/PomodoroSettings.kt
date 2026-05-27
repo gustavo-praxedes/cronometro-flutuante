@@ -27,7 +27,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun PomodoroSettings(dataStore: OverlayDataStore, modifier: Modifier = Modifier) {
     val context = LocalContext.current
-    val config = dataStore.configFlow.collectAsState(initial = OverlayConfig()).value
+    val config = dataStore.configFlow.collectAsState<OverlayConfig, OverlayConfig?>(initial = null).value ?: return
     val scope = rememberCoroutineScope()
     val volumeMinLabel = stringResource(R.string.settings_volume_min)
     val volumeMaxLabel = stringResource(R.string.settings_volume_max)
@@ -42,18 +42,8 @@ fun PomodoroSettings(dataStore: OverlayDataStore, modifier: Modifier = Modifier)
             option.copy(label = label)
         }
     }
-    val presets = remember(
-        config.pomodoroPresetsSpec,
-        config.pomodoroCustomPresetName,
-        config.pomodoroCustomPhasesSpec,
-        config.pomodoroCustomCycles
-    ) {
-        PomodoroPresetCatalog.decode(
-            raw = config.pomodoroPresetsSpec,
-            legacyCustomName = config.pomodoroCustomPresetName,
-            legacyCustomSpec = config.pomodoroCustomPhasesSpec,
-            legacyCustomCycles = config.pomodoroCustomCycles
-        )
+    val presets = remember(config.pomodoroPresetsSpec) {
+        PomodoroPresetCatalog.decode(config.pomodoroPresetsSpec)
     }
     val safeSelectedPresetId = presets.firstOrNull { it.id == config.pomodoroPreset }?.id
         ?: presets.firstOrNull()?.id
@@ -62,19 +52,14 @@ fun PomodoroSettings(dataStore: OverlayDataStore, modifier: Modifier = Modifier)
 
     LaunchedEffect(safeSelectedPresetId) {
         if (safeSelectedPresetId != config.pomodoroPreset) {
-            dataStore.updateConfig(config.copy(pomodoroPreset = safeSelectedPresetId))
+            dataStore.updateConfig { it.copy(pomodoroPreset = safeSelectedPresetId) }
         }
     }
-    LaunchedEffect(config.pomodoroPresetsSpec, config.pomodoroCustomPhasesSpec, config.pomodoroCustomCycles) {
+    LaunchedEffect(config.pomodoroPresetsSpec) {
         if (config.pomodoroPresetsSpec.isBlank()) {
             val focusSound = if (config.pomodoroFocusAlertEnabled) config.pomodoroFocusAlertSoundType else "NONE"
             val breakSound = if (config.pomodoroBreakAlertEnabled) config.pomodoroBreakAlertSoundType else "NONE"
-            val seeded = PomodoroPresetCatalog.decode(
-                raw = "",
-                legacyCustomName = config.pomodoroCustomPresetName,
-                legacyCustomSpec = config.pomodoroCustomPhasesSpec,
-                legacyCustomCycles = config.pomodoroCustomCycles
-            ).map { preset ->
+            val seeded = PomodoroPresetCatalog.defaults().map { preset ->
                 preset.copy(
                     items = preset.items.map { item ->
                         when (item) {
@@ -91,12 +76,12 @@ fun PomodoroSettings(dataStore: OverlayDataStore, modifier: Modifier = Modifier)
                     }
                 )
             }
-            dataStore.updateConfig(
-                config.copy(
+            dataStore.updateConfig {
+                it.copy(
                     pomodoroPresetsSpec = PomodoroPresetCatalog.encode(seeded),
                     pomodoroPreset = seeded.firstOrNull()?.id ?: PomodoroPresetCatalog.DEFAULT_ID
                 )
-            )
+            }
         }
     }
 
@@ -108,10 +93,12 @@ fun PomodoroSettings(dataStore: OverlayDataStore, modifier: Modifier = Modifier)
             selectedPreset = selectedPreset,
             selectedPresetId = safeSelectedPresetId,
             onPresetSelected = { value ->
-                scope.launch { dataStore.updateConfig(config.copy(pomodoroPreset = value)) }
+                scope.launch { dataStore.updateConfig { it.copy(pomodoroPreset = value) } }
             },
             onCreatePreset = {
-                editingPreset = PomodoroPresetCatalog.newUserPresetTemplate(nextUserPresetIndex(presets))
+                editingPreset = PomodoroPresetCatalog.newUserPresetTemplate(
+                    index = nextUserPresetIndex(presets)
+                )
             },
             onEditPreset = { preset ->
                 editingPreset = preset
@@ -130,12 +117,12 @@ fun PomodoroSettings(dataStore: OverlayDataStore, modifier: Modifier = Modifier)
                             ?: PomodoroPresetCatalog.DEFAULT_ID
                     }
                     scope.launch {
-                        dataStore.updateConfig(
-                            config.copy(
+                        dataStore.updateConfig {
+                            it.copy(
                                 pomodoroPreset = nextPresetId,
                                 pomodoroPresetsSpec = PomodoroPresetCatalog.encode(updated)
                             )
-                        )
+                        }
                     }
                 }
             }
@@ -151,12 +138,12 @@ fun PomodoroSettings(dataStore: OverlayDataStore, modifier: Modifier = Modifier)
                 display = "${(config.focusAlertVolume * 100).toInt()}%",
                 onChange = { value ->
                     scope.launch {
-                        dataStore.updateConfig(
-                            config.copy(
+                        dataStore.updateConfig {
+                            it.copy(
                                 focusAlertVolume = value,
                                 breakAlertVolume = value
                             )
-                        )
+                        }
                     }
                 },
                 modifier = Modifier.padding(
@@ -170,20 +157,17 @@ fun PomodoroSettings(dataStore: OverlayDataStore, modifier: Modifier = Modifier)
             config = config,
             onAutoNextCycleChange = { enabled ->
                 scope.launch {
-                    dataStore.updateConfig(
-                        config.copy(
+                    dataStore.updateConfig {
+                        it.copy(
                             pomodoroAutoNextCycle = enabled,
                             pomodoroAutoStartBreak = enabled,
                             pomodoroAutoStartFocus = enabled
                         )
-                    )
+                    }
                 }
             },
-            onDndChange = { enabled ->
-                scope.launch { dataStore.updateConfig(config.copy(pomodoroDndDuringFocus = enabled)) }
-            },
             onDailyGoalChange = { value ->
-                scope.launch { dataStore.updateConfig(config.copy(pomodoroDailyGoalCycles = value)) }
+                scope.launch { dataStore.updateConfig { it.copy(pomodoroDailyGoalCycles = value) } }
             }
         )
 
@@ -205,15 +189,12 @@ fun PomodoroSettings(dataStore: OverlayDataStore, modifier: Modifier = Modifier)
             onSave = { saved ->
                 val updated = upsertPreset(presets, saved)
                 scope.launch {
-                    dataStore.updateConfig(
-                        config.copy(
+                    dataStore.updateConfig {
+                        it.copy(
                             pomodoroPreset = saved.id,
-                            pomodoroPresetsSpec = PomodoroPresetCatalog.encode(updated),
-                            pomodoroCustomPresetName = saved.name,
-                            pomodoroCustomCycles = saved.cycles,
-                            pomodoroCustomPhasesSpec = saved.legacyPhasesSpec()
+                            pomodoroPresetsSpec = PomodoroPresetCatalog.encode(updated)
                         )
-                    )
+                    }
                 }
                 editingPreset = null
             }

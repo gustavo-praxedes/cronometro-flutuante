@@ -69,6 +69,7 @@
     <string name="settings_search_placeholder">Pesquise configurações...</string>
     <string name="settings_search_no_results">Nenhum resultado</string>
     <string name="settings_badge_alert">!</string>
+    <string name="settings_version_footer">Versão %1$s</string>
     <string name="tool_settings_empty_title">Sem configurações</string>
     <string name="tool_settings_empty_subtitle">Sem ajustes específicos para esta ferramenta.</string>
 
@@ -248,6 +249,7 @@
     <string name="settings_volume_break_alert">Volume alerta pausa</string>
     <string name="settings_volume_environment">Volume ambiente</string>
     <string name="settings_volume_pomodoro">Volume Pomodoro</string>
+    <string name="settings_volume_notification">Volume notificação</string>
     <string name="settings_volume_min">0%</string>
     <string name="settings_volume_max">100%</string>
     <string name="settings_app_notification_sound_label">Som notificação</string>
@@ -351,18 +353,17 @@
     <string name="settings_changelog">Atualizações</string>
     <string name="changelog_title">Novidades da Versão</string>
     <string name="version_prefix">v%1$s</string>
-    <string name="updates_no_changes">Sem mudanças registradas.</string>
-    <string name="updates_pill_new_version">Nova Versão • %1$s</string>
-    <string name="updates_pill_current_version">Versão Atual • %1$s</string>
     <string name="updates_whats_new_title">O QUE HÁ DE NOVO</string>
     <string name="updates_action_checking">Verificando...</string>
     <string name="updates_action_downloading">Baixando...</string>
     <string name="updates_action_install">Instalar</string>
     <string name="updates_action_updated">App atualizado</string>
-    <string name="updates_action_download">Baixar</string>
+    <string name="updates_action_update">Atualizar</string>
     <string name="updates_action_check">Verificar atualizações</string>
     <string name="updates_action_search">Procurar atualizações</string>
     <string name="updates_current_version_fallback">Versão atual instalada. Sem atualização pendente.</string>
+    <string name="updates_fallback_improvement">Aprimoramento no funcionamento.</string>
+    <string name="updates_fallback_bugfix">Correção de pequenos bugs.</string>
 
     <!-- ============================================================================= -->
     <!-- SOBRE O PROJETO & CRIADOR -->

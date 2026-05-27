@@ -80,7 +80,8 @@ class OverlayManager(
 
         val view = ComposeView(context).apply {
             setContent {
-                val config by dataStore.configFlow.collectAsState(initial = OverlayConfig())
+                val config = dataStore.configFlow.collectAsState<OverlayConfig, OverlayConfig?>(initial = null).value
+                    ?: return@setContent
                 val rawState = toolState.collectAsState().value
 
                 KronoTheme(selectedTheme = config.selectedTheme, appFontSize = config.appFontSize) {

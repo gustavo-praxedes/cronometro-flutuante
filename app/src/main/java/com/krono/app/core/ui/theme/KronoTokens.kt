@@ -203,7 +203,7 @@ object KronoTokens {
         val colorInputWidth = 180.dp
         val sliderLabelWidth = 92.dp
         val sliderValueWidth = 52.dp
-        const val descriptionMaxLen = 40
+        const val descriptionMaxLen = 50
     }
 
     // ── Roda de Seleção (Wheel Picker) ──────────────────────

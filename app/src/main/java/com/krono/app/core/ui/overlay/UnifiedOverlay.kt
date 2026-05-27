@@ -159,6 +159,7 @@ fun UnifiedOverlay(
             fontSize = (KronoTokens.Typography.statusLabel.value * currentScale).sp,
             lineHeight = (KronoTokens.Typography.statusLabelLine.value * currentScale).sp,
             fontWeight = FontWeight.Normal,
+            fontFamily = timerFontFamily(config.overlayFontFamily),
             platformStyle = PlatformTextStyle(includeFontPadding = false)
         )
         val labelOverflows = remember(cleanLabel, labelTextStyle, contentWidth, density) {

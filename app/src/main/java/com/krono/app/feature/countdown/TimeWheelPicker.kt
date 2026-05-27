@@ -1,12 +1,10 @@
 ﻿package com.krono.app.feature.countdown
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -17,7 +15,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -72,21 +69,6 @@ fun TimeWheelPicker(
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.Center
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(KronoTokens.Wheel.itemHeight)
-                    .background(
-                        color = MaterialTheme.colorScheme.primary.copy(alpha = KronoTokens.Alpha.glass),
-                        shape = KronoTokens.Shape.input
-                    )
-                    .border(
-                        width = 1.dp,
-                        color = MaterialTheme.colorScheme.primary.copy(alpha = KronoTokens.Alpha.glassBorder),
-                        shape = KronoTokens.Shape.input
-                    )
-            )
-
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly,
@@ -108,7 +90,7 @@ private fun WheelLabel(text: String) {
         text = text,
         fontSize = KronoTokens.Wheel.labelFontSize,
         fontWeight = FontWeight.Normal,
-        color = MaterialTheme.colorScheme.primary.copy(alpha = KronoTokens.Alpha.label),
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier.padding(bottom = KronoTokens.Spacing.xs),
         maxLines = 1,
         softWrap = false
@@ -154,16 +136,6 @@ private fun WheelColumn(
         contentAlignment = Alignment.Center,
         modifier = Modifier.width(KronoTokens.Wheel.columnWidth)
     ) {
-        Box(
-            modifier = Modifier
-                .width(KronoTokens.Wheel.columnFocusWidth)
-                .height(containerH - KronoTokens.Spacing.xs)
-                .background(
-                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-                    shape = KronoTokens.Shape.input
-                )
-        )
-
         LazyColumn(
             state = listState,
             flingBehavior = snapBehavior,

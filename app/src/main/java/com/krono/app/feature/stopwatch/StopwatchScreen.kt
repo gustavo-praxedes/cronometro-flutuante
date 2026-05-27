@@ -7,9 +7,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.krono.app.R
 import com.krono.app.core.ui.theme.KronoIcons
 import com.krono.app.core.ui.theme.timerFontFamily
 import com.krono.app.core.data.TimerDisplayFormat
@@ -25,6 +27,7 @@ fun StopwatchScreen(
     onPause       : () -> Unit,
     onReset       : () -> Unit,
     onOpenOverlay : () -> Unit,
+    onFlag        : () -> Unit = {},
     onOpenSettings: () -> Unit
 ) {
     val isRunning = state.isRunning
@@ -118,6 +121,18 @@ fun StopwatchScreen(
                     Icon(
                         imageVector = KronoIcons.Feature.Overlay,
                         contentDescription = "Abrir Overlay",
+                        modifier = Modifier.size(28.dp)
+                    )
+                }
+
+                FilledTonalIconButton(
+                    onClick  = onFlag,
+                    enabled  = false,
+                    modifier = Modifier.size(56.dp)
+                ) {
+                    Icon(
+                        imageVector = KronoIcons.Action.Lap,
+                        contentDescription = stringResource(R.string.action_lap),
                         modifier = Modifier.size(28.dp)
                     )
                 }

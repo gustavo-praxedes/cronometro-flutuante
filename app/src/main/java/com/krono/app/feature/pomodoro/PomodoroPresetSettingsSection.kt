@@ -222,11 +222,16 @@ private fun PresetSheetRow(
                 overflow = TextOverflow.Ellipsis
             )
         }
-        IconButton(onClick = onEdit) {
+        IconButton(
+            onClick = onEdit,
+            enabled = !preset.isBuiltIn
+        ) {
             Icon(
                 imageVector = KronoIcons.Action.Settings,
                 contentDescription = stringResource(R.string.action_edit),
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(
+                    alpha = if (preset.isBuiltIn) KronoTokens.Alpha.disabled else 1f
+                )
             )
         }
         IconButton(
@@ -246,7 +251,5 @@ private fun PresetSheetRow(
 
 private fun PomodoroPresetConfig.dropdownLabel(): String = when (id) {
     PomodoroPresetCatalog.DEFAULT_ID -> "Padrão"
-    PomodoroPresetCatalog.LONG_ID -> "Longo"
-    PomodoroPresetCatalog.SHORT_ID -> "Curto"
     else -> name
 }

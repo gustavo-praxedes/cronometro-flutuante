@@ -25,6 +25,7 @@ class CountdownManager(
 
     private val activeTimers = mutableMapOf<String, Job>()
     private val remainingMsMap = mutableMapOf<String, Long>()
+    private val deadlineElapsedMsMap = mutableMapOf<String, Long>()
     private val activeOverlays = mutableMapOf<String, CountdownOverlayManager>()
 
     private fun peers(): List<CountdownOverlayManager> = activeOverlays.values.toList()
@@ -34,13 +35,18 @@ class CountdownManager(
         val state = vmState(id) ?: return
         if (state.isCompleted) return
 
-        remainingMsMap[id] = state.remainingMs
+        val initialRemainingMs = (remainingMsMap[id] ?: state.remainingMs).coerceAtLeast(0L)
+        remainingMsMap[id] = initialRemainingMs
+        deadlineElapsedMsMap[id] = SystemClock.elapsedRealtime() + initialRemainingMs
 
         activeTimers[id] = scope.launch {
-            val deadlineElapsedMs = SystemClock.elapsedRealtime() + state.remainingMs.coerceAtLeast(0L)
-            var lastReportedSecond = state.remainingSeconds
+            var lastReportedSecond = remainingSecondsFromMs(initialRemainingMs)
 
             while (true) {
+                val deadlineElapsedMs = deadlineElapsedMsMap[id]
+                    ?: (SystemClock.elapsedRealtime() + (remainingMsMap[id] ?: 0L)).also {
+                        deadlineElapsedMsMap[id] = it
+                    }
                 val currentRemainingMs = (deadlineElapsedMs - SystemClock.elapsedRealtime()).coerceAtLeast(0L)
                 val currentRemainingSeconds = remainingSecondsFromMs(currentRemainingMs)
 
@@ -68,8 +74,14 @@ class CountdownManager(
     }
 
     fun pause(id: String) {
+        deadlineElapsedMsMap[id]?.let { deadline ->
+            val currentRemainingMs = (deadline - SystemClock.elapsedRealtime()).coerceAtLeast(0L)
+            remainingMsMap[id] = currentRemainingMs
+            countdownViewModel.onTick(id, currentRemainingMs)
+        }
         activeTimers[id]?.cancel()
         activeTimers.remove(id)
+        deadlineElapsedMsMap.remove(id)
         feedbackManager.stopTimerSounds("countdown pause")
         syncOverlay(id)
         vmState(id)?.let { if (it.isOverlayVisible) notificationHelper.postCountdownNotification(it) }
@@ -78,6 +90,7 @@ class CountdownManager(
     fun reset(id: String) {
         activeTimers[id]?.cancel()
         activeTimers.remove(id)
+        deadlineElapsedMsMap.remove(id)
         feedbackManager.stopTimerSounds("countdown reset")
         val total = vmState(id)?.config?.totalSeconds ?: return
         remainingMsMap[id] = total * 1000L
@@ -87,9 +100,20 @@ class CountdownManager(
 
     fun addOneMinute(id: String) {
         val state = vmState(id) ?: return
-        val base = remainingMsMap[id] ?: state.remainingMs
-        val next = (base + 60_000L).coerceAtMost((99L * 3600L + 59L * 60L + 59L) * 1000L)
+        val now = SystemClock.elapsedRealtime()
+        val isRunning = activeTimers[id]?.isActive == true
+        val base = if (isRunning) {
+            deadlineElapsedMsMap[id]?.let { (it - now).coerceAtLeast(0L) }
+                ?: remainingMsMap[id]
+                ?: state.remainingMs
+        } else {
+            remainingMsMap[id] ?: state.remainingMs
+        }
+        val next = (base + 60_000L).coerceAtMost(maxRemainingMs())
         remainingMsMap[id] = next
+        if (isRunning) {
+            deadlineElapsedMsMap[id] = now + next
+        }
         countdownViewModel.setRemainingMs(id, next, clearCompleted = true)
         syncOverlay(id)
         vmState(id)?.let { if (it.isOverlayVisible) notificationHelper.postCountdownNotification(it) }
@@ -98,6 +122,11 @@ class CountdownManager(
     fun setRemaining(id: String, seconds: Long) {
         val next = seconds.coerceAtLeast(0L) * 1000L
         remainingMsMap[id] = next
+        if (activeTimers[id]?.isActive == true) {
+            deadlineElapsedMsMap[id] = SystemClock.elapsedRealtime() + next
+        } else {
+            deadlineElapsedMsMap.remove(id)
+        }
         countdownViewModel.setRemainingSeconds(id, seconds, clearCompleted = true)
         syncOverlay(id)
         vmState(id)?.let { if (it.isOverlayVisible) notificationHelper.postCountdownNotification(it) }
@@ -162,6 +191,7 @@ class CountdownManager(
     fun destroy(id: String) {
         activeTimers[id]?.cancel()
         activeTimers.remove(id)
+        deadlineElapsedMsMap.remove(id)
         feedbackManager.stopTimerSounds("countdown destroy")
         remainingMsMap.remove(id)
         hideOverlay(id)
@@ -170,6 +200,7 @@ class CountdownManager(
     fun destroyAll() {
         activeTimers.values.forEach { it.cancel() }
         activeTimers.clear()
+        deadlineElapsedMsMap.clear()
         feedbackManager.stopTimerSounds("countdown destroy all")
         remainingMsMap.clear()
         activeOverlays.values.forEach { it.hide() }
@@ -179,6 +210,7 @@ class CountdownManager(
 
     private fun complete(id: String) {
         activeTimers.remove(id)
+        deadlineElapsedMsMap.remove(id)
         feedbackManager.stopTimerSounds("countdown complete")
         val resetToConfigured = id == CountdownViewModel.SCREEN_OVERLAY_ID
         val finalRemaining = if (resetToConfigured) {
@@ -198,6 +230,9 @@ class CountdownManager(
 
     private fun remainingSecondsFromMs(ms: Long): Long =
         ((ms.coerceAtLeast(0L) + 999L) / 1000L)
+
+    private fun maxRemainingMs(): Long =
+        (99L * 3600L + 59L * 60L + 59L) * 1000L
 
     private fun delayUntilNextSecondBoundary(remainingMs: Long): Long {
         val safeRemainingMs = remainingMs.coerceAtLeast(0L)

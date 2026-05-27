@@ -114,7 +114,8 @@ class TransparentProxyActivity : ComponentActivity() {
         val updateData = rawData as? UpdateInfo
 
         setContent {
-            val config by dataStore.configFlow.collectAsState(initial = OverlayConfig())
+            val config = dataStore.configFlow.collectAsState(initial = null as OverlayConfig?).value
+                ?: return@setContent
             val trigger by remember { permissionsRefreshTrigger }
             val scope = rememberCoroutineScope()
             

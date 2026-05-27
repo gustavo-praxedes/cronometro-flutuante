@@ -88,7 +88,8 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            val config by dataStore.configFlow.collectAsState(initial = OverlayConfig())
+            val config = dataStore.configFlow.collectAsState(initial = null as OverlayConfig?).value
+                ?: return@setContent
             LaunchedEffect(config.appLanguage) {
                 val localeTag = config.appLanguage.ifBlank { "pt-BR" }
                 val locale = Locale.forLanguageTag(localeTag)

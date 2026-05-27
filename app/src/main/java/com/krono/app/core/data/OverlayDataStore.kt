@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
 import com.krono.app.core.util.SOUND_NONE
 import com.krono.app.core.util.normalizeNotificationSound
+import com.krono.app.feature.pomodoro.PomodoroPresetCatalog
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
@@ -77,6 +78,7 @@ class OverlayDataStore(private val context: Context) {
         val TICK_SOUND_ENABLED = booleanPreferencesKey("tick_sound_enabled")
         val ENVIRONMENT_SOUND_TYPE = stringPreferencesKey("environment_sound_type")
         val APP_NOTIFICATION_SOUND_TYPE = stringPreferencesKey("app_notification_sound_type")
+        val APP_NOTIFICATION_VOLUME = floatPreferencesKey("app_notification_volume")
         val TICK_VOLUME = floatPreferencesKey("tick_volume")
         val PLAY_PAUSE_VOLUME = floatPreferencesKey("play_pause_volume")
         val PLAY_PAUSE_SOUND_TYPE = stringPreferencesKey("play_pause_sound_type")
@@ -123,6 +125,48 @@ class OverlayDataStore(private val context: Context) {
         context.dataStore.edit { prefs ->
             val current = preferencesToConfig(prefs)
             writeConfig(prefs, transform(current))
+        }
+    }
+
+    suspend fun migratePomodoroPresetsIfNeeded() {
+        context.dataStore.edit { prefs ->
+            val currentSpec = prefs[POMODORO_PRESETS_SPEC].orEmpty()
+            val legacyName = prefs[POMODORO_CUSTOM_PRESET_NAME] ?: "Meu Preset"
+            val legacySpec = prefs[POMODORO_CUSTOM_PHASES_SPEC].orEmpty()
+            val legacyCycles = prefs[POMODORO_CUSTOM_CYCLES] ?: 4
+            val selectedPreset = PomodoroPresetCatalog.normalizeSelectedPresetId(
+                prefs[POMODORO_PRESET] ?: PomodoroPresetCatalog.DEFAULT_ID
+            )
+
+            val needsMigration = currentSpec.isBlank() ||
+                PomodoroPresetCatalog.isLegacyPresetStorage(currentSpec) ||
+                PomodoroPresetCatalog.requiresCatalogMigration(currentSpec) ||
+                selectedPreset != (prefs[POMODORO_PRESET] ?: PomodoroPresetCatalog.DEFAULT_ID) ||
+                prefs.contains(POMODORO_CUSTOM_PRESET_NAME) ||
+                prefs.contains(POMODORO_CUSTOM_PHASES_SPEC) ||
+                prefs.contains(POMODORO_CUSTOM_FOCUS_MINUTES) ||
+                prefs.contains(POMODORO_CUSTOM_BREAK_MINUTES) ||
+                prefs.contains(POMODORO_CUSTOM_CYCLES)
+
+            if (!needsMigration) return@edit
+
+            val migratedPresets = PomodoroPresetCatalog.migrateLegacyPresets(
+                raw = currentSpec,
+                legacyCustomName = legacyName,
+                legacyCustomSpec = legacySpec,
+                legacyCustomCycles = legacyCycles
+            )
+            val safePresetId = migratedPresets.firstOrNull { it.id == selectedPreset }?.id
+                ?: migratedPresets.firstOrNull()?.id
+                ?: PomodoroPresetCatalog.DEFAULT_ID
+
+            prefs[POMODORO_PRESETS_SPEC] = PomodoroPresetCatalog.encode(migratedPresets)
+            prefs[POMODORO_PRESET] = safePresetId
+            prefs.remove(POMODORO_CUSTOM_PRESET_NAME)
+            prefs.remove(POMODORO_CUSTOM_PHASES_SPEC)
+            prefs.remove(POMODORO_CUSTOM_FOCUS_MINUTES)
+            prefs.remove(POMODORO_CUSTOM_BREAK_MINUTES)
+            prefs.remove(POMODORO_CUSTOM_CYCLES)
         }
     }
 
@@ -233,7 +277,7 @@ class OverlayDataStore(private val context: Context) {
             focusModeEnabled = prefs[FOCUS_MODE_ENABLED] ?: false,
             selectedTheme = prefs[SELECTED_THEME] ?: "AUTO",
             appLanguage = prefs[APP_LANGUAGE] ?: "pt-BR",
-            selectedFont = prefs[SELECTED_FONT] ?: "SYSTEM_DEFAULT",
+            selectedFont = prefs[SELECTED_FONT] ?: "CHIVO_MONO",
             appFontSize = prefs[APP_FONT_SIZE] ?: "NORMAL",
             stopwatchFormat = prefs[STOPWATCH_FORMAT] ?: "HH_MM_SS",
             countdownFormat = prefs[COUNTDOWN_FORMAT] ?: "HH_MM_SS",
@@ -245,13 +289,10 @@ class OverlayDataStore(private val context: Context) {
             pomodoroAutoStartBreak = prefs[POMODORO_AUTO_START_BREAK] ?: true,
             pomodoroAutoStartFocus = prefs[POMODORO_AUTO_START_FOCUS] ?: true,
             pomodoroAutoNextCycle = prefs[POMODORO_AUTO_NEXT_CYCLE] ?: (prefs[POMODORO_AUTO_START_BREAK] ?: true),
-            pomodoroPreset = prefs[POMODORO_PRESET] ?: "CLASSICO",
+            pomodoroPreset = PomodoroPresetCatalog.normalizeSelectedPresetId(
+                prefs[POMODORO_PRESET] ?: PomodoroPresetCatalog.DEFAULT_ID
+            ),
             pomodoroPresetsSpec = prefs[POMODORO_PRESETS_SPEC] ?: "",
-            pomodoroCustomPresetName = prefs[POMODORO_CUSTOM_PRESET_NAME] ?: "Meu Preset",
-            pomodoroCustomPhasesSpec = prefs[POMODORO_CUSTOM_PHASES_SPEC] ?: "Etapa 1|25|4294198070|krono_alm_alarmbeep;Etapa 2|5|4280391411|krono_alm_beeps",
-            pomodoroCustomFocusMinutes = prefs[POMODORO_CUSTOM_FOCUS_MINUTES] ?: 25,
-            pomodoroCustomBreakMinutes = prefs[POMODORO_CUSTOM_BREAK_MINUTES] ?: 5,
-            pomodoroCustomCycles = prefs[POMODORO_CUSTOM_CYCLES] ?: 4,
             pomodoroFocusAlertSoundType = normalizeNotificationSound(prefs[POMODORO_FOCUS_ALERT_SOUND_TYPE] ?: "krono_alm_alarmbeep"),
             pomodoroBreakAlertSoundType = normalizeNotificationSound(prefs[POMODORO_BREAK_ALERT_SOUND_TYPE] ?: "krono_alm_beeps"),
             pomodoroDndDuringFocus = prefs[POMODORO_DND_DURING_FOCUS] ?: false,
@@ -268,11 +309,12 @@ class OverlayDataStore(private val context: Context) {
                 ?: prefs[PO_OVERLAY_CUSTOM_TEXT_COLOR],
             allSoundsEnabled = prefs[ALL_SOUNDS_ENABLED] ?: true,
             playPauseSoundEnabled = resolvedPlayPauseSoundType != SOUND_NONE,
-            playPauseVibrationEnabled = prefs[PLAY_PAUSE_VIBRATION_ENABLED] ?: true,
+            playPauseVibrationEnabled = prefs[PLAY_PAUSE_VIBRATION_ENABLED] ?: false,
             secondsVibrationEnabled = prefs[SECONDS_VIBRATION_ENABLED] ?: false,
             tickSoundEnabled = resolvedEnvironmentSoundType != SOUND_NONE,
             environmentSoundType = resolvedEnvironmentSoundType,
             appNotificationSoundType = prefs[APP_NOTIFICATION_SOUND_TYPE] ?: SOUND_NONE,
+            appNotificationVolume = prefs[APP_NOTIFICATION_VOLUME] ?: 0.8f,
             tickVolume = prefs[TICK_VOLUME] ?: 0.35f,
             playPauseVolume = prefs[PLAY_PAUSE_VOLUME] ?: 0.8f,
             playPauseSoundType = resolvedPlayPauseSoundType,
@@ -341,11 +383,6 @@ class OverlayDataStore(private val context: Context) {
         prefs[POMODORO_AUTO_NEXT_CYCLE] = config.pomodoroAutoNextCycle
         prefs[POMODORO_PRESET] = config.pomodoroPreset
         prefs[POMODORO_PRESETS_SPEC] = config.pomodoroPresetsSpec
-        prefs[POMODORO_CUSTOM_PRESET_NAME] = config.pomodoroCustomPresetName
-        prefs[POMODORO_CUSTOM_PHASES_SPEC] = config.pomodoroCustomPhasesSpec
-        prefs[POMODORO_CUSTOM_FOCUS_MINUTES] = config.pomodoroCustomFocusMinutes
-        prefs[POMODORO_CUSTOM_BREAK_MINUTES] = config.pomodoroCustomBreakMinutes
-        prefs[POMODORO_CUSTOM_CYCLES] = config.pomodoroCustomCycles
         prefs[POMODORO_FOCUS_ALERT_SOUND_TYPE] = config.pomodoroFocusAlertSoundType
         prefs[POMODORO_BREAK_ALERT_SOUND_TYPE] = config.pomodoroBreakAlertSoundType
         prefs[POMODORO_DND_DURING_FOCUS] = config.pomodoroDndDuringFocus
@@ -361,6 +398,7 @@ class OverlayDataStore(private val context: Context) {
         prefs[TICK_SOUND_ENABLED] = config.environmentSoundType != SOUND_NONE
         prefs[ENVIRONMENT_SOUND_TYPE] = config.environmentSoundType
         prefs[APP_NOTIFICATION_SOUND_TYPE] = config.appNotificationSoundType
+        prefs[APP_NOTIFICATION_VOLUME] = config.appNotificationVolume
         prefs[TICK_VOLUME] = config.tickVolume
         prefs[PLAY_PAUSE_VOLUME] = config.playPauseVolume
         prefs[PLAY_PAUSE_SOUND_TYPE] = config.playPauseSoundType

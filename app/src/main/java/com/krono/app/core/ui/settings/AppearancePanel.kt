@@ -180,7 +180,7 @@ fun AppearancePanel(
                 maxLabel = volumeMaxLabel,
                 range = 0f..1f,
                 display = "${(config.playPauseVolume * 100).toInt()}%",
-                onChange = { scope.launch { dataStore.updateConfig(config.copy(playPauseVolume = it)) } },
+                onChange = { value -> scope.launch { dataStore.updateConfig { it.copy(playPauseVolume = value) } } },
                 enabled = config.playPauseSoundType != SOUND_NONE,
                 modifier = Modifier.padding(
                     horizontal = KronoTokens.Settings.panelHorizontalInset,
@@ -224,7 +224,7 @@ fun AppearancePanel(
                 maxLabel = volumeMaxLabel,
                 range = 0f..1f,
                 display = "${(config.tickVolume * 100).toInt()}%",
-                onChange = { value -> scope.launch { dataStore.updateConfig(config.copy(tickVolume = value)) } },
+                onChange = { value -> scope.launch { dataStore.updateConfig { it.copy(tickVolume = value) } } },
                 enabled = config.environmentSoundType != SOUND_NONE,
                 modifier = Modifier.padding(
                     horizontal = KronoTokens.Settings.panelHorizontalInset,
@@ -235,7 +235,7 @@ fun AppearancePanel(
             KronoDropdown(
                 value = config.appNotificationSoundType,
                 onValueChange = { value ->
-                    scope.launch { dataStore.updateConfig(config.copy(appNotificationSoundType = value)) }
+                    scope.launch { dataStore.updateConfig { it.copy(appNotificationSoundType = value) } }
                 },
                 options = notificationSounds.map { it.uriString },
                 label = stringResource(R.string.settings_app_notification_sound_label),
@@ -244,7 +244,7 @@ fun AppearancePanel(
                 optionLeadingContentDescription = stringResource(R.string.settings_sound_preview),
                 optionLeadingIconVisible = { it != SOUND_NONE },
                 onOptionLeadingClick = { sound ->
-                    if (sound != SOUND_NONE) previewAppNotificationSound(context, config.playPauseVolume, sound, SoundTimingPolicy.profile(sound).startDelayMs)
+                    if (sound != SOUND_NONE) previewAppNotificationSound(context, config.appNotificationVolume, sound, SoundTimingPolicy.profile(sound).startDelayMs)
                 },
                 onDismiss = { stopSoundPreview() },
                 textMapping = { value ->
@@ -252,13 +252,28 @@ fun AppearancePanel(
                         ?: notificationSounds.first().label
                 }
             )
+            SettingsDivider()
+            AppearanceSlider(
+                label = stringResource(R.string.settings_volume_notification),
+                value = config.appNotificationVolume,
+                minLabel = volumeMinLabel,
+                maxLabel = volumeMaxLabel,
+                range = 0f..1f,
+                display = "${(config.appNotificationVolume * 100).toInt()}%",
+                onChange = { value -> scope.launch { dataStore.updateConfig { it.copy(appNotificationVolume = value) } } },
+                enabled = config.appNotificationSoundType != SOUND_NONE,
+                modifier = Modifier.padding(
+                    horizontal = KronoTokens.Settings.panelHorizontalInset,
+                    vertical = KronoTokens.Spacing.sm
+                )
+            )
         }
 
         SettingsGroup(title = stringResource(R.string.settings_widget_group)) {
             FontSelector(
                 selectedFont = config.overlayFontFamily,
                 onChange = { value ->
-                    scope.launch { dataStore.updateConfig(config.copy(overlayFontFamily = value)) }
+                    scope.launch { dataStore.updateConfig { it.copy(overlayFontFamily = value) } }
                 },
                 leadingIcon = KronoIcons.Action.TypeSpecimen
             )

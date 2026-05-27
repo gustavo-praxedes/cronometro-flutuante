@@ -36,18 +36,14 @@ fun PomodoroScreen(
     onOpenSettings: () -> Unit,
     selectedFont: String = "SYSTEM_DEFAULT",
     timeFormat: String = "HH_MM_SS",
-    selectedPreset: String = "CLASSICO",
+    selectedPreset: String = PomodoroPresetCatalog.DEFAULT_ID,
     presetsSpec: String = "",
-    customPresetPhasesSpec: String = "",
-    customFocusMinutes: Int = 25,
-    customBreakMinutes: Int = 5,
-    customCycles: Int = 4,
     showHours: Boolean = true,
     showMinutes: Boolean = true,
     showSeconds: Boolean = true,
     showMilliseconds: Boolean = false,
     playPauseBeepEnabled: Boolean = false,
-    playPauseVibrationEnabled: Boolean = true,
+    playPauseVibrationEnabled: Boolean = false,
     playPauseVolume: Float = 0.8f,
     playPauseSoundType: String = "krono_tip_complete",
     autoStartNextCycle: Boolean = true,
@@ -71,14 +67,10 @@ fun PomodoroScreen(
         label = "pomodoro_display_flash"
     )
 
-    LaunchedEffect(selectedPreset, presetsSpec, customFocusMinutes, customBreakMinutes, customCycles, customPresetPhasesSpec) {
+    LaunchedEffect(selectedPreset, presetsSpec) {
         viewModel.applyPreset(
             presetKey = selectedPreset,
-            presetsSpec = presetsSpec,
-            customFocusMinutes = customFocusMinutes,
-            customBreakMinutes = customBreakMinutes,
-            customCycles = customCycles,
-            customPhasesSpec = customPresetPhasesSpec
+            presetsSpec = presetsSpec
         )
     }
     LaunchedEffect(autoStartNextCycle) {

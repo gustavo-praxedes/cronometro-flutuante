@@ -2,6 +2,7 @@
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font as ResourceFont
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.googlefonts.Font
@@ -24,7 +25,6 @@ private val firaCodeFont      = GoogleFont("Fira Code")
 private val anonymousProFont  = GoogleFont("Anonymous Pro")
 private val robotoMonoFont    = GoogleFont("Roboto Mono")
 private val spaceMonoFont     = GoogleFont("Space Mono")
-private val chivoMonoFont     = GoogleFont("Chivo Mono")
 private val azeretMonoFont    = GoogleFont("Azeret Mono")
 
 val JetBrainsMono = FontFamily(Font(googleFont = jetbrainsMonoFont, fontProvider = provider, weight = FontWeight.Normal))
@@ -32,18 +32,39 @@ val FiraCode      = FontFamily(Font(googleFont = firaCodeFont,      fontProvider
 val AnonymousPro  = FontFamily(Font(googleFont = anonymousProFont,  fontProvider = provider, weight = FontWeight.Normal))
 val RobotoMono    = FontFamily(Font(googleFont = robotoMonoFont,    fontProvider = provider, weight = FontWeight.Normal))
 val SpaceMono     = FontFamily(Font(googleFont = spaceMonoFont,     fontProvider = provider, weight = FontWeight.Normal))
-val ChivoMono     = FontFamily(Font(googleFont = chivoMonoFont,     fontProvider = provider, weight = FontWeight.Normal))
+val ChivoMono     = FontFamily(ResourceFont(R.font.chivo_mono_regular, weight = FontWeight.Normal))
 val AzeretMono    = FontFamily(Font(googleFont = azeretMonoFont,    fontProvider = provider, weight = FontWeight.Normal))
 
 // ── Tipografia Padrão ────────────────────────────────────────
-val AppTypography = Typography(
-    bodyLarge = TextStyle(
-        fontFamily = FontFamily.Default,
+private val BaseTypography = Typography()
+
+private fun TextStyle.withChivoMono(): TextStyle = copy(
+    fontFamily = ChivoMono,
+    letterSpacing = 0.sp
+)
+
+val AppTypography = BaseTypography.copy(
+    displayLarge = BaseTypography.displayLarge.withChivoMono(),
+    displayMedium = BaseTypography.displayMedium.withChivoMono(),
+    displaySmall = BaseTypography.displaySmall.withChivoMono(),
+    headlineLarge = BaseTypography.headlineLarge.withChivoMono(),
+    headlineMedium = BaseTypography.headlineMedium.withChivoMono(),
+    headlineSmall = BaseTypography.headlineSmall.withChivoMono(),
+    titleLarge = BaseTypography.titleLarge.withChivoMono(),
+    titleMedium = BaseTypography.titleMedium.withChivoMono(),
+    titleSmall = BaseTypography.titleSmall.withChivoMono(),
+    bodyLarge = BaseTypography.bodyLarge.copy(
+        fontFamily = ChivoMono,
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
         lineHeight = 24.sp,
-        letterSpacing = 0.5.sp,
-    )
+        letterSpacing = 0.sp,
+    ),
+    bodyMedium = BaseTypography.bodyMedium.withChivoMono(),
+    bodySmall = BaseTypography.bodySmall.withChivoMono(),
+    labelLarge = BaseTypography.labelLarge.withChivoMono(),
+    labelMedium = BaseTypography.labelMedium.withChivoMono(),
+    labelSmall = BaseTypography.labelSmall.withChivoMono()
 )
 
 /**
@@ -51,7 +72,7 @@ val AppTypography = Typography(
  * Agora as fontes são carregadas dinamicamente do Google Fonts.
  */
 fun timerFontFamily(selectedFont: String): FontFamily {
-    return when (KronoFontOption.entries.find { it.name == selectedFont } ?: KronoFontOption.SYSTEM_DEFAULT) {
+    return when (KronoFontOption.entries.find { it.name == selectedFont } ?: KronoFontOption.CHIVO_MONO) {
         KronoFontOption.JETBRAINS_MONO -> JetBrainsMono
         KronoFontOption.FIRA_CODE      -> FiraCode
         KronoFontOption.ANONYMOUS_PRO  -> AnonymousPro
@@ -59,7 +80,7 @@ fun timerFontFamily(selectedFont: String): FontFamily {
         KronoFontOption.COMMIT_MONO    -> SpaceMono
         KronoFontOption.CHIVO_MONO     -> ChivoMono
         KronoFontOption.AZERET_MONO    -> AzeretMono
-        else -> FontFamily.Monospace
+        else -> ChivoMono
     }
 }
 

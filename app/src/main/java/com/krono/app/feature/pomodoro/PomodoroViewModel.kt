@@ -8,7 +8,6 @@ import com.krono.app.core.data.OverlayDataStore
 import com.krono.app.core.data.OverlayConfig
 import com.krono.app.core.tool.ToolState
 import com.krono.app.core.tool.ToolViewModel
-import com.krono.app.core.util.normalizeNotificationSound
 import com.krono.app.core.util.playPomodoroPhaseBeep
 import com.krono.app.core.util.stopActiveTimerSounds
 import com.krono.app.core.util.triggerSecondFeedback
@@ -34,7 +33,7 @@ class PomodoroViewModel(application: Application) : AndroidViewModel(application
     private var focusSeconds = FOCUS_SECONDS
     private var breakSeconds = BREAK_SECONDS
     private var autoStartNextCycle = true
-    private var currentPresetKey = "CLASSICO"
+    private var currentPresetKey = PomodoroPresetCatalog.DEFAULT_ID
     private var currentPresetsSpecRaw = ""
     private var maxCycles = 4
     private var customPhases: List<PhaseDef> = defaultPhases()
@@ -57,20 +56,6 @@ class PomodoroViewModel(application: Application) : AndroidViewModel(application
         PhaseDef("Foco", focusSeconds, 0xFFEF4444.toInt(), "krono_alm_alarmbeep"),
         PhaseDef("Pausa", breakSeconds, 0xFF22C55E.toInt(), "krono_alm_beeps")
     )
-
-    private fun parseCustomPhases(spec: String): List<PhaseDef> {
-        return spec.split(";")
-            .mapNotNull { row ->
-                val p = row.split("|")
-                if (p.size < 4) return@mapNotNull null
-                val label = p[0].ifBlank { "Etapa" }
-                val minutes = p[1].toLongOrNull()?.coerceAtLeast(1L) ?: 1L
-                val color = p[2].toLongOrNull()?.toInt() ?: 0xFFEF4444.toInt()
-                val sound = normalizeNotificationSound(p[3])
-                PhaseDef(label, minutes * 60L, color, sound)
-            }
-            .ifEmpty { listOf(PhaseDef("Etapa 1", 25 * 60L, 0xFFEF4444.toInt(), "krono_alm_alarmbeep")) }
-    }
 
     init {
         viewModelScope.launch {
@@ -214,63 +199,39 @@ class PomodoroViewModel(application: Application) : AndroidViewModel(application
 
     fun applyPreset(
         presetKey: String,
-        presetsSpec: String = "",
-        customFocusMinutes: Int = 25,
-        customBreakMinutes: Int = 5,
-        customCycles: Int = 4,
-        customPhasesSpec: String = ""
+        presetsSpec: String = ""
     ) {
-        val normalizedFocus = customFocusMinutes.coerceAtLeast(1)
-        val normalizedBreak = customBreakMinutes.coerceAtLeast(1)
-        val normalizedCycles = customCycles.coerceAtLeast(1)
-        val normalizedSpec = customPhasesSpec.trim()
-        val availablePresets = PomodoroPresetCatalog.decode(
-            raw = presetsSpec,
-            legacyCustomName = "Meu Preset",
-            legacyCustomSpec = customPhasesSpec,
-            legacyCustomCycles = customCycles
-        )
-        val selectedPreset = availablePresets.firstOrNull { it.id == presetKey }
+        val availablePresets = PomodoroPresetCatalog.decode(presetsSpec)
+        val safePresetKey = PomodoroPresetCatalog.normalizeSelectedPresetId(presetKey)
+        val selectedPreset = availablePresets.firstOrNull { it.id == safePresetKey }
+            ?: availablePresets.firstOrNull()
         if (
-            presetKey == currentPresetKey &&
+            safePresetKey == currentPresetKey &&
             presetsSpec == currentPresetsSpecRaw &&
-            normalizedCycles == maxCycles &&
-            normalizedFocus == focusSeconds.toInt() / 60 &&
-            normalizedBreak == breakSeconds.toInt() / 60 &&
-            normalizedSpec == customPhases.joinToString(";") { "${it.label}|${(it.seconds / 60L).coerceAtLeast(1L)}|${it.color.toLong()}|${it.soundType}" }
-        ) return
-
-        customPhases = if (selectedPreset != null) {
-            selectedPreset.executionPhases().map { phase ->
+            selectedPreset?.cycles == maxCycles &&
+            selectedPreset?.executionPhases()?.map { phase ->
                 PhaseDef(
                     label = phase.label,
                     seconds = phase.totalSeconds.coerceAtLeast(1L),
                     color = phase.color,
                     soundType = phase.soundType
                 )
-            }.ifEmpty { defaultPhases() }
-        } else {
-            when (presetKey) {
-                "CURTO" -> listOf(
-                    PhaseDef("Foco", 15 * 60L, 0xFFEF4444.toInt(), "krono_alm_alarmbeep"),
-                    PhaseDef("Pausa", 5 * 60L, 0xFF22C55E.toInt(), "krono_alm_beeps")
-                )
-                "LONGO" -> listOf(
-                    PhaseDef("Foco", 50 * 60L, 0xFFEF4444.toInt(), "krono_alm_alarmbeep"),
-                    PhaseDef("Pausa", 10 * 60L, 0xFF22C55E.toInt(), "krono_alm_beeps")
-                )
-                "CUSTOM" -> if (customPhasesSpec.isNotBlank()) parseCustomPhases(customPhasesSpec) else listOf(
-                    PhaseDef("Foco", normalizedFocus.toLong() * 60L, 0xFFEF4444.toInt(), "krono_alm_alarmbeep"),
-                    PhaseDef("Pausa", normalizedBreak.toLong() * 60L, 0xFF22C55E.toInt(), "krono_alm_beeps")
-                )
-                else -> listOf(
-                    PhaseDef("Foco", FOCUS_SECONDS, 0xFFEF4444.toInt(), "krono_alm_alarmbeep"),
-                    PhaseDef("Pausa", BREAK_SECONDS, 0xFF22C55E.toInt(), "krono_alm_beeps")
+            } == customPhases
+        ) return
+
+        customPhases = selectedPreset?.executionPhases()
+            ?.map { phase ->
+                PhaseDef(
+                    label = phase.label,
+                    seconds = phase.totalSeconds.coerceAtLeast(1L),
+                    color = phase.color,
+                    soundType = phase.soundType
                 )
             }
-        }
-        maxCycles = selectedPreset?.cycles?.coerceIn(1, 12) ?: normalizedCycles
-        currentPresetKey = presetKey
+            ?.ifEmpty { defaultPhases() }
+            ?: defaultPhases()
+        maxCycles = selectedPreset?.cycles?.coerceIn(1, 12) ?: 4
+        currentPresetKey = selectedPreset?.id ?: PomodoroPresetCatalog.DEFAULT_ID
         currentPresetsSpecRaw = presetsSpec
         if (_state.value.isRunning) return
         currentPhaseIndex = 0

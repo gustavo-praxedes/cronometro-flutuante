@@ -307,16 +307,6 @@ class CountdownViewModel(
     }
 
     fun addOneMinute(context: Context, id: String) {
-        val current = _countdowns.value.find { it.config.id == id }?.remainingMs ?: 0L
-        val next = (current + 60_000L).coerceAtMost(secondsToMs(99L * 3600L + 59L * 60L + 59L))
-        setRemainingMs(id, next, clearCompleted = true)
-        context.startService(
-            Intent(context, MainService::class.java).apply {
-                action = ACTION_COUNTDOWN_SET_SECONDS
-                putExtra(EXTRA_COUNTDOWN_ID, id)
-                putExtra(EXTRA_COUNTDOWN_SECONDS, msToRemainingSeconds(next))
-            }
-        )
         sendAction(context, ACTION_COUNTDOWN_PLUS_ONE, id)
     }
 

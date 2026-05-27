@@ -1,23 +1,45 @@
 package com.krono.app.feature.pomodoro
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.AlertDialog
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.PlatformTextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.krono.app.R
 import com.krono.app.core.data.OverlayConfig
+import com.krono.app.core.ui.theme.KronoIcons
 import com.krono.app.core.ui.theme.KronoTokens
+import com.krono.app.core.ui.theme.adaptiveDialogWidth
 import com.krono.app.core.util.NotificationSoundOption
 
 @Composable
@@ -32,34 +54,79 @@ internal fun PomodoroPresetEditorDialog(
 ) {
     val state = remember(initialPreset.id) { PomodoroPresetEditorState(initialPreset) }
     var editingPhase by remember { mutableStateOf<EditingPhase?>(null) }
+    val defaultCardColor = MaterialTheme.colorScheme.primary.toArgb()
+    val dialogColor = MaterialTheme.colorScheme.surface
 
-    AlertDialog(
+    Dialog(
         onDismissRequest = onDismiss,
-        confirmButton = {
-            TextButton(
-                enabled = state.canSave,
-                onClick = { onSave(state.toPresetConfig(initialPreset)) }
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
+        Surface(
+            modifier = Modifier
+                .adaptiveDialogWidth()
+                .wrapContentHeight(),
+            shape = KronoTokens.Shape.dialog,
+            color = dialogColor,
+            tonalElevation = 0.dp,
+            shadowElevation = KronoTokens.Elevation.dialog
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(KronoTokens.Spacing.dialogPadding)
+                    .verticalScroll(rememberScrollState())
+                    .animateContentSize(),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(stringResource(R.string.action_save))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }
-        },
-        title = { Text(stringResource(R.string.pomodoro_preset_dialog_title)) },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(KronoTokens.Spacing.sm)) {
-                OutlinedTextField(
-                    value = state.name,
-                    onValueChange = { value -> state.name = value.take(50) },
-                    label = { Text(stringResource(R.string.pomodoro_preset_label_name)) },
-                    modifier = Modifier.fillMaxWidth()
-                )
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = stringResource(R.string.pomodoro_preset_dialog_title),
+                        style = MaterialTheme.typography.headlineSmall.copy(
+                            platformStyle = PlatformTextStyle(includeFontPadding = false)
+                        ),
+                        fontWeight = FontWeight.Normal,
+                        fontSize = KronoTokens.Typography.dialogTitle,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(horizontal = KronoTokens.Spacing.dialogPadding)
+                    )
+
+                    IconButton(
+                        onClick = onDismiss,
+                        modifier = Modifier
+                            .size(KronoTokens.Icon.close)
+                            .align(Alignment.CenterEnd)
+                    ) {
+                        Icon(
+                            imageVector = KronoIcons.Navigation.Close,
+                            contentDescription = stringResource(R.string.action_close),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+
+                Spacer(Modifier.height(KronoTokens.Spacing.sectionGap))
+
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(KronoTokens.Spacing.sm)
+                ) {
+                    OutlinedTextField(
+                        value = state.name,
+                        onValueChange = { value -> state.name = value.take(50) },
+                        label = { Text(stringResource(R.string.pomodoro_preset_label_name)) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+
+                Spacer(Modifier.height(KronoTokens.Spacing.sectionGap))
+
                 PomodoroPresetItemList(
                     items = state.items,
                     cycles = state.cycles,
                     onCyclesChange = { state.cycles = it },
-                    onAddCard = state::addCard,
+                    onAddCard = { state.addCard(defaultCardColor) },
                     onAddGroup = state::addGroup,
                     onRemoveItem = state::removeItem,
                     onMoveItem = state::moveItem,
@@ -68,22 +135,48 @@ internal fun PomodoroPresetEditorDialog(
                         state.moveCardToGroup(cardId, groupId, group?.phases?.size ?: 0)
                     },
                     onUpdateGroup = state::updateGroup,
-                    onAddPhaseToGroup = state::addPhaseToGroup,
+                    onAddPhaseToGroup = { groupId -> state.addPhaseToGroup(groupId, defaultCardColor) },
                     onRemovePhaseFromGroup = state::removePhaseFromGroup,
                     onMovePhaseInGroup = state::movePhaseInGroup,
                     onMovePhaseOutOfGroup = state::moveCardOutOfGroup,
                     onEditPhase = { groupId, phase -> editingPhase = EditingPhase(groupId, phase.id) }
                 )
+
+                Spacer(Modifier.height(KronoTokens.Spacing.sectionGap))
+                HorizontalDivider(
+                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = KronoTokens.Alpha.divider),
+                    thickness = KronoTokens.Stroke.divider
+                )
+                Spacer(Modifier.height(KronoTokens.Spacing.sm))
+
                 if (!state.canSave) {
                     Text(
                         text = stringResource(R.string.pomodoro_preset_empty_error),
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.error
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(Modifier.height(KronoTokens.Spacing.sm))
+                }
+
+                Button(
+                    onClick = { onSave(state.toPresetConfig(initialPreset)) },
+                    enabled = state.canSave,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(KronoTokens.Button.height),
+                    shape = KronoTokens.Shape.button
+                ) {
+                    Text(
+                        text = stringResource(R.string.action_save),
+                        fontSize = KronoTokens.Typography.buttonLabel,
+                        fontWeight = FontWeight.Normal
                     )
                 }
             }
         }
-    )
+    }
 
     val currentEditing = editingPhase
     val currentPhase = currentEditing?.let { state.findPhase(it.groupId, it.phaseId) }

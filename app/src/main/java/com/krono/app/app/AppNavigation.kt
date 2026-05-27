@@ -123,7 +123,7 @@ fun AppNavigation(
     val pomodoroState by pomodoroViewModel.state.collectAsState()
     val countdowns by app.countdownViewModel.countdowns.collectAsState()
     val scope         = rememberCoroutineScope()
-    val config        by dataStore.configFlow.collectAsState(initial = OverlayConfig())
+    val config = dataStore.configFlow.collectAsState<OverlayConfig, OverlayConfig?>(initial = null).value ?: return
 
     var showPermissionsDialog by remember { mutableStateOf(false) }
     var permissionsDismissedThisSession by remember { mutableStateOf(false) }
@@ -142,6 +142,7 @@ fun AppNavigation(
         (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !hasNotificationPermission)
 
     LaunchedEffect(Unit) {
+        dataStore.migratePomodoroPresetsIfNeeded()
         launch { navigationEvents.collect { route -> navController.navigate(route) { launchSingleTop = true } } }
         launch {
             permissionsDialogEvents.collect {
@@ -331,10 +332,6 @@ fun AppNavigation(
                     showMilliseconds = config.showMilliseconds,
                     selectedPreset = config.pomodoroPreset,
                     presetsSpec = config.pomodoroPresetsSpec,
-                    customPresetPhasesSpec = config.pomodoroCustomPhasesSpec,
-                    customFocusMinutes = config.pomodoroCustomFocusMinutes,
-                    customBreakMinutes = config.pomodoroCustomBreakMinutes,
-                    customCycles = config.pomodoroCustomCycles,
                     playPauseBeepEnabled = config.allSoundsEnabled && config.playPauseSoundEnabled,
                     playPauseVibrationEnabled = config.playPauseVibrationEnabled,
                     playPauseVolume = config.playPauseVolume,

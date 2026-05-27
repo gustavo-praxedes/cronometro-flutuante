@@ -8,5 +8,10 @@ import com.krono.app.core.ui.theme.KronoIcons
 
 @Composable
 fun CountdownSettings(dataStore: OverlayDataStore, modifier: Modifier = Modifier) {
-    ToolEmptySettingsPanel(icon = KronoIcons.Feature.Countdown, modifier = modifier)
+    ToolEmptySettingsPanel(
+        icon = KronoIcons.Feature.Countdown,
+        titleRes = com.krono.app.R.string.countdown_settings_empty_title,
+        subtitleRes = com.krono.app.R.string.countdown_settings_empty_subtitle,
+        modifier = modifier
+    )
 }

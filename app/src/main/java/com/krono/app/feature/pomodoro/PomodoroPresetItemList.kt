@@ -5,11 +5,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -95,6 +98,7 @@ internal fun PomodoroPresetItemList(
             }
         }
 
+        androidx.compose.foundation.layout.Spacer(modifier = Modifier.height(KronoTokens.Spacing.xs))
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(KronoTokens.Spacing.sm)
@@ -110,6 +114,12 @@ internal fun PomodoroPresetItemList(
         }
 
         SettingsDivider()
+        Text(
+            text = stringResource(R.string.pomodoro_section_cycles),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(horizontal = KronoTokens.Settings.panelHorizontalInset)
+        )
         AppearanceSlider(
             label = stringResource(R.string.pomodoro_custom_cycles_inline, cycles),
             value = cycles.toFloat(),

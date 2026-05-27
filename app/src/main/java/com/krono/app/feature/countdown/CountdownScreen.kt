@@ -73,7 +73,7 @@ fun CountdownScreen(
     showMilliseconds: Boolean = false,
     onConfiguredTimeChange: (Long) -> Unit = {},
     playPauseBeepEnabled: Boolean = false,
-    playPauseVibrationEnabled: Boolean = true,
+    playPauseVibrationEnabled: Boolean = false,
     playPauseVolume: Float = 0.8f,
     playPauseSoundType: String = "krono_tip_complete",
     openOverlayOnPlay: Boolean = false,

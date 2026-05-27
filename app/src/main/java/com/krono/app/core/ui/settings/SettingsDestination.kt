@@ -38,3 +38,9 @@ sealed class SettingsDestination(
         icon = KronoIcons.Settings.Info
     )
 }
+
+fun SettingsDestination.showsDetailHeader(): Boolean = when (this) {
+    SettingsDestination.Stopwatch,
+    SettingsDestination.Countdown -> false
+    else -> true
+}

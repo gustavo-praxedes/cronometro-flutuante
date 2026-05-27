@@ -17,7 +17,6 @@ import com.krono.app.core.ui.theme.KronoTokens
 internal fun PomodoroBehaviorSettingsSection(
     config: OverlayConfig,
     onAutoNextCycleChange: (Boolean) -> Unit,
-    onDndChange: (Boolean) -> Unit,
     onDailyGoalChange: (Int) -> Unit
 ) {
     SettingsGroup(title = stringResource(R.string.settings_group_behavior)) {
@@ -27,14 +26,6 @@ internal fun PomodoroBehaviorSettingsSection(
             leadingIcon = KronoIcons.Action.Autorenew,
             checked = config.pomodoroAutoNextCycle,
             onChange = onAutoNextCycleChange
-        )
-        SettingsDivider()
-        ToggleRow(
-            label = stringResource(R.string.pomodoro_dnd_label),
-            subtitle = stringResource(R.string.pomodoro_dnd_subtitle),
-            leadingIcon = KronoIcons.Action.Focus,
-            checked = config.pomodoroDndDuringFocus,
-            onChange = onDndChange
         )
         SettingsDivider()
         AppearanceSlider(

@@ -218,15 +218,16 @@ class CountdownOverlayManager(
             setViewTreeSavedStateRegistryOwner(this@CountdownOverlayManager)
 
             setContent {
-                val overlayConfig by overlayDataStore.configFlow.collectAsState(initial = OverlayConfig())
+                val overlayConfig = overlayDataStore.configFlow.collectAsState<OverlayConfig, OverlayConfig?>(initial = null).value
+                    ?: return@setContent
                 KronoTheme(selectedTheme = overlayConfig.selectedTheme, appFontSize = overlayConfig.appFontSize) {
                     overlayState.value?.let { s ->
-                        val showPlusOne = this@CountdownOverlayManager.id == SCREEN_OVERLAY_ID
+                        val useToolColor = this@CountdownOverlayManager.id == SCREEN_OVERLAY_ID
                         CountdownOverlayUi(
                             state = s,
                             config = overlayConfig,
-                            useToolColor = showPlusOne,
-                            showPlusOne = showPlusOne,
+                            useToolColor = useToolColor,
+                            showPlusOne = true,
                             onPlay = onPlay,
                             onPause = onPause,
                             onReset = onReset,
