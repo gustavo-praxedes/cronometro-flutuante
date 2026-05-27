@@ -42,6 +42,7 @@ class OverlayDataStore(private val context: Context) {
         val SELECTED_THEME     = stringPreferencesKey("selected_theme")
         val APP_LANGUAGE       = stringPreferencesKey("app_language")
         val SELECTED_FONT      = stringPreferencesKey("selected_font")
+        val AVAILABLE_GOOGLE_FONTS = stringPreferencesKey("available_google_fonts")
         val DONATION_PENDING   = booleanPreferencesKey("donation_pending")
         val ACTIVE_TOOL_ID     = stringPreferencesKey("active_tool_id")
         val DIRECT_LAUNCH_TOOL_ID = stringPreferencesKey("direct_launch_tool_id")
@@ -277,7 +278,8 @@ class OverlayDataStore(private val context: Context) {
             focusModeEnabled = prefs[FOCUS_MODE_ENABLED] ?: false,
             selectedTheme = prefs[SELECTED_THEME] ?: "AUTO",
             appLanguage = prefs[APP_LANGUAGE] ?: "pt-BR",
-            selectedFont = prefs[SELECTED_FONT] ?: "CHIVO_MONO",
+            selectedFont = normalizeAppFont(prefs[SELECTED_FONT]),
+            availableGoogleFonts = prefs[AVAILABLE_GOOGLE_FONTS] ?: "",
             appFontSize = prefs[APP_FONT_SIZE] ?: "NORMAL",
             stopwatchFormat = prefs[STOPWATCH_FORMAT] ?: "HH_MM_SS",
             countdownFormat = prefs[COUNTDOWN_FORMAT] ?: "HH_MM_SS",
@@ -298,7 +300,7 @@ class OverlayDataStore(private val context: Context) {
             pomodoroDndDuringFocus = prefs[POMODORO_DND_DURING_FOCUS] ?: false,
             pomodoroDailyGoalCycles = prefs[POMODORO_DAILY_GOAL_CYCLES] ?: 4,
             pomodoroSessionHistory = prefs[POMODORO_SESSION_HISTORY] ?: "",
-            overlayFontFamily = prefs[OVERLAY_FONT_FAMILY] ?: (prefs[SELECTED_FONT] ?: "CHIVO_MONO"),
+            overlayFontFamily = prefs[OVERLAY_FONT_FAMILY] ?: "CHIVO_MONO",
             overlayCustomColor = prefs[OVERLAY_CUSTOM_COLOR]
                 ?: prefs[SW_OVERLAY_CUSTOM_COLOR]
                 ?: prefs[CD_OVERLAY_CUSTOM_COLOR]
@@ -369,7 +371,8 @@ class OverlayDataStore(private val context: Context) {
         prefs[FOCUS_MODE_ENABLED] = config.focusModeEnabled
         prefs[SELECTED_THEME] = config.selectedTheme
         prefs[APP_LANGUAGE] = config.appLanguage
-        prefs[SELECTED_FONT] = config.selectedFont
+        prefs[SELECTED_FONT] = normalizeAppFont(config.selectedFont)
+        prefs[AVAILABLE_GOOGLE_FONTS] = normalizeAvailableGoogleFonts(config.availableGoogleFonts)
         prefs[APP_FONT_SIZE] = config.appFontSize
         prefs[STOPWATCH_FORMAT] = config.stopwatchFormat
         prefs[COUNTDOWN_FORMAT] = config.countdownFormat
@@ -427,5 +430,26 @@ class OverlayDataStore(private val context: Context) {
         prefs[ACTIVE_TOOL_ID] = config.activeToolId
         prefs[DIRECT_LAUNCH_TOOL_ID] = config.directLaunchToolId
     }
+
+    private fun normalizeAppFont(value: String?): String =
+        when (value) {
+            "CHIVO" -> "CHIVO"
+            "CHIVO_LIGHT" -> "CHIVO_LIGHT"
+            "JETBRAINS_MONO",
+            "FIRA_CODE",
+            "ANONYMOUS_PRO",
+            "ROBOTO_MONO",
+            "COMMIT_MONO",
+            "AZERET_MONO",
+            "CHIVO_MONO" -> value
+            else -> "CHIVO"
+        }
+
+    private fun normalizeAvailableGoogleFonts(value: String): String =
+        value.split(",")
+            .map { it.trim() }
+            .filter { it.isNotBlank() }
+            .distinct()
+            .joinToString(",")
 }
 

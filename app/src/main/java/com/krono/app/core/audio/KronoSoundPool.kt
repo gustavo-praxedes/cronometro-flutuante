@@ -20,7 +20,7 @@ object KronoSoundPool {
             .build()
 
         soundPool = SoundPool.Builder()
-            .setMaxStreams(5)
+            .setMaxStreams(12)
             .setAudioAttributes(attrs)
             .build()
 
@@ -31,13 +31,6 @@ object KronoSoundPool {
                 Log.e(TAG, "Failed to load sound sampleId=$sampleId status=$status")
             }
         }
-
-        // Preload second-tick sounds
-        preload(context.applicationContext, KronoSoundCatalog.environmentResId("krono_env_ticking"))
-        preload(context.applicationContext, KronoSoundCatalog.environmentResId("krono_env_fastticking"))
-        
-        // Preload play/pause beeps
-        KronoSoundCatalog.playPause.forEach { preload(context.applicationContext, it.rawResId) }
     }
 
     private fun preload(context: Context, resId: Int) {

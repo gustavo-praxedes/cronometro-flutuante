@@ -16,6 +16,12 @@ import com.krono.app.feature.pomodoro.PomodoroViewModel
 import com.krono.app.core.tool.ToolRegistry
 import com.krono.app.core.data.OverlayDataStore
 import com.krono.app.core.audio.KronoSoundPool
+import com.krono.app.core.ui.theme.KronoFontCatalog
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 const val NOTIFICATION_ID         = 1
 const val CHANNEL_ID              = "timer_channel"
@@ -30,6 +36,7 @@ const val EXTRA_SHOW_DONATION     = "extra_show_donation"
 const val EXTRA_TOOL_ID           = "extra_tool_id"
 
 class KronoApp : Application() {
+    private val appScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     val stopwatchViewModel: StopwatchViewModel by lazy {
         StopwatchViewModel(this)
@@ -54,10 +61,28 @@ class KronoApp : Application() {
 
         createNotificationChannel()
         KronoSoundPool.init(this)
+        discoverDownloadableFonts()
 
         ToolRegistry.register(StopwatchTool(OverlayDataStore(this), stopwatchViewModel))
         ToolRegistry.register(CountdownTool(countdownViewModel))
         ToolRegistry.register(PomodoroTool(pomodoroViewModel))
+    }
+
+    private fun discoverDownloadableFonts() {
+        appScope.launch {
+            val dataStore = OverlayDataStore(this@KronoApp)
+            val config = dataStore.configFlow.first()
+            val known = config.availableGoogleFonts.split(",")
+                .map { it.trim() }
+                .filter { it.isNotBlank() }
+                .toSet()
+            val discovered = KronoFontCatalog.discoverAvailableGoogleFonts(this@KronoApp, known)
+            if (discovered != known) {
+                dataStore.updateConfig {
+                    it.copy(availableGoogleFonts = discovered.sorted().joinToString(","))
+                }
+            }
+        }
     }
 
     private fun createNotificationChannel() {

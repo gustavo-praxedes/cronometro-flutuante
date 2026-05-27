@@ -17,7 +17,9 @@ import com.krono.app.core.ui.components.AppearanceSlider
 import com.krono.app.core.ui.components.SettingsDivider
 import com.krono.app.core.ui.dialogs.ColorPickerDialog
 import com.krono.app.core.ui.theme.KronoIcons
+import com.krono.app.core.ui.theme.KronoFontCatalog
 import com.krono.app.core.ui.theme.KronoTokens
+import com.krono.app.core.ui.components.AppFontSelector
 import com.krono.app.core.ui.components.FontSelector
 import com.krono.app.core.ui.components.KronoDropdown
 import com.krono.app.core.ui.components.ThemeSelector
@@ -49,6 +51,21 @@ fun AppearancePanel(
     val overlayCornerMax = stringResource(R.string.settings_overlay_corner_max)
     var showOverlayColorPicker by remember { mutableStateOf(false) }
     var showOverlayTextColorPicker by remember { mutableStateOf(false) }
+    val availableGoogleFonts = remember(config.availableGoogleFonts) {
+        config.availableGoogleFonts.split(",")
+            .map { it.trim() }
+            .filter { it.isNotBlank() }
+            .toSet()
+    }
+
+    LaunchedEffect(Unit) {
+        val discovered = KronoFontCatalog.discoverAvailableGoogleFonts(context, availableGoogleFonts)
+        if (discovered != availableGoogleFonts) {
+            dataStore.updateConfig {
+                it.copy(availableGoogleFonts = discovered.sorted().joinToString(","))
+            }
+        }
+    }
 
     SettingsPanelLayout(modifier = modifier) {
         SettingsGroup(title = stringResource(R.string.settings_group_theme)) {
@@ -63,6 +80,16 @@ fun AppearancePanel(
                             )
                         )
                     }
+                }
+            )
+            SettingsDivider()
+
+            AppFontSelector(
+                selectedFont = config.selectedFont,
+                availableGoogleFonts = availableGoogleFonts,
+                leadingIcon = KronoIcons.Action.TypeSpecimen,
+                onChange = { value ->
+                    scope.launch { dataStore.updateConfig(config.copy(selectedFont = value)) }
                 }
             )
             SettingsDivider()
@@ -272,6 +299,7 @@ fun AppearancePanel(
         SettingsGroup(title = stringResource(R.string.settings_widget_group)) {
             FontSelector(
                 selectedFont = config.overlayFontFamily,
+                availableGoogleFonts = availableGoogleFonts,
                 onChange = { value ->
                     scope.launch { dataStore.updateConfig { it.copy(overlayFontFamily = value) } }
                 },

@@ -1,6 +1,6 @@
 package com.krono.app.feature.pomodoro
 
-import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -102,14 +102,14 @@ internal class DragDropState(
     }
 }
 
-internal fun Modifier.dragHandle(
+internal fun Modifier.dragSource(
     state: DragDropState,
     index: Int,
     onDragStarted: () -> Unit = {},
     onDragFinished: () -> Unit = {}
 ): Modifier =
     pointerInput(state, index) {
-        detectDragGestures(
+        detectDragGesturesAfterLongPress(
             onDragStart = {
                 onDragStarted()
                 state.onDragStart(index)

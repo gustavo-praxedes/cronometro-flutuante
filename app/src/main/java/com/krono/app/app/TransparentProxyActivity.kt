@@ -128,7 +128,7 @@ class TransparentProxyActivity : ComponentActivity() {
             }
             val hasInstall = remember(trigger) { packageManager.canRequestPackageInstalls() }
 
-            KronoTheme(selectedTheme = config.selectedTheme, appFontSize = config.appFontSize) {
+            KronoTheme(selectedTheme = config.selectedTheme, selectedFont = config.selectedFont, appFontSize = config.appFontSize) {
                 Surface(modifier = Modifier.fillMaxSize(), color = Color.Transparent) {
                     when (type) {
                         TYPE_PERMISSIONS -> PermissionsDialog(

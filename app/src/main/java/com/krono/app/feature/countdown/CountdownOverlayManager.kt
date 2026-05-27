@@ -220,7 +220,7 @@ class CountdownOverlayManager(
             setContent {
                 val overlayConfig = overlayDataStore.configFlow.collectAsState<OverlayConfig, OverlayConfig?>(initial = null).value
                     ?: return@setContent
-                KronoTheme(selectedTheme = overlayConfig.selectedTheme, appFontSize = overlayConfig.appFontSize) {
+                KronoTheme(selectedTheme = overlayConfig.selectedTheme, selectedFont = overlayConfig.selectedFont, appFontSize = overlayConfig.appFontSize) {
                     overlayState.value?.let { s ->
                         val useToolColor = this@CountdownOverlayManager.id == SCREEN_OVERLAY_ID
                         CountdownOverlayUi(

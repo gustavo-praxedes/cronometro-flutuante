@@ -2,6 +2,8 @@
 
 enum class KronoFontOption(val label: String, val fontFamily: String) {
     SYSTEM_DEFAULT ("Sistema (Padrão)", "default"),
+    CHIVO ("Chivo", "chivo_app"),
+    CHIVO_LIGHT ("Chivo Light", "chivo_light"),
     JETBRAINS_MONO ("JetBrains Mono", "jetbrains"),
     FIRA_CODE ("Fira Code", "fira"),
     ANONYMOUS_PRO ("Anonymous Pro", "anonymous"),

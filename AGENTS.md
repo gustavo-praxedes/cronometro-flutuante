@@ -7,6 +7,7 @@
 # Nunca
 1. Chain-of-thought
 2. Introdução, conclusão e resumo do trabalho
+3. Altere changelog.md
 
 # Princípios
 1. Simples é melhor que complexo

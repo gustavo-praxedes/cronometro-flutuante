@@ -9,6 +9,7 @@ import com.krono.app.core.data.OverlayConfig
 import com.krono.app.core.tool.ToolState
 import com.krono.app.core.tool.ToolViewModel
 import com.krono.app.core.util.playPomodoroPhaseBeep
+import com.krono.app.core.util.prepareSecondTickFeedback
 import com.krono.app.core.util.stopActiveTimerSounds
 import com.krono.app.core.util.triggerSecondFeedback
 import android.os.SystemClock
@@ -68,6 +69,11 @@ class PomodoroViewModel(application: Application) : AndroidViewModel(application
         _state.value = _state.value.copy(isRunning = true)
         lastSecondFeedback = null
         phaseDeadlineElapsedMs = SystemClock.elapsedRealtime() + _state.value.remainingMs
+        prepareSecondTickFeedback(
+            context = getApplication(),
+            tickSoundEnabled = latestConfig.allSoundsEnabled && latestConfig.tickSoundEnabled,
+            environmentSoundType = latestConfig.environmentSoundType
+        )
         tickerJob?.cancel()
         tickerJob = viewModelScope.launch {
             while (_state.value.isRunning) {

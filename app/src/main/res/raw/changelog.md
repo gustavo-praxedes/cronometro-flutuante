@@ -1,10 +1,10 @@
-# 3.3.1
+# ✨ Novidades
+- feat: Adicionado Timer.
+- feat: Adicionado Pomodoro.
+- feat: Adicionado Settings.
 
-## Novidades
-- Aprimoramentos visuais.
+# 🐛 Correções
 
-## Correções
-- Correção de pequenos bugs.
 
-## Manutenção
-- Melhorias internas de código. 
+# 🔧 Manutenção
+

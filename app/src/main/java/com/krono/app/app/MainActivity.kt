@@ -101,7 +101,7 @@ class MainActivity : ComponentActivity() {
                 res.updateConfiguration(conf, res.displayMetrics)
             }
 
-            KronoTheme(selectedTheme = config.selectedTheme, appFontSize = config.appFontSize) {
+            KronoTheme(selectedTheme = config.selectedTheme, selectedFont = config.selectedFont, appFontSize = config.appFontSize) {
                 val surfaceColor = MaterialTheme.colorScheme.background
                 DisposableEffect(config.keepScreenOn) {
                     if (config.keepScreenOn) {

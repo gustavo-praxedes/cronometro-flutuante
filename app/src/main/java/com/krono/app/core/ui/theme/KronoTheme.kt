@@ -15,6 +15,7 @@ import androidx.compose.material3.Typography
 @Composable
 fun KronoTheme(
     selectedTheme: String,
+    selectedFont: String = "CHIVO",
     appFontSize: String = "NORMAL",
     content: @Composable () -> Unit
 ) {
@@ -38,7 +39,7 @@ fun KronoTheme(
         "LARGE" -> 1.15f
         else -> 1f
     }
-    val scaledTypography = AppTypography.scaled(fontScale)
+    val scaledTypography = appTypography(selectedFont).scaled(fontScale)
 
     MaterialTheme(
         colorScheme = colorScheme,

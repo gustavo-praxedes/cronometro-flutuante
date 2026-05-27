@@ -76,6 +76,13 @@ object KronoSoundCatalog {
     fun environmentResId(id: String): Int = environment.firstOrNull { it.id == id }?.rawResId
         ?: environment.first().rawResId
 
+    fun secondTickResId(id: String): Int = when (id) {
+        "krono_env_fastticking" -> R.raw.krono_env_fastticking_tick
+        "krono_env_metronome" -> R.raw.krono_env_metronome_tick
+        "krono_env_ticking" -> R.raw.krono_env_ticking_tick
+        else -> environmentResId(id)
+    }
+
     fun appNotificationResId(id: String): Int = notifications.firstOrNull { it.id == id }?.rawResId
         ?: notifications.first().rawResId
 

@@ -206,6 +206,17 @@ object KronoTokens {
         const val descriptionMaxLen = 50
     }
 
+    object PresetEditor {
+        val rowHeight = Button.height
+        val itemGap = Spacing.sm
+        val innerGap = Spacing.xs
+        val sideInset = Settings.panelHorizontalInset
+        val nestedInset = Spacing.sm
+        val menuSlot = Size.iconBox
+        val timeWidth = 86.dp
+        val sliderValueWidth = Component.sliderValueWidth
+    }
+
     // ── Roda de Seleção (Wheel Picker) ──────────────────────
     object Wheel {
         val itemHeight       = 48.dp

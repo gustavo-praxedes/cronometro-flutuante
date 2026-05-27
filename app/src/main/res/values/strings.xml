@@ -38,6 +38,7 @@
     <string name="action_edit">Editar</string>
     <string name="action_add">Adicionar</string>
     <string name="action_delete">Excluir</string>
+    <string name="action_more">Mais opções</string>
     <string name="action_plus_one_minute">+1 min</string>
     <string name="action_return_to_screen">Voltar</string>
     <string name="action_lap">Volta</string>
@@ -105,6 +106,7 @@
     <string name="settings_language_label">Idioma do app</string>
     <string name="settings_language_pt_br">Português (Brasil)</string>
     <string name="settings_font_label">Fonte</string>
+    <string name="settings_app_font_label">Fonte do app</string>
     <string name="settings_overlay_font_label">Fonte do overlay</string>
     <string name="settings_time_format_label">Formato</string>
     <string name="settings_font_size_label">Tamanho da fonte no app</string>
@@ -136,8 +138,8 @@
     <string name="settings_overlay_custom_color">Cor do overlay</string>
     <string name="settings_overlay_custom_color_none">Padrão do tema</string>
     <string name="settings_overlay_custom_text_color">Cor da fonte</string>
-    <string name="settings_overlay_scale_min">0.5x</string>
-    <string name="settings_overlay_scale_max">1.5x</string>
+    <string name="settings_overlay_scale_min">1.0x</string>
+    <string name="settings_overlay_scale_max">2.0x</string>
     <string name="settings_overlay_corner_min">0dp</string>
     <string name="settings_overlay_corner_max">50dp</string>
 

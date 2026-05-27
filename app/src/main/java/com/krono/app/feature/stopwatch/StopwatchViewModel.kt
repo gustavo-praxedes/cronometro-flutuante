@@ -8,6 +8,7 @@ import com.krono.app.core.data.OverlayDataStore
 import com.krono.app.core.data.OverlayConfig
 import com.krono.app.core.data.TimerPreferences
 import com.krono.app.core.tool.ToolViewModel
+import com.krono.app.core.util.prepareSecondTickFeedback
 import com.krono.app.core.util.stopActiveTimerSounds
 import com.krono.app.core.util.triggerSecondFeedback
 import com.krono.app.feature.stopwatch.StopwatchState
@@ -53,6 +54,11 @@ class StopwatchViewModel(application: Application) : AndroidViewModel(applicatio
             overlayDataStore.configFlow.collect { latestConfig = it }
         }
         if (_stopwatchState.value.isRunning) {
+            prepareSecondTickFeedback(
+                context = getApplication(),
+                tickSoundEnabled = latestConfig.allSoundsEnabled && latestConfig.tickSoundEnabled,
+                environmentSoundType = latestConfig.environmentSoundType
+            )
             startUpdateLoop()
         }
     }
@@ -87,6 +93,11 @@ class StopwatchViewModel(application: Application) : AndroidViewModel(applicatio
         _stopwatchState.value = newState
         timerPreferences.saveState(newState.toStopwatchState())
         lastSecondFeedback = null
+        prepareSecondTickFeedback(
+            context = getApplication(),
+            tickSoundEnabled = latestConfig.allSoundsEnabled && latestConfig.tickSoundEnabled,
+            environmentSoundType = latestConfig.environmentSoundType
+        )
         startUpdateLoop()
     }
 

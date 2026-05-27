@@ -38,6 +38,7 @@ class CountdownManager(
         val initialRemainingMs = (remainingMsMap[id] ?: state.remainingMs).coerceAtLeast(0L)
         remainingMsMap[id] = initialRemainingMs
         deadlineElapsedMsMap[id] = SystemClock.elapsedRealtime() + initialRemainingMs
+        feedbackManager.prepareSecondTick(currentConfigProvider())
 
         activeTimers[id] = scope.launch {
             var lastReportedSecond = remainingSecondsFromMs(initialRemainingMs)

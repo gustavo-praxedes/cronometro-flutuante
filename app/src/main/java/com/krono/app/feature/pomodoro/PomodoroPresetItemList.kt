@@ -12,15 +12,12 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.Slider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.krono.app.R
-import com.krono.app.core.ui.components.AppearanceSlider
-import com.krono.app.core.ui.components.SettingsDivider
 import com.krono.app.core.ui.theme.KronoIcons
 import com.krono.app.core.ui.theme.KronoTokens
 
@@ -59,14 +56,14 @@ internal fun PomodoroPresetItemList(
 
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(KronoTokens.Spacing.sm)
+        verticalArrangement = Arrangement.spacedBy(KronoTokens.PresetEditor.itemGap)
     ) {
         LazyColumn(
             state = listState,
             modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(max = 420.dp),
-            verticalArrangement = Arrangement.spacedBy(KronoTokens.Spacing.sm)
+            verticalArrangement = Arrangement.spacedBy(KronoTokens.PresetEditor.itemGap)
         ) {
             itemsIndexed(items, key = { _, item -> item.id }) { index, item ->
                 when (item) {
@@ -101,33 +98,39 @@ internal fun PomodoroPresetItemList(
         androidx.compose.foundation.layout.Spacer(modifier = Modifier.height(KronoTokens.Spacing.xs))
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(KronoTokens.Spacing.sm)
+            horizontalArrangement = Arrangement.spacedBy(KronoTokens.PresetEditor.itemGap)
         ) {
-            OutlinedButton(onClick = onAddCard, modifier = Modifier.weight(1f)) {
+            OutlinedButton(
+                onClick = onAddCard,
+                modifier = Modifier
+                    .weight(1f)
+                    .height(KronoTokens.PresetEditor.rowHeight)
+            ) {
                 Icon(imageVector = KronoIcons.Action.AddCircle, contentDescription = null)
-                Text(stringResource(R.string.pomodoro_card_add))
+                androidx.compose.material3.Text(stringResource(R.string.pomodoro_card_add))
             }
-            OutlinedButton(onClick = onAddGroup, modifier = Modifier.weight(1f)) {
+            OutlinedButton(
+                onClick = onAddGroup,
+                modifier = Modifier
+                    .weight(1f)
+                    .height(KronoTokens.PresetEditor.rowHeight)
+            ) {
                 Icon(imageVector = KronoIcons.Action.ListAltAdd, contentDescription = null)
-                Text(stringResource(R.string.pomodoro_group_add))
+                androidx.compose.material3.Text(stringResource(R.string.pomodoro_group_add))
             }
         }
 
-        SettingsDivider()
-        Text(
-            text = stringResource(R.string.pomodoro_section_cycles),
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(horizontal = KronoTokens.Settings.panelHorizontalInset)
+        CycleSliderHeader(
+            title = stringResource(R.string.pomodoro_section_cycles),
+            value = cycles,
+            modifier = Modifier.fillMaxWidth()
         )
-        AppearanceSlider(
-            label = stringResource(R.string.pomodoro_custom_cycles_inline, cycles),
+        Slider(
             value = cycles.toFloat(),
-            minLabel = stringResource(R.string.settings_value_one),
-            maxLabel = stringResource(R.string.settings_value_twelve),
-            range = 1f..12f,
-            display = cycles.toString(),
-            onChange = { onCyclesChange(it.toInt().coerceIn(1, 12)) }
+            valueRange = 1f..12f,
+            steps = 10,
+            onValueChange = { onCyclesChange(it.toInt().coerceIn(1, 12)) },
+            modifier = Modifier.fillMaxWidth()
         )
     }
 }

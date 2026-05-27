@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -54,7 +53,7 @@ internal fun PomodoroPresetEditorDialog(
 ) {
     val state = remember(initialPreset.id) { PomodoroPresetEditorState(initialPreset) }
     var editingPhase by remember { mutableStateOf<EditingPhase?>(null) }
-    val defaultCardColor = MaterialTheme.colorScheme.primary.toArgb()
+    val defaultCardColor = MaterialTheme.colorScheme.surface.toArgb()
     val dialogColor = MaterialTheme.colorScheme.surface
 
     Dialog(
@@ -116,7 +115,10 @@ internal fun PomodoroPresetEditorDialog(
                         value = state.name,
                         onValueChange = { value -> state.name = value.take(50) },
                         label = { Text(stringResource(R.string.pomodoro_preset_label_name)) },
-                        modifier = Modifier.fillMaxWidth()
+                        singleLine = true,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(KronoTokens.PresetEditor.rowHeight)
                     )
                 }
 
@@ -143,22 +145,6 @@ internal fun PomodoroPresetEditorDialog(
                 )
 
                 Spacer(Modifier.height(KronoTokens.Spacing.sectionGap))
-                HorizontalDivider(
-                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = KronoTokens.Alpha.divider),
-                    thickness = KronoTokens.Stroke.divider
-                )
-                Spacer(Modifier.height(KronoTokens.Spacing.sm))
-
-                if (!state.canSave) {
-                    Text(
-                        text = stringResource(R.string.pomodoro_preset_empty_error),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Spacer(Modifier.height(KronoTokens.Spacing.sm))
-                }
 
                 Button(
                     onClick = { onSave(state.toPresetConfig(initialPreset)) },

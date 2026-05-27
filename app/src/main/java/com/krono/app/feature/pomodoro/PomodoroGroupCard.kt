@@ -3,17 +3,23 @@ package com.krono.app.feature.pomodoro
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,13 +29,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.krono.app.R
-import com.krono.app.core.ui.components.AppearanceSlider
-import com.krono.app.core.ui.components.SettingsDivider
 import com.krono.app.core.ui.theme.KronoIcons
 import com.krono.app.core.ui.theme.KronoTokens
 
@@ -48,7 +52,7 @@ internal fun PomodoroGroupCard(
     rootDragDropState: DragDropState? = null
 ) {
     var expanded by remember(group.id) { mutableStateOf(true) }
-    val haptic = LocalHapticFeedback.current
+    var menuExpanded by remember { mutableStateOf(false) }
     val childListState = rememberLazyListState()
     val childDragDropState = rememberDragDropState(
         lazyListState = childListState,
@@ -70,19 +74,20 @@ internal fun PomodoroGroupCard(
         color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.22f)
     ) {
         Column(
-            modifier = Modifier.padding(vertical = KronoTokens.Spacing.xs),
-            verticalArrangement = Arrangement.spacedBy(KronoTokens.Spacing.xs)
+            modifier = Modifier.padding(vertical = KronoTokens.PresetEditor.innerGap),
+            verticalArrangement = Arrangement.spacedBy(KronoTokens.PresetEditor.innerGap)
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = KronoTokens.Settings.panelHorizontalInset),
+                    .height(KronoTokens.PresetEditor.rowHeight)
+                    .padding(horizontal = KronoTokens.PresetEditor.sideInset),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(KronoTokens.Spacing.xs)
+                horizontalArrangement = Arrangement.spacedBy(KronoTokens.PresetEditor.innerGap)
             ) {
                 IconButton(
                     onClick = { expanded = !expanded },
-                    modifier = Modifier.size(KronoTokens.Size.iconBox)
+                    modifier = Modifier.size(KronoTokens.PresetEditor.menuSlot)
                 ) {
                     Icon(
                         imageVector = if (expanded) KronoIcons.Action.ExpandLess else KronoIcons.Action.ExpandMore,
@@ -93,51 +98,97 @@ internal fun PomodoroGroupCard(
                         }
                     )
                 }
-                if (rootDragDropState != null) {
-                    IconButton(
-                        onClick = {},
-                        modifier = Modifier
-                            .size(KronoTokens.Size.iconBox)
-                            .dragHandle(
-                                state = rootDragDropState,
-                                index = rootIndex,
-                                onDragStarted = { haptic.performHapticFeedback(HapticFeedbackType.LongPress) },
-                                onDragFinished = { haptic.performHapticFeedback(HapticFeedbackType.LongPress) }
-                            )
-                    ) {
-                        Icon(
-                            imageVector = KronoIcons.Action.Drag,
-                            contentDescription = stringResource(R.string.pomodoro_drag_handle)
-                        )
-                    }
-                }
                 if (expanded) {
                     OutlinedTextField(
                         value = group.label,
                         onValueChange = { value -> onUpdateGroup(group.copy(label = value.take(50))) },
                         label = { Text(stringResource(R.string.pomodoro_group_name_label)) },
-                        modifier = Modifier.weight(1f)
+                        singleLine = true,
+                        trailingIcon = {
+                            Box {
+                                IconButton(
+                                    onClick = { menuExpanded = true },
+                                    modifier = Modifier.size(KronoTokens.PresetEditor.menuSlot)
+                                ) {
+                                    Icon(
+                                        imageVector = KronoIcons.Action.More,
+                                        contentDescription = stringResource(R.string.action_more)
+                                    )
+                                }
+                                DropdownMenu(
+                                    expanded = menuExpanded,
+                                    onDismissRequest = { menuExpanded = false }
+                                ) {
+                                    DropdownMenuItem(
+                                        text = { Text(stringResource(R.string.action_delete)) },
+                                        leadingIcon = {
+                                            Icon(
+                                                imageVector = KronoIcons.Action.Delete,
+                                                contentDescription = null
+                                            )
+                                        },
+                                        onClick = {
+                                            menuExpanded = false
+                                            onDeleteGroup()
+                                        }
+                                    )
+                                }
+                            }
+                        },
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(KronoTokens.PresetEditor.rowHeight)
                     )
                 } else {
                     Text(
                         text = group.label.ifBlank { stringResource(R.string.pomodoro_group_default_label, rootIndex + 1) },
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurface,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f)
                     )
-                }
-                IconButton(onClick = onDeleteGroup, modifier = Modifier.size(KronoTokens.Size.iconBox)) {
-                    Icon(
-                        imageVector = KronoIcons.Action.Delete,
-                        contentDescription = stringResource(R.string.action_delete)
-                    )
+                    Box {
+                        IconButton(
+                            onClick = { menuExpanded = true },
+                            modifier = Modifier.size(KronoTokens.PresetEditor.menuSlot)
+                        ) {
+                            Icon(
+                                imageVector = KronoIcons.Action.More,
+                                contentDescription = stringResource(R.string.action_more)
+                            )
+                        }
+                        DropdownMenu(
+                            expanded = menuExpanded,
+                            onDismissRequest = { menuExpanded = false }
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.action_delete)) },
+                                leadingIcon = {
+                                    Icon(
+                                        imageVector = KronoIcons.Action.Delete,
+                                        contentDescription = null
+                                    )
+                                },
+                                onClick = {
+                                    menuExpanded = false
+                                    onDeleteGroup()
+                                }
+                            )
+                        }
+                    }
                 }
             }
 
             if (expanded) {
                 Column(
-                    modifier = Modifier.padding(horizontal = KronoTokens.Spacing.sm),
-                    verticalArrangement = Arrangement.spacedBy(KronoTokens.Spacing.xs)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            start = KronoTokens.PresetEditor.sideInset + KronoTokens.PresetEditor.menuSlot + KronoTokens.PresetEditor.innerGap,
+                            end = KronoTokens.PresetEditor.sideInset
+                        ),
+                    verticalArrangement = Arrangement.spacedBy(KronoTokens.PresetEditor.innerGap)
                 ) {
                     group.phases.forEachIndexed { index, phase ->
                         PomodoroPhaseCard(
@@ -147,35 +198,58 @@ internal fun PomodoroGroupCard(
                             dragDropState = childDragDropState,
                             onEdit = { onEditPhase(phase) },
                             onDelete = { onDeletePhase(phase.id) },
-                            modifier = Modifier.padding(horizontal = KronoTokens.Spacing.sm)
+                            modifier = Modifier.fillMaxWidth()
                         )
                     }
                     OutlinedButton(
                         onClick = onAddPhase,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = KronoTokens.Spacing.xs)
+                            .height(KronoTokens.PresetEditor.rowHeight)
                     ) {
                         Icon(imageVector = KronoIcons.Action.AddCircle, contentDescription = null)
                         Text(stringResource(R.string.pomodoro_card_add))
                     }
-                    Text(
-                        text = stringResource(R.string.pomodoro_section_group_cycles),
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(horizontal = KronoTokens.Settings.panelHorizontalInset)
+                    CycleSliderHeader(
+                        title = stringResource(R.string.pomodoro_section_group_cycles),
+                        value = group.cycles
                     )
-                    AppearanceSlider(
-                        label = stringResource(R.string.pomodoro_group_cycles_inline, group.cycles),
+                    Slider(
                         value = group.cycles.toFloat(),
-                        minLabel = stringResource(R.string.settings_value_one),
-                        maxLabel = stringResource(R.string.settings_value_twelve),
-                        range = 1f..12f,
-                        display = group.cycles.toString(),
-                        onChange = { onUpdateGroup(group.copy(cycles = it.toInt().coerceIn(1, 12))) }
+                        valueRange = 1f..12f,
+                        steps = 10,
+                        onValueChange = { onUpdateGroup(group.copy(cycles = it.toInt().coerceIn(1, 12))) },
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
             }
         }
+    }
+}
+
+@Composable
+internal fun CycleSliderHeader(
+    title: String,
+    value: Int,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(KronoTokens.PresetEditor.innerGap)
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.weight(1f)
+        )
+        Text(
+            text = value.toString(),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.primary,
+            textAlign = TextAlign.End,
+            modifier = Modifier.width(KronoTokens.PresetEditor.sliderValueWidth)
+        )
     }
 }

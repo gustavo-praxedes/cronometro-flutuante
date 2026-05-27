@@ -2,7 +2,6 @@ package com.krono.app.core.util
 
 import android.content.Context
 import android.media.AudioAttributes
-import android.media.MediaPlayer
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
@@ -13,6 +12,7 @@ import android.os.VibratorManager
 import android.util.Log
 import com.krono.app.core.audio.EnvironmentSoundLoop
 import com.krono.app.core.audio.KronoSoundCatalog
+import com.krono.app.core.audio.SecondTickSoundPool
 import com.krono.app.core.audio.SoundPlaybackMode
 import com.krono.app.core.audio.SoundTimingPolicy
 import com.krono.app.core.audio.SoundPreviewPlayer
@@ -21,9 +21,6 @@ import com.krono.app.core.audio.KronoSoundPool
 @Volatile private var lastSecondVibrationAtMs: Long = 0L
 @Volatile private var activeEnvironmentLoopSoundType: String = SOUND_NONE
 private val feedbackHandler = Handler(Looper.getMainLooper())
-private val activeSecondTickLock = Any()
-private val activeSecondTickStreams = mutableSetOf<Int>()
-private val secondTickStopCallbacks = mutableMapOf<Int, Runnable>()
 private const val AUDIO_DELAY_NONE_MS = 0L
 private const val PLAY_PAUSE_VIBRATION_MS = 80L
 private const val SECOND_VIBRATION_MS = 45L
@@ -72,6 +69,7 @@ fun triggerSecondFeedback(
     triggerSecondVibration(context, vibrationEnabled)
     if (!tickSoundEnabled || environmentSoundType == SOUND_NONE) {
         stopActiveTimerSounds("disabled")
+        SecondTickSoundPool.clearSelected()
         return
     }
     val profile = SoundTimingPolicy.profile(environmentSoundType)
@@ -82,26 +80,13 @@ fun triggerSecondFeedback(
             activeEnvironmentLoopSoundType = SOUND_NONE
         }
 
-        // Use SoundPool for low latency ticks
-        val resId = KronoSoundCatalog.environmentResId(environmentSoundType)
-        val streamId = KronoSoundPool.play(context, resId, tickVolume)
-        if (streamId > 0 && profile.maxDurationMs > 0L) {
-            val stopCallback = Runnable {
-                synchronized(activeSecondTickLock) {
-                    activeSecondTickStreams.remove(streamId)
-                    secondTickStopCallbacks.remove(streamId)
-                }
-                KronoSoundPool.stop(streamId)
-            }
-            synchronized(activeSecondTickLock) {
-                activeSecondTickStreams.add(streamId)
-                secondTickStopCallbacks[streamId] = stopCallback
-            }
-            feedbackHandler.postDelayed(stopCallback, profile.maxDurationMs)
-        }
+        val resId = KronoSoundCatalog.secondTickResId(environmentSoundType)
+        SecondTickSoundPool.prepare(context.applicationContext, resId)
+        SecondTickSoundPool.playSelected(context.applicationContext, resId, tickVolume)
         return
     }
 
+    SecondTickSoundPool.clearSelected()
     activeEnvironmentLoopSoundType = environmentSoundType
     EnvironmentSoundLoop.heartbeat(
         context = context,
@@ -114,6 +99,19 @@ fun triggerSecondFeedback(
         endTrimMs = profile.endTrimMs,
         crossfadeMs = profile.crossfadeMs,
         nativeLoop = profile.nativeLoop
+    )
+}
+
+fun prepareSecondTickFeedback(
+    context: Context,
+    tickSoundEnabled: Boolean,
+    environmentSoundType: String
+) {
+    if (!tickSoundEnabled || environmentSoundType == SOUND_NONE) return
+    if (SoundTimingPolicy.profile(environmentSoundType).playbackMode != SoundPlaybackMode.SecondTick) return
+    SecondTickSoundPool.prepare(
+        context = context.applicationContext,
+        resId = KronoSoundCatalog.secondTickResId(environmentSoundType)
     )
 }
 
@@ -144,12 +142,19 @@ fun playPlayPauseBeep(
     context: Context,
     volume: Float,
     soundType: String,
-    @Suppress("UNUSED_PARAMETER") startDelayMs: Long = AUDIO_DELAY_NONE_MS,
-    @Suppress("UNUSED_PARAMETER") maxLifetimeMs: Long = 0L
+    startDelayMs: Long = AUDIO_DELAY_NONE_MS,
+    maxLifetimeMs: Long = 0L
 ) {
     if (soundType == SOUND_NONE) return
     val resId = KronoSoundCatalog.playPauseResId(soundType)
-    KronoSoundPool.play(context, resId, volume)
+    playBundledSound(
+        context = context,
+        resId = resId,
+        volume = volume,
+        usage = AudioAttributes.USAGE_ASSISTANCE_SONIFICATION,
+        maxLifetimeMs = maxLifetimeMs,
+        startDelayMs = startDelayMs
+    )
 }
 
 fun previewPlayPauseSound(
@@ -176,12 +181,19 @@ fun playEnvironmentSound(
     context: Context,
     volume: Float,
     soundType: String,
-    @Suppress("UNUSED_PARAMETER") startDelayMs: Long = AUDIO_DELAY_NONE_MS,
-    @Suppress("UNUSED_PARAMETER") maxLifetimeMs: Long = 0L
+    startDelayMs: Long = AUDIO_DELAY_NONE_MS,
+    maxLifetimeMs: Long = 0L
 ) {
     if (soundType == SOUND_NONE) return
     val resId = KronoSoundCatalog.environmentResId(soundType)
-    KronoSoundPool.play(context, resId, volume)
+    playBundledSound(
+        context = context,
+        resId = resId,
+        volume = volume,
+        usage = AudioAttributes.USAGE_MEDIA,
+        maxLifetimeMs = maxLifetimeMs,
+        startDelayMs = startDelayMs
+    )
 }
 
 fun previewEnvironmentSound(
@@ -289,15 +301,7 @@ fun stopSoundPreview() {
 fun stopActiveTimerSounds(reason: String = "timer stopped") {
     activeEnvironmentLoopSoundType = SOUND_NONE
     EnvironmentSoundLoop.stop(reason)
-    val (streams, callbacks) = synchronized(activeSecondTickLock) {
-        val pendingStreams = activeSecondTickStreams.toList()
-        val pendingCallbacks = secondTickStopCallbacks.values.toList()
-        activeSecondTickStreams.clear()
-        secondTickStopCallbacks.clear()
-        pendingStreams to pendingCallbacks
-    }
-    callbacks.forEach(feedbackHandler::removeCallbacks)
-    streams.forEach(KronoSoundPool::stop)
+    SecondTickSoundPool.stopActiveStream()
 }
 
 fun loadNotificationSoundOptions(@Suppress("UNUSED_PARAMETER") context: Context): List<NotificationSoundOption> {
@@ -340,22 +344,24 @@ private fun pomodoroAlertSoundResId(soundType: String): Int = when (normalizeNot
     else -> KronoSoundCatalog.pomodoroAlertResId(soundType)
 }
 
-private fun playPauseSoundResId(soundType: String): Int = KronoSoundCatalog.playPauseResId(soundType)
-
 private fun playBundledSound(
     context: Context,
     resId: Int,
     volume: Float,
-    @Suppress("UNUSED_PARAMETER") usage: Int,
-    @Suppress("UNUSED_PARAMETER") maxLifetimeMs: Long,
+    usage: Int,
+    maxLifetimeMs: Long,
     startDelayMs: Long,
-    @Suppress("UNUSED_PARAMETER") startOffsetMs: Long = 0L,
-    @Suppress("UNUSED_PARAMETER") endTrimMs: Long = 0L
+    startOffsetMs: Long = 0L,
+    endTrimMs: Long = 0L
 ) {
     val safeVolume = volume.coerceIn(0f, 1f)
     if (safeVolume <= 0f) return
     val play = {
-        KronoSoundPool.play(context.applicationContext, resId, safeVolume)
+        val streamId = KronoSoundPool.play(context.applicationContext, resId, safeVolume)
+        if (streamId > 0 && maxLifetimeMs > 0L) {
+            feedbackHandler.postDelayed({ KronoSoundPool.stop(streamId) }, maxLifetimeMs)
+        }
+        streamId
     }
     if (startDelayMs > 0L) {
         Handler(Looper.getMainLooper()).postDelayed({ play() }, startDelayMs)

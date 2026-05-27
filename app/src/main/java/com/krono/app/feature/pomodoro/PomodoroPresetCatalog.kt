@@ -90,7 +90,7 @@ object PomodoroPresetCatalog {
         val safeIndex = index.coerceAtLeast(1)
         return PomodoroPresetConfig(
             id = "USR_$safeIndex",
-            name = "Preset $safeIndex",
+            name = "Novo preset",
             cycles = DEFAULT_CYCLES,
             items = emptyList(),
             isBuiltIn = false

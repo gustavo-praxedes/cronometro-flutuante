@@ -11,7 +11,7 @@ data class SoundTimingProfile(
     val playbackMode: SoundPlaybackMode = SoundPlaybackMode.AmbientLoop,
     val startOffsetMs: Long = 0L,
     val endTrimMs: Long = 0L,
-    val crossfadeMs: Long = 1_500L,
+    val crossfadeMs: Long = 5_000L,
     val nativeLoop: Boolean = false,
     val staleAfterMs: Long = 1_500L,
     val maxDurationMs: Long = 950L,
@@ -26,7 +26,7 @@ object SoundTimingPolicy {
 
     private val AMBIENT_DEFAULT = SoundTimingProfile(
         playbackMode = SoundPlaybackMode.AmbientLoop,
-        crossfadeMs = 1_500L,
+        crossfadeMs = 5_000L,
         staleAfterMs = 1_500L,
         previewMaxMs = 5_000L
     )
@@ -38,9 +38,9 @@ object SoundTimingPolicy {
     )
 
     private val PROFILES = mapOf(
-        "krono_env_fastticking" to SECOND_TICK_DEFAULT.copy(startOffsetMs = 0L, maxDurationMs = 1_000L),
-        "krono_env_metronome" to SECOND_TICK_DEFAULT.copy(startOffsetMs = 149L, maxDurationMs = 1_000L),
-        "krono_env_ticking" to SECOND_TICK_DEFAULT.copy(startOffsetMs = 0L, maxDurationMs = 1_000L),
+        "krono_env_fastticking" to SECOND_TICK_DEFAULT.copy(startOffsetMs = 105L, maxDurationMs = 900L, alignmentOffsetMs = 0L),
+        "krono_env_metronome" to SECOND_TICK_DEFAULT.copy(startOffsetMs = 140L, maxDurationMs = 850L, alignmentOffsetMs = 0L),
+        "krono_env_ticking" to SECOND_TICK_DEFAULT.copy(startOffsetMs = 535L, maxDurationMs = 850L, alignmentOffsetMs = 0L),
     )
 
     fun profile(soundType: String): SoundTimingProfile = when {

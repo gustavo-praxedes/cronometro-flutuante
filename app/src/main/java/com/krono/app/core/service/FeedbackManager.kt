@@ -4,6 +4,7 @@ import android.content.Context
 import com.krono.app.core.audio.SoundTimingPolicy
 import com.krono.app.core.data.OverlayConfig
 import com.krono.app.core.util.playPomodoroNotificationSound
+import com.krono.app.core.util.prepareSecondTickFeedback
 import com.krono.app.core.util.stopActiveTimerSounds
 import com.krono.app.core.util.triggerCompletionVibration
 import com.krono.app.core.util.triggerSecondFeedback
@@ -45,6 +46,14 @@ class FeedbackManager(private val context: Context) {
             environmentSoundType = config.environmentSoundType,
             startDelayMs = SoundTimingPolicy.profile(config.environmentSoundType).startDelayMs,
             staleAfterMs = SoundTimingPolicy.profile(config.environmentSoundType).staleAfterMs
+        )
+    }
+
+    fun prepareSecondTick(config: OverlayConfig) {
+        prepareSecondTickFeedback(
+            context = context,
+            tickSoundEnabled = config.allSoundsEnabled && config.tickSoundEnabled,
+            environmentSoundType = config.environmentSoundType
         )
     }
 

@@ -84,7 +84,7 @@ class OverlayManager(
                     ?: return@setContent
                 val rawState = toolState.collectAsState().value
 
-                KronoTheme(selectedTheme = config.selectedTheme, appFontSize = config.appFontSize) {
+                KronoTheme(selectedTheme = config.selectedTheme, selectedFont = config.selectedFont, appFontSize = config.appFontSize) {
                     when (toolId) {
                         "pomodoro" -> {
                             val pomodoroState = (rawState as? com.krono.app.feature.pomodoro.PomodoroState)

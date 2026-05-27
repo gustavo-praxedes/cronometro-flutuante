@@ -33,39 +33,63 @@ val AnonymousPro  = FontFamily(Font(googleFont = anonymousProFont,  fontProvider
 val RobotoMono    = FontFamily(Font(googleFont = robotoMonoFont,    fontProvider = provider, weight = FontWeight.Normal))
 val SpaceMono     = FontFamily(Font(googleFont = spaceMonoFont,     fontProvider = provider, weight = FontWeight.Normal))
 val ChivoMono     = FontFamily(ResourceFont(R.font.chivo_mono_regular, weight = FontWeight.Normal))
+val Chivo         = FontFamily(
+    ResourceFont(R.font.chivo_light, weight = FontWeight.Light),
+    ResourceFont(R.font.chivo_regular, weight = FontWeight.Normal)
+)
+val ChivoLight    = FontFamily(
+    ResourceFont(R.font.chivo_light, weight = FontWeight.Normal)
+)
 val AzeretMono    = FontFamily(Font(googleFont = azeretMonoFont,    fontProvider = provider, weight = FontWeight.Normal))
 
 // ── Tipografia Padrão ────────────────────────────────────────
 private val BaseTypography = Typography()
 
-private fun TextStyle.withChivoMono(): TextStyle = copy(
-    fontFamily = ChivoMono,
+private fun TextStyle.withAppFont(fontFamily: FontFamily): TextStyle = copy(
+    fontFamily = fontFamily,
     letterSpacing = 0.sp
 )
 
-val AppTypography = BaseTypography.copy(
-    displayLarge = BaseTypography.displayLarge.withChivoMono(),
-    displayMedium = BaseTypography.displayMedium.withChivoMono(),
-    displaySmall = BaseTypography.displaySmall.withChivoMono(),
-    headlineLarge = BaseTypography.headlineLarge.withChivoMono(),
-    headlineMedium = BaseTypography.headlineMedium.withChivoMono(),
-    headlineSmall = BaseTypography.headlineSmall.withChivoMono(),
-    titleLarge = BaseTypography.titleLarge.withChivoMono(),
-    titleMedium = BaseTypography.titleMedium.withChivoMono(),
-    titleSmall = BaseTypography.titleSmall.withChivoMono(),
-    bodyLarge = BaseTypography.bodyLarge.copy(
-        fontFamily = ChivoMono,
-        fontWeight = FontWeight.Normal,
-        fontSize = 16.sp,
-        lineHeight = 24.sp,
-        letterSpacing = 0.sp,
-    ),
-    bodyMedium = BaseTypography.bodyMedium.withChivoMono(),
-    bodySmall = BaseTypography.bodySmall.withChivoMono(),
-    labelLarge = BaseTypography.labelLarge.withChivoMono(),
-    labelMedium = BaseTypography.labelMedium.withChivoMono(),
-    labelSmall = BaseTypography.labelSmall.withChivoMono()
-)
+fun appTypography(selectedFont: String): Typography {
+    val fontFamily = appFontFamily(selectedFont)
+    return BaseTypography.copy(
+        displayLarge = BaseTypography.displayLarge.withAppFont(fontFamily),
+        displayMedium = BaseTypography.displayMedium.withAppFont(fontFamily),
+        displaySmall = BaseTypography.displaySmall.withAppFont(fontFamily),
+        headlineLarge = BaseTypography.headlineLarge.withAppFont(fontFamily),
+        headlineMedium = BaseTypography.headlineMedium.withAppFont(fontFamily),
+        headlineSmall = BaseTypography.headlineSmall.withAppFont(fontFamily),
+        titleLarge = BaseTypography.titleLarge.withAppFont(fontFamily),
+        titleMedium = BaseTypography.titleMedium.withAppFont(fontFamily),
+        titleSmall = BaseTypography.titleSmall.withAppFont(fontFamily),
+        bodyLarge = BaseTypography.bodyLarge.copy(
+            fontFamily = fontFamily,
+            fontWeight = FontWeight.Normal,
+            fontSize = 16.sp,
+            lineHeight = 24.sp,
+            letterSpacing = 0.sp,
+        ),
+        bodyMedium = BaseTypography.bodyMedium.withAppFont(fontFamily),
+        bodySmall = BaseTypography.bodySmall.withAppFont(fontFamily),
+        labelLarge = BaseTypography.labelLarge.withAppFont(fontFamily),
+        labelMedium = BaseTypography.labelMedium.withAppFont(fontFamily),
+        labelSmall = BaseTypography.labelSmall.withAppFont(fontFamily)
+    )
+}
+
+fun appFontFamily(selectedFont: String): FontFamily =
+    when (KronoFontOption.entries.find { it.name == selectedFont } ?: KronoFontOption.CHIVO) {
+        KronoFontOption.CHIVO          -> Chivo
+        KronoFontOption.CHIVO_LIGHT    -> ChivoLight
+        KronoFontOption.JETBRAINS_MONO -> JetBrainsMono
+        KronoFontOption.FIRA_CODE      -> FiraCode
+        KronoFontOption.ANONYMOUS_PRO  -> AnonymousPro
+        KronoFontOption.ROBOTO_MONO    -> RobotoMono
+        KronoFontOption.COMMIT_MONO    -> SpaceMono
+        KronoFontOption.AZERET_MONO    -> AzeretMono
+        KronoFontOption.CHIVO_MONO     -> ChivoMono
+        else -> Chivo
+    }
 
 /**
  * Retorna a FontFamily baseada na opção selecionada.
