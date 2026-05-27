@@ -1,10 +1,11 @@
 # ✨ Novidades
-- feat: Adicionado Timer.
-- feat: Adicionado Pomodoro.
-- feat: Adicionado Settings.
+- feat: Adicionado Pomodoro
+- feat: Adicionado Timer
 
 # 🐛 Correções
 
 
 # 🔧 Manutenção
 
+
+# 📝 Documentação
