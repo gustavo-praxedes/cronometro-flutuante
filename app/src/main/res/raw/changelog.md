@@ -1,11 +1,13 @@
 # ✨ Novidades
-- feat: Adicionado Pomodoro
-- feat: Adicionado Timer
+- feat: Adicionado pomodoro
+- feat: Adicionado timer
+
 
 # 🐛 Correções
 
 
 # 🔧 Manutenção
+
 
 
 # 📝 Documentação

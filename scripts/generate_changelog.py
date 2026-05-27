@@ -92,11 +92,7 @@ def main():
     if not content: content = "- Melhorias de estabilidade e correções internas."
     content = content.strip()
 
-    # Atualiza Android Raw
-    os.makedirs(os.path.dirname(ANDROID_RAW_CHANGELOG), exist_ok=True)
-    with open(ANDROID_RAW_CHANGELOG, "w", encoding="utf-8") as f:
-        f.write(content)
-    
+
     # Atualiza Raiz
     update_root_changelog(version, content)
     print("✅ Sincronização concluída.")
