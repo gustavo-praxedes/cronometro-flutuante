@@ -2,6 +2,13 @@
 
 Histórico de mudanças do Krono.
 
+## [3.4.1](https://github.com/gustavo-praxedes/krono/compare/v3.4.0...v3.4.1) (2026-05-28)
+
+
+### 🐛 Correções
+
+* Correção de textos cortados em preset editor ([2eb2e71](https://github.com/gustavo-praxedes/krono/commit/2eb2e71bef05e44c5356126b8a68e78e18865da6))
+
 ## [3.4.0](https://github.com/gustavo-praxedes/krono/compare/v3.3.1...v3.4.0) (2026-05-27)
 
 
