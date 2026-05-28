@@ -1,14 +1,11 @@
 # ✨ Novidades
-- feat: Adicionado pomodoro
-- feat: Adicionado timer
-- feat: Redesign de settings
-
+- feat: Adicionado pomodoro e timer
 
 # 🐛 Correções
-
+fix: Pequenos bugs corrigidos
 
 # 🔧 Manutenção
-
+- chore: Redesign de settings
 
 
 # 📝 Documentação

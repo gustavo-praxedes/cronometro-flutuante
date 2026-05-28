@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -32,6 +33,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.krono.app.core.ui.theme.KronoTokens
 import kotlinx.coroutines.flow.distinctUntilChanged
 
 @Composable
@@ -43,11 +45,9 @@ fun CountdownScreenWheelPicker(
     modifier: Modifier = Modifier,
     fadeColor: Color = MaterialTheme.colorScheme.background
 ) {
-    val itemHeight = 100.dp
+    val itemHeight = KronoTokens.Wheel.screenItemHeight
     val visibleItems = 3
     val wheelHeight = itemHeight * visibleItems
-    val groupWidth = 120.dp
-    val colonWidth = 18.dp
 
     val initH = (totalSeconds / 3600L).toInt().coerceIn(0, 99)
     val initM = ((totalSeconds % 3600L) / 60L).toInt().coerceIn(0, 59)
@@ -60,14 +60,25 @@ fun CountdownScreenWheelPicker(
 
     fun emit() = latestOnValueChange(h.intValue * 3600L + m.intValue * 60L + s.intValue)
 
-    Box(
+    BoxWithConstraints(
         modifier = modifier
             .fillMaxWidth()
             .height(wheelHeight),
         contentAlignment = Alignment.Center
     ) {
+        val colonWidth = KronoTokens.Wheel.screenSeparatorWidth
+        val columnWidth = (((maxWidth - colonWidth * 2) / 3).value)
+            .coerceIn(
+                KronoTokens.Wheel.screenColumnMinWidth.value,
+                KronoTokens.Wheel.screenColumnMaxWidth.value
+            )
+            .dp
+        val effectiveNumberFontSize = (numberFontSize.value * (columnWidth.value / KronoTokens.Wheel.screenFontReferenceWidth.value)
+            .coerceIn(KronoTokens.Wheel.screenMinFontScale, 1f)).sp
+        val rowWidth = columnWidth * 3 + colonWidth * 2
+
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.width(rowWidth),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -75,15 +86,15 @@ fun CountdownScreenWheelPicker(
                 rangeStart = 0,
                 rangeSize = 100,
                 initial = initH,
-                columnWidth = groupWidth,
+                columnWidth = columnWidth,
                 itemHeight = itemHeight,
-                numberFontSize = numberFontSize,
+                numberFontSize = effectiveNumberFontSize,
                 fontFamily = fontFamily,
                 onSelected = { h.intValue = it; emit() }
             )
             ColonAnchor(
                 itemHeight = itemHeight,
-                numberFontSize = numberFontSize,
+                numberFontSize = effectiveNumberFontSize,
                 fontFamily = fontFamily,
                 width = colonWidth
             )
@@ -91,15 +102,15 @@ fun CountdownScreenWheelPicker(
                 rangeStart = 0,
                 rangeSize = 60,
                 initial = initM,
-                columnWidth = groupWidth,
+                columnWidth = columnWidth,
                 itemHeight = itemHeight,
-                numberFontSize = numberFontSize,
+                numberFontSize = effectiveNumberFontSize,
                 fontFamily = fontFamily,
                 onSelected = { m.intValue = it; emit() }
             )
             ColonAnchor(
                 itemHeight = itemHeight,
-                numberFontSize = numberFontSize,
+                numberFontSize = effectiveNumberFontSize,
                 fontFamily = fontFamily,
                 width = colonWidth
             )
@@ -107,9 +118,9 @@ fun CountdownScreenWheelPicker(
                 rangeStart = 0,
                 rangeSize = 60,
                 initial = initS,
-                columnWidth = groupWidth,
+                columnWidth = columnWidth,
                 itemHeight = itemHeight,
-                numberFontSize = numberFontSize,
+                numberFontSize = effectiveNumberFontSize,
                 fontFamily = fontFamily,
                 onSelected = { s.intValue = it; emit() }
             )

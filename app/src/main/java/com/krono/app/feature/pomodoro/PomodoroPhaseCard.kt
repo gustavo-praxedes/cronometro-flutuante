@@ -84,7 +84,7 @@ internal fun PomodoroPhaseCard(
         ) {
             Text(
                 text = phase.label.ifBlank { stringResource(R.string.pomodoro_interval_default_label, index + 1) },
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,

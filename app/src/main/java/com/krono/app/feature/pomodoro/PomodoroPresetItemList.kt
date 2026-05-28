@@ -2,6 +2,7 @@ package com.krono.app.feature.pomodoro
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -13,9 +14,11 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Slider
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.krono.app.R
 import com.krono.app.core.ui.theme.KronoIcons
@@ -104,19 +107,31 @@ internal fun PomodoroPresetItemList(
                 onClick = onAddCard,
                 modifier = Modifier
                     .weight(1f)
-                    .height(KronoTokens.PresetEditor.rowHeight)
+                    .height(KronoTokens.PresetEditor.rowHeight),
+                contentPadding = PaddingValues(horizontal = KronoTokens.Spacing.sm)
             ) {
                 Icon(imageVector = KronoIcons.Action.AddCircle, contentDescription = null)
-                androidx.compose.material3.Text(stringResource(R.string.pomodoro_card_add))
+                Text(
+                    text = stringResource(R.string.pomodoro_card_add),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    softWrap = false
+                )
             }
             OutlinedButton(
                 onClick = onAddGroup,
                 modifier = Modifier
                     .weight(1f)
-                    .height(KronoTokens.PresetEditor.rowHeight)
+                    .height(KronoTokens.PresetEditor.rowHeight),
+                contentPadding = PaddingValues(horizontal = KronoTokens.Spacing.sm)
             ) {
                 Icon(imageVector = KronoIcons.Action.ListAltAdd, contentDescription = null)
-                androidx.compose.material3.Text(stringResource(R.string.pomodoro_group_add))
+                Text(
+                    text = stringResource(R.string.pomodoro_group_add),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    softWrap = false
+                )
             }
         }
 

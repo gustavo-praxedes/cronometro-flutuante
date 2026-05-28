@@ -107,6 +107,7 @@ fun UnifiedOverlay(
                 ).size.width.toDp()
             }
         }
+        val timerTextWidth = measuredTimerWidth + dimensions.timerTextSideInset + dimensions.timerTextSideInset
         val returnToScreenDescription = stringResource(R.string.action_return_to_screen)
         val beepDescription = stringResource(R.string.settings_all_sounds_label)
         val mainButtons = remember(buttons, returnToScreenDescription, onClose, onNavigateToApp) {
@@ -144,7 +145,7 @@ fun UnifiedOverlay(
             gap = dimensions.controlGap
         )
         val contentWidth = maxOf(
-            measuredTimerWidth,
+            timerTextWidth,
             minimumMainRowWidth,
             minimumQuickRowWidth
         )
@@ -221,7 +222,7 @@ fun UnifiedOverlay(
                     style = timerTextStyle,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
-                        .width(measuredTimerWidth)
+                        .width(timerTextWidth)
                         .offset(x = dimensions.timerVisualOffsetX)
                 )
 

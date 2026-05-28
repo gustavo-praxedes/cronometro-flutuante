@@ -208,12 +208,13 @@ object KronoTokens {
 
     object PresetEditor {
         val rowHeight = Button.height
+        val inputHeight = 72.dp
         val itemGap = Spacing.sm
         val innerGap = Spacing.xs
-        val sideInset = Settings.panelHorizontalInset
+        val sideInset = Spacing.md
         val nestedInset = Spacing.sm
         val menuSlot = Size.iconBox
-        val timeWidth = 86.dp
+        val timeWidth = 76.dp
         val sliderValueWidth = Component.sliderValueWidth
     }
 
@@ -228,6 +229,12 @@ object KronoTokens {
         val labelFontSize     = 10.sp
         val selectedFontSize  = 26.sp
         val separatorFontSize = 22.sp
+        val screenItemHeight = 104.dp
+        val screenColumnMaxWidth = 120.dp
+        val screenColumnMinWidth = 80.dp
+        val screenSeparatorWidth = 16.dp
+        val screenFontReferenceWidth = 96.dp
+        val screenMinFontScale = 0.82f
 
         const val rotationFactor = 20f
         const val cameraDistance = 8f
@@ -265,8 +272,9 @@ object KronoTokens {
         // Tipografia do tempo
         val timerVisualOffsetX = (0).dp
         val timerFontSize  = 34.sp
-        val timerLineHeight = 34.sp
+        val timerLineHeight = 40.sp
         val timerLetterSpacing = (0).sp
+        val timerTextSideInset = 3.dp
 
         // Larguras por formato exibido
         val timerWidthFull = 168.dp

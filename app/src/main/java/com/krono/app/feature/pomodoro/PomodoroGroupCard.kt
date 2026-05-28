@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -80,7 +81,13 @@ internal fun PomodoroGroupCard(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(KronoTokens.PresetEditor.rowHeight)
+                    .heightIn(
+                        min = if (expanded) {
+                            KronoTokens.PresetEditor.inputHeight
+                        } else {
+                            KronoTokens.PresetEditor.rowHeight
+                        }
+                    )
                     .padding(horizontal = KronoTokens.PresetEditor.sideInset),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(KronoTokens.PresetEditor.innerGap)
@@ -137,7 +144,7 @@ internal fun PomodoroGroupCard(
                         },
                         modifier = Modifier
                             .weight(1f)
-                            .height(KronoTokens.PresetEditor.rowHeight)
+                            .heightIn(min = KronoTokens.PresetEditor.inputHeight)
                     )
                 } else {
                     Text(

@@ -4,6 +4,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -40,11 +41,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.krono.app.core.data.TimerDisplayFormat
@@ -246,23 +252,14 @@ fun CountdownScreen(
                             )
                         }
                     } else {
-                        Text(
-                            text = currentRemainingMs.toOverlayFormattedTime(
+                        CountdownScreenTimeText(
+                            timeDisplay = currentRemainingMs.toOverlayFormattedTime(
                                 showHours = showHours,
                                 showMinutes = showMinutes,
                                 showSeconds = showSeconds,
                                 showMilliseconds = showMilliseconds
                             ),
-                            fontSize = 76.sp,
-                            fontWeight = FontWeight.Normal,
-                            fontFamily = timerFontFamily(selectedFont),
-                            style = TextStyle(
-                                lineHeight = 90.sp,
-                                platformStyle = PlatformTextStyle(includeFontPadding = false)
-                            ),
-                            color = MaterialTheme.colorScheme.onBackground,
-                            maxLines = 1,
-                            softWrap = false
+                            fontFamily = timerFontFamily(selectedFont)
                         )
                     }
 
@@ -430,6 +427,62 @@ fun CountdownScreen(
         )
     }
 
+}
+
+@Composable
+private fun CountdownScreenTimeText(
+    timeDisplay: String,
+    fontFamily: FontFamily,
+    modifier: Modifier = Modifier
+) {
+    BoxWithConstraints(
+        modifier = modifier.fillMaxWidth(),
+        contentAlignment = Alignment.Center
+    ) {
+        val density = LocalDensity.current
+        val textMeasurer = rememberTextMeasurer()
+        val baseFontSize = 76.sp
+        val baseLineHeight = 90.sp
+        val baseStyle = TextStyle(
+            fontSize = baseFontSize,
+            lineHeight = baseLineHeight,
+            fontWeight = FontWeight.Normal,
+            fontFamily = fontFamily,
+            platformStyle = PlatformTextStyle(includeFontPadding = false)
+        )
+        val fontScale = remember(timeDisplay, baseStyle, maxWidth, density, textMeasurer) {
+            with(density) {
+                val measuredWidth = textMeasurer.measure(
+                    text = AnnotatedString(timeDisplay),
+                    style = baseStyle,
+                    maxLines = 1,
+                    softWrap = false
+                ).size.width.toDp().value
+                if (measuredWidth <= 0f) {
+                    1f
+                } else {
+                    val safeWidth = (maxWidth.value - KronoTokens.Spacing.xs.value * 2f).coerceAtLeast(1f)
+                    (safeWidth / measuredWidth).coerceIn(0.55f, 1f)
+                }
+            }
+        }
+        Text(
+            text = timeDisplay,
+            fontSize = (baseFontSize.value * fontScale).sp,
+            lineHeight = (baseLineHeight.value * fontScale).sp,
+            fontWeight = FontWeight.Normal,
+            fontFamily = fontFamily,
+            style = baseStyle.copy(
+                fontSize = (baseFontSize.value * fontScale).sp,
+                lineHeight = (baseLineHeight.value * fontScale).sp
+            ),
+            color = MaterialTheme.colorScheme.onBackground,
+            maxLines = 1,
+            softWrap = false,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
 }
 
 
